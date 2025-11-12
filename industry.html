@@ -7,10 +7,10 @@
   <link rel="icon" href="https://img.freepik.com/premium-vector/face-scan-icon_933463-79729.jpg" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Moul&display=swap');
@@ -19,8 +19,7 @@
     #sidebar { transition: transform .3s ease-in-out; }
     #sidebar.is-open { transform: translateX(0); }
     .nav-link.active { background:#4f46e5; color:#fff; box-shadow:0 4px 14px rgba(79,70,229,.39) }
-    /* IMPORTANT: remove mirror. Keep centering transform only */
-    .video-container video { position:absolute; top:50%; left:50%; width:100%; height:100%; object-fit:cover; transform:translate(-50%,-50%); }
+    .video-container video { position:absolute; top:50%; left:50%; width:100%; height:100%; object-fit:cover; transform:translate(-50%,-50%); /* removed mirror */ }
     .video-container { position:relative; border-radius:50%; overflow:hidden; border:5px solid transparent; transition:all .4s ease; box-shadow:0 0 15px rgba(0,0,0,.5); }
     .video-container.ready { border-color:#4ade80; box-shadow:0 0 25px rgba(74,222,128,.6); }
     .video-container.fail { border-color:#f43f5e; box-shadow:0 0 25px rgba(244,63,94,.6); }
@@ -58,7 +57,7 @@
   <div id="login-screen">
     <div class="login-card text-center">
       <img src="https://i.postimg.cc/FHBn0Fdf/di3-copy.png" alt="Logo" class="w-24 h-24 rounded-full mx-auto mb-4 shadow-lg">
-      <h1 id="login-title" class="text-2xl font-bold text-white khmer-title mb-2">ឩស្សាហកម្មឌីជីថល</h1>
+      <h1 id="login-title" class="text-2xl font-bold text-white khmer-title mb-2">ចូលគណនី</h1>
       <p id="login-subtitle" class="text-slate-400 mb-6">សូមជ្រើសរើសឈ្មោះរបស់អ្នក</p>
 
       <div id="admin-selection-area">
@@ -106,8 +105,20 @@
           <li><a href="#" id="nav-scan" class="nav-link active flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"><i class="fas fa-camera-retro fa-fw"></i><span class="font-semibold">ថតរូប</span></a></li>
           <li><a href="#" id="nav-list" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"><i class="fas fa-users fa-fw"></i><span class="font-semibold">ទិន្នន័យរូបភាពនិស្សិត</span></a></li>
           <li><a href="#" id="nav-records" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"><i class="fas fa-database fa-fw"></i><span class="font-semibold">រូបភាពបានរក្សាទុក</span></a></li>
+          <li><a href="#" id="nav-history" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"><i class="fas fa-chart-line fa-fw"></i><span class="font-semibold">History & Analytics</span></a></li>
           <li><a href="#" id="nav-storage" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"><i class="fas fa-link fa-fw"></i><span class="font-semibold">Storage Links</span></a></li>
         </ul>
+
+        <div id="sidebar-profile-btn" class="p-4 border-t border-slate-700/50">
+          <button id="open-profile-btn" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-700/50">
+            <img id="sidebar-profile-img" class="w-8 h-8 rounded-full" src="https://i.postimg.cc/FHBn0Fdf/di3-copy.png" alt="Admin" crossorigin="anonymous">
+            <div class="text-left flex-1">
+              <div id="sidebar-profile-name" class="font-semibold text-white">Not signed</div>
+              <div id="sidebar-profile-role" class="text-xs text-slate-400">Role: -</div>
+            </div>
+            <i class="fas fa-user-cog text-slate-400"></i>
+          </button>
+        </div>
 
         <div id="admin-profile-sidebar" class="hidden p-4 border-t border-slate-700/50">
           <div class="flex items-center gap-3">
@@ -212,6 +223,42 @@
             </div>
           </div>
 
+          <!-- PAGE: HISTORY & ANALYTICS -->
+          <div id="page-history" class="hidden main-content rounded-2xl p-6 h-full flex flex-col">
+            <div class="flex items-center justify-between mb-4 gap-4">
+              <h1 class="text-2xl text-white khmer-title">History & Analytics</h1>
+              <div class="flex gap-2 items-center">
+                <input type="date" id="history-start" class="filter-select p-2" />
+                <input type="date" id="history-end" class="filter-select p-2" />
+                <select id="history-admin-filter" class="filter-select p-2"><option value="all">All Admins</option></select>
+                <button id="history-apply" class="bg-indigo-600 text-white py-2 px-3 rounded-lg">Apply</button>
+                <button id="export-csv" class="bg-green-600 text-white py-2 px-3 rounded">Export CSV</button>
+                <button id="export-json" class="bg-slate-600 text-white py-2 px-3 rounded">Export JSON</button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div class="p-4 rounded-lg bg-slate-700/50"><p class="text-slate-400">Total actions</p><p id="hist-total" class="text-2xl font-bold">0</p></div>
+              <div class="p-4 rounded-lg bg-green-800/30"><p class="text-slate-400">Uploads</p><p id="hist-uploads" class="text-2xl font-bold">0</p></div>
+              <div class="p-4 rounded-lg bg-red-800/30"><p class="text-slate-400">Deletes</p><p id="hist-deletes" class="text-2xl font-bold">0</p></div>
+            </div>
+
+            <div class="mb-4">
+              <canvas id="hist-chart" height="120"></canvas>
+            </div>
+
+            <div id="hist-list" class="table-container overflow-y-auto">
+              <table class="w-full text-left text-slate-300">
+                <thead class="bg-slate-700/50 sticky top-0"><tr><th class="p-3">Timestamp</th><th class="p-3">Admin</th><th class="p-3">Action</th><th class="p-3">Student</th><th class="p-3">Image</th></tr></thead>
+                <tbody id="hist-list-body"></tbody>
+              </table>
+            </div>
+
+            <div class="flex justify-center mt-4">
+              <button id="history-load-more" class="bg-indigo-600 text-white py-2 px-4 rounded">Load more</button>
+            </div>
+          </div>
+
           <!-- PAGE: STORAGE -->
           <div id="page-storage" class="hidden main-content rounded-2xl p-6 h-full flex flex-col">
             <h1 class="text-2xl text-white khmer-title mb-6">Storage & Links</h1>
@@ -223,7 +270,50 @@
     </div>
   </div>
 
-  <!-- MODAL -->
+  <!-- PROFILE MODAL -->
+  <div id="profile-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal">
+    <div class="modal-content w-full max-w-md p-6 rounded-2xl shadow-2xl text-left">
+      <div class="flex items-center gap-4 mb-4">
+        <img id="profile-modal-img" class="w-16 h-16 rounded-full" src="" alt="Admin" crossorigin="anonymous">
+        <div>
+          <h3 id="profile-modal-name" class="text-xl font-bold"></h3>
+          <div id="profile-modal-role" class="text-slate-400"></div>
+          <div id="profile-modal-position" class="text-slate-400 text-sm mt-1"></div>
+        </div>
+        <div class="ml-auto">
+          <button id="profile-logout" class="text-red-400 hover:text-red-300">Logout</button>
+        </div>
+      </div>
+
+      <div id="profile-actions" class="space-y-3">
+        <div id="profile-admin-actions" class="hidden">
+          <button id="open-admin-manager" class="w-full bg-indigo-600 text-white py-2 rounded-lg">Admin Management (Superadmin)</button>
+          <button id="open-history-from-profile" class="w-full bg-slate-600 text-white py-2 rounded-lg">View History & Analytics</button>
+        </div>
+        <div id="profile-viewer-actions">
+          <p class="text-slate-400 text-sm">You can view student images and stats as permitted by your role.</p>
+        </div>
+      </div>
+
+      <div class="mt-4 text-right">
+        <button id="close-profile-modal" class="w-28 bg-indigo-600 text-white py-2 rounded-lg">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN MANAGER MODAL -->
+  <div id="admin-manager-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal">
+    <div class="modal-content w-full max-w-3xl p-6 rounded-2xl shadow-2xl text-left">
+      <h3 class="text-xl font-bold mb-4">Admin Management</h3>
+      <div id="admin-manager-list" class="space-y-2 max-h-72 overflow-y-auto"></div>
+      <div class="mt-4 flex gap-3">
+        <button id="admin-manager-refresh" class="bg-slate-600 text-white py-2 px-4 rounded-lg">Refresh</button>
+        <button id="admin-manager-close" class="bg-indigo-600 text-white py-2 px-4 rounded-lg">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL (generic) -->
   <div id="modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal">
     <div class="modal-content w-full max-w-sm p-6 rounded-2xl shadow-2xl text-center">
       <div id="modal-icon" class="w-16 h-16 mx-auto mb-4"></div>
@@ -233,10 +323,14 @@
   </div>
 
   <script>
-    // === BACKEND ENDPOINT ===
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyPBipQMaJ9d8UQg2BdVXPw6ycZHb4hxcNfiJEW4LFZvceXo62UjkDCZEP7JwqJw_4u/exec';
+    // ============================
+    // CONFIG
+    // ============================
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyM-9UZbpL8GW6agRejPVGalKcTQPIdmm5-Xa0BWnpgrJiqahHFIRSE0LKH7n15AjNQ/exec'; // <<--- REPLACE with your deployed web app URL
+    const SECOND_SHEET_ID = '1_Kgl8UQXRsVATt_BOHYQjVWYKkRIBA12R-qnsBoSUzc';
+    const SECOND_SHEET_NAME = 'បញ្ជឺឈ្មោះរួម';
 
-    // === DOM refs ===
+    // DOM refs (essentials)
     const video = document.getElementById('video'), captureCanvas = document.getElementById('capture-canvas'),
       photoPreview = document.getElementById('photo-preview'), uploadBtn = document.getElementById('upload-btn'),
       retakeBtn = document.getElementById('retake-btn'), cameraSection = document.getElementById('camera-section'),
@@ -248,10 +342,12 @@
       modalMessage = document.getElementById('modal-message'), modalButtons = document.getElementById('modal-buttons');
 
     const pageScan = document.getElementById('page-scan'), pageRecords = document.getElementById('page-records'),
-      pageList = document.getElementById('page-list'), pageStorage = document.getElementById('page-storage');
+      pageList = document.getElementById('page-list'), pageStorage = document.getElementById('page-storage'),
+      pageHistory = document.getElementById('page-history');
 
     const navScan = document.getElementById('nav-scan'), navRecords = document.getElementById('nav-records'),
-      navList = document.getElementById('nav-list'), navStorage = document.getElementById('nav-storage');
+      navList = document.getElementById('nav-list'), navStorage = document.getElementById('nav-storage'),
+      navHistory = document.getElementById('nav-history');
 
     const sidebar = document.getElementById('sidebar'), menuBtn = document.getElementById('menu-btn'),
       sidebarBackdrop = document.getElementById('sidebar-backdrop'), logoutBtn = document.getElementById('logout-btn');
@@ -276,7 +372,37 @@
       adminProfileImgHeader = document.getElementById('admin-profile-img-header'), adminProfileSidebar = document.getElementById('admin-profile-sidebar'),
       adminProfileImgSidebar = document.getElementById('admin-profile-img-sidebar'), adminNameSidebar = document.getElementById('admin-name-sidebar');
 
-    // === Icons & state ===
+    // Profile & Admin Manager refs
+    const sidebarProfileImg = document.getElementById('sidebar-profile-img');
+    const sidebarProfileName = document.getElementById('sidebar-profile-name');
+    const sidebarProfileRole = document.getElementById('sidebar-profile-role');
+
+    const openProfileBtn = document.getElementById('open-profile-btn');
+    const profileModal = document.getElementById('profile-modal');
+    const profileModalImg = document.getElementById('profile-modal-img');
+    const profileModalName = document.getElementById('profile-modal-name');
+    const profileModalRole = document.getElementById('profile-modal-role');
+    const profileModalPosition = document.getElementById('profile-modal-position');
+    const profileLogout = document.getElementById('profile-logout');
+    const profileAdminActions = document.getElementById('profile-admin-actions');
+
+    const adminManagerModal = document.getElementById('admin-manager-modal');
+    const adminManagerList = document.getElementById('admin-manager-list');
+    const adminManagerRefresh = document.getElementById('admin-manager-refresh');
+    const adminManagerClose = document.getElementById('admin-manager-close');
+
+    const historyApplyBtn = document.getElementById('history-apply');
+    const historyStart = document.getElementById('history-start');
+    const historyEnd = document.getElementById('history-end');
+    const historyAdminFilter = document.getElementById('history-admin-filter');
+    const histTotal = document.getElementById('hist-total');
+    const histUploads = document.getElementById('hist-uploads');
+    const histDeletes = document.getElementById('hist-deletes');
+    const histListBody = document.getElementById('hist-list-body');
+    const histChartCtx = document.getElementById('hist-chart').getContext('2d');
+    const historyLoadMoreBtn = document.getElementById('history-load-more');
+
+    // icons & modal helper
     const icons = {
       success:`<svg class="w-full h-full text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
       error:`<svg class="w-full h-full text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
@@ -285,16 +411,14 @@
       choice:`<svg class="w-full h-full text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m4 13-4-4M3 10h12M3 15h4M4 19h16a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1z"/></svg>`
     };
 
-    // DEFAULT to back camera everywhere
-    const DEFAULT_FACING = 'environment'; // scan page uses back camera by default
-
+    // state
     let studentsData=[], savedRecordsData=[], allStudentsListData=[], adminData=[],
-        currentStream, faceApiInterval, stableFrames=0, currentFacingMode=DEFAULT_FACING,
+        currentStream, faceApiInterval, stableFrames=0, currentFacingMode='environment',
         selectedStudent=null, currentCameraMode='auto',
         loggedInAdmin=null, adminFaceMatcher=null, adminScanInterval=null, isScanning=false,
         isUploading=false;
 
-    // === Session helpers (auto-skip login) ===
+    // session helpers
     const SESSION_KEY = 'di_admin_session_v1';
     function saveAdminSession({ name, imageUrl }) {
       try { localStorage.setItem(SESSION_KEY, JSON.stringify({ name, imageUrl, ts: Date.now() })); } catch (_) {}
@@ -304,9 +428,9 @@
     }
     function clearAdminSession() { try { localStorage.removeItem(SESSION_KEY); } catch (_) {} }
 
-    // === Modal ===
+    // modal helper
     function showModal(type, message, actions={}) {
-      modalIcon.innerHTML = icons[type];
+      modalIcon.innerHTML = icons[type] || '';
       modalMessage.textContent = message;
       modal.classList.remove('hidden');
       modalButtons.innerHTML = '';
@@ -328,7 +452,7 @@
       }
     }
 
-    // === Face API models ===
+    // Face API model loader
     async function loadModels(){
       const MODEL_URL='./models';
       await Promise.all([
@@ -339,23 +463,29 @@
       ]);
     }
 
-    // === Admin Login ===
+    // ============================
+    // Admin list + login (admin list from backend)
+    // ============================
     async function fetchAdmins(){
-      const res = await fetch(`${SCRIPT_URL}?action=getAdmins`);
-      if(!res.ok) throw new Error(`Server error: ${res.status}`);
-      const data = await res.json();
-      if (Array.isArray(data?.data)) adminData = data.data.map(o => [o.name, o.imageUrl]);
-      else if (Array.isArray(data)) adminData = data.filter(r => r[0] && r[1]);
-      else throw new Error('Unexpected admin payload.');
-      if (!adminData.length) throw new Error('No admin data found.');
-      populateAdminSelect();
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getAdmins`);
+        if(!res.ok) throw new Error('Failed to fetch admins');
+        const data = await res.json();
+        adminData = Array.isArray(data.data) ? data.data : [];
+        populateAdminSelect();
+        populateHistoryAdminFilter();
+      } catch (e) {
+        console.warn('fetchAdmins failed:', e);
+        adminListLoader.classList.add('hidden');
+        adminSelect.classList.remove('hidden');
+      }
     }
 
     function populateAdminSelect(){
       adminSelect.innerHTML = '<option value="">-- សូមជ្រើសរើសឈ្មោះ --</option>';
       adminData.forEach((a,i)=>{
         const opt=document.createElement('option');
-        opt.value=i; opt.textContent=a[0];
+        opt.value=i; opt.textContent=a.name;
         adminSelect.appendChild(opt);
       });
       adminListLoader.classList.add('hidden');
@@ -369,24 +499,40 @@
     proceedToScanBtn.onclick = () => {
       const idx = adminSelect.value;
       if (!idx) return;
-      loggedInAdmin = adminData[idx]; // [name, imageUrl]
+      const candidate = adminData[idx];
+      if (candidate && candidate.disabled) { showModal('error','This admin account has been disabled. Contact a superadmin.'); return; }
+      loggedInAdmin = [candidate.name, candidate.imageUrl];
       adminSelectionArea.classList.add('hidden');
       adminScanArea.classList.remove('hidden');
       adminScanStatus.textContent='Starting camera...';
-      startAdminLoginScan();
+      startAdminLoginScan(candidate);
     };
 
-    async function startAdminLoginScan(){
-      adminScanStatus.textContent = `Loading reference for ${loggedInAdmin[0]}...`;
-      adminFaceMatcher = await createFaceMatcher(loggedInAdmin[1]);
+    // Create FaceMatcher from admin image
+    async function createFaceMatcherForAdmin(imageUrl, label){
+      try{
+        const img = await faceapi.fetchImage(imageUrl);
+        const det = await faceapi.detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
+                                .withFaceLandmarks().withFaceDescriptor();
+        if(!det) return null;
+        const desc = new faceapi.LabeledFaceDescriptors(label,[det.descriptor]);
+        return new faceapi.FaceMatcher(desc, 0.5);
+      }catch(e){
+        console.error('createFaceMatcherForAdmin error', e);
+        return null;
+      }
+    }
+
+    // Admin login: ALWAYS use front camera
+    async function startAdminLoginScan(candidate){
+      adminScanStatus.textContent = `Loading reference for ${candidate.name}...`;
+      adminFaceMatcher = await createFaceMatcherForAdmin(candidate.imageUrl, candidate.name);
       if(!adminFaceMatcher){
         adminScanStatus.textContent='Could not load reference image. Please go back.';
         adminVideoWrapper.classList.add('fail'); return;
       }
       try{
-        // DEFAULT: back camera (environment)
-        // ADMIN LOGIN uses FRONT camera
-        const stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode: 'user', width:640, height:480 }});
+        const stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user', width:640, height:480 }});
         currentStream=stream; adminVideo.srcObject=stream;
         adminVideo.onloadedmetadata=()=>{
           adminScanStatus.textContent='Look at the camera. Auto-scanning...';
@@ -394,21 +540,6 @@
         };
       }catch(err){
         showModal('error','Please allow camera access.'); resetToAdminSelection();
-      }
-    }
-
-    async function createFaceMatcher(imageUrl){
-      try{
-        const img = await faceapi.fetchImage(imageUrl);
-        const det = await faceapi.detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
-                                .withFaceLandmarks().withFaceDescriptor();
-        if(!det){ adminScanStatus.textContent='No face found in profile photo.'; return null; }
-        const desc = new faceapi.LabeledFaceDescriptors(loggedInAdmin[0],[det.descriptor]);
-        return new faceapi.FaceMatcher(desc, 0.5);
-      }catch(e){
-        console.error(e);
-        adminScanStatus.innerHTML='Error loading reference image (check CORS).';
-        return null;
       }
     }
 
@@ -461,15 +592,13 @@
     }
     adminBackBtn.onclick = resetToAdminSelection;
 
-    // === After successful login: save session + remove login page ===
+    // After successful login
     async function onLoginSuccess(){
       clearInterval(adminScanInterval);
       stopCamera();
 
-      // persist session
       saveAdminSession({ name: loggedInAdmin[0], imageUrl: loggedInAdmin[1] });
 
-      // set profile
       adminProfileImgHeader.crossOrigin='anonymous';
       adminProfileImgSidebar.crossOrigin='anonymous';
       adminProfileImgHeader.src = loggedInAdmin[1];
@@ -478,49 +607,30 @@
       adminProfileImgHeader.classList.remove('hidden');
       adminProfileSidebar.classList.remove('hidden');
 
-      // remove login screen permanently
       loginScreen.classList.add('hidden');
       if (loginScreen.parentNode) loginScreen.parentNode.removeChild(loginScreen);
 
-      // show app
       mainAppWrapper.classList.remove('hidden');
 
+      renderProfileUI();
       await fetchStudents();
     }
 
-    // === Logout clears session ===
-    logoutBtn.onclick = (e)=>{ 
-      e.preventDefault(); 
-      clearAdminSession(); 
-      location.reload(); 
-    };
+    logoutBtn.onclick = (e)=>{ e.preventDefault(); clearAdminSession(); location.reload(); };
+    profileLogout.onclick = (e)=>{ e.preventDefault(); clearAdminSession(); location.reload(); };
 
-    // === Students & Records ===
-    // REPLACED: fetchStudents with defensive filtering for 'បុគ្គលិក'
+    // ============================
+    // Students & Records
+    // ============================
     async function fetchStudents(){
       try{
         const res = await fetch(`${SCRIPT_URL}?action=getStudents`);
         if(!res.ok) throw new Error(`Server error: ${res.status}`);
         const data = await res.json();
-        if(data.status === 'error') throw new Error(`Script Error: ${data.message}`);
-
-        // data is expected to be an array with header row -> slice(1)
-        studentsData = data.slice(1) || [];
-
-        // DEFENSIVE: remove any rows whose Group (column index 3) is 'បុគ្គលិក'
-        // studentsData rows are: [ID, Name, Class, Group, UploadCount]
-        studentsData = studentsData.filter(s => {
-          const g = (s[3] || '').toString().trim();
-          return g !== 'បុគ្គលិក';
-        });
-
-        // keep a master copy used by class filter
+        studentsData = data.slice(1);
         allStudentsListData = studentsData;
-
         populateStudentList();
-      }catch(e){
-        showModal('error', `Could not fetch student data: ${e.message}`);
-      }
+      }catch(e){ showModal('error',`Could not fetch student data: ${e.message}`); }
     }
 
     function populateStudentList(filter=''){
@@ -546,49 +656,28 @@
 
     function showCameraModeSelection(){
       showModal('choice','សូមជ្រើសរើសប្រតិបត្តិកាមេរ៉ា',{
-        // DEFAULT to back camera for both options
-        'ថតរូបស្វ័យប្រវត្តិ':{ callback:()=>startCamera(DEFAULT_FACING,'auto'), className:"w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition" },
-        'ថតរូបដោយខ្លួនឯង':{ callback:()=>startCamera(DEFAULT_FACING,'manual'), className:"w-full bg-slate-600 text-white py-3 rounded-lg font-semibold hover:bg-slate-700 transition" }
+        'ថតរូបស្វ័យប្រវត្តិ':{ callback:()=>startCamera('environment','auto'), className:"w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition" },
+        'ថតរូបដោយខ្លួនឯង':{ callback:()=>startCamera('environment','manual'), className:"w-full bg-slate-600 text-white py-3 rounded-lg font-semibold hover:bg-slate-700 transition" }
       });
     }
 
-    // REPLACED: populateClassFilter to exclude 'បុគ្គលិក' groups
     function populateClassFilter(records, filterElement){
-      // records: array like savedRecordsData where r[3] is class, r[4] is group
-      const classes = [...new Set(
-        records
-          .filter(r => ((r[4] || '').toString().trim() !== 'បុគ្គលិក')) // skip ក្រុម 'បុគ្គលិក'
-          .map(r => r[3])
-          .filter(Boolean)
-      )];
-      filterElement.innerHTML = '<option value="all">All Classes</option>';
-      classes.sort().forEach(c => filterElement.innerHTML += `<option value="${c}">${c}</option>`);
+      const classes=[...new Set(records.map(r=>r[3]).filter(Boolean))];
+      filterElement.innerHTML='<option value="all">All Classes</option>';
+      classes.sort().forEach(c=>filterElement.innerHTML+=`<option value="${c}">${c}</option>`);
     }
 
-    // REPLACED: displaySavedRecords filters out 'បុគ្គលិក'
     async function displaySavedRecords(){
       recordsLoading.style.display='block'; recordsTable.classList.add('hidden');
       try{
-        const res = await fetch(`${SCRIPT_URL}?action=getSavedData`);
+        const res=await fetch(`${SCRIPT_URL}?action=getSavedData`);
         if(!res.ok) throw new Error(`Server error: ${res.status}`);
-        const data = await res.json();
-
-        // data expected with header row -> slice(1)
-        savedRecordsData = (data.slice(1) || []);
-
-        // DEFENSIVE: InfoUsers rows layout: [serial, name, id, class, group, imageUrl, ...]
-        // Filter out any saved records where group === 'បុគ្គលិក' (column index 4)
-        savedRecordsData = savedRecordsData.filter(r => {
-          const grp = (r[4] || '').toString().trim();
-          return grp !== 'បុគ្គលិក';
-        });
-
+        const data=await res.json();
+        savedRecordsData=data.slice(1);
         populateClassFilter(savedRecordsData, recordsClassFilter);
         filterRecordsTable();
         recordsLoading.style.display='none'; recordsTable.classList.remove('hidden');
-      }catch(e){
-        recordsLoading.innerHTML = `<p class="text-red-400">Error: ${e.message}</p>`;
-      }
+      }catch(e){ recordsLoading.innerHTML=`<p class="text-red-400">Error: ${e.message}</p>`; }
     }
 
     function filterRecordsTable(){
@@ -625,38 +714,27 @@
     }
 
     async function handleDelete(serialNumber, imageUrl){
+      // server-side permission enforced; frontend only shows modal and sends adminName
       showModal('confirm','តើអ្នកប្រាកដទេថាចង់លុបរូបភាពនេះ?',{
-        'បោះបង់':{ callback:null, className:"w-full bg-slate-600 text-white py-2 rounded-lg font-semibold hover:bg-slate-700 transition" },
-        'លុប':{ callback:async()=>{
+        'Cancel':{ callback:null, className:"w-full bg-slate-600 text-white py-2 rounded-lg font-semibold hover:bg-slate-700 transition" },
+        'Delete':{ callback:async()=>{
           showModal('loading','កំពុងលុប...');
           try{
-            const res=await fetch(SCRIPT_URL,{ method:'POST', body:JSON.stringify({action:'delete', serialNumber, imageUrl}), redirect:'follow' });
+            const res=await fetch(SCRIPT_URL,{ method:'POST', body:JSON.stringify({action:'delete', serialNumber, imageUrl, adminName: loggedInAdmin ? loggedInAdmin[0] : ''}), redirect:'follow' });
             if(!res.ok) throw new Error(`Server error: ${res.status}`);
             const r=await res.json();
             if(r.status==='success'){
-          try {
-            if (r.imageUrl) {
-              await writeImageLinksToSecondarySheet({ id: selectedStudent ? selectedStudent[0] : null, imageUrl: r.imageUrl, columns:['AA','AJ'], rangeStart:9, rangeEnd:866 });
-            }
-          } catch (ee) { console.warn('Secondary sheet (AA/AJ) update failed:', ee); }
-          showModal('success',"រូបភាពត្រូវបានលុប!",{ 'OK':{ callback:async()=>{ await fetchStudents(); await displaySavedRecords(); await displayStudentList(); } }});
+              showModal('success',"រូបភាពត្រូវបានលុប!",{ 'OK':{ callback:async()=>{ await fetchStudents(); await displaySavedRecords(); populateStudentList(); } }});
             }else throw new Error(r.message||"Unknown server error.");
           }catch(e){ showModal('error',`Delete failed: ${e.message}`); }
         }, className:"w-full bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition" }
       });
     }
 
-    // REPLACED: populateListClassFilterV2 excludes 'បុគ្គលិក'
     function populateListClassFilterV2(){
-      // allStudentsListData rows: [ID, Name, Class, Group, UploadCount]
-      const classes = [...new Set(
-        allStudentsListData
-          .filter(s => ((s[3] || '').toString().trim() !== 'បុគ្គលិក')) // ensure not 'បុគ្គលិក'
-          .map(s => s[2])
-          .filter(Boolean)
-      )];
-      listClassFilter.innerHTML = '<option value="all">All Students</option><option value="with_photos">With Photos</option>';
-      classes.sort().forEach(c => listClassFilter.innerHTML += `<option value="${c}">${c}</option>`);
+      const classes=[...new Set(allStudentsListData.map(s=>s[2]).filter(Boolean))];
+      listClassFilter.innerHTML='<option value="all">All Students</option><option value="with_photos">With Photos</option>';
+      classes.sort().forEach(c=>listClassFilter.innerHTML+=`<option value="${c}">${c}</option>`);
     }
 
     function filterStudentListTable(){
@@ -682,55 +760,14 @@
       listPendingCount.textContent=arr.length-done;
     }
 
-    async function displayStudentList(){
-      listLoading.style.display='block'; listTable.classList.add('hidden');
-      if (savedRecordsData.length === 0) {
-        try {
-          const res = await fetch(`${SCRIPT_URL}?action=getSavedData`);
-          if (!res.ok) throw new Error(`Server error: ${res.status}`);
-          const data = await res.json();
-          savedRecordsData = data.slice(1);
-          // Defensive filter for savedRecordsData as well
-          savedRecordsData = savedRecordsData.filter(r => {
-            const grp = (r[4] || '').toString().trim();
-            return grp !== 'បុគ្គលិក';
-          });
-        } catch (e) { console.error("Could not pre-fetch records for images:", e); }
-      }
-      populateListClassFilterV2();
-      filterStudentListTable();
-      listLoading.style.display='none'; listTable.classList.remove('hidden');
-    }
-
-    // === Camera & Capture ===
-    // Helper to write the captured image link into the Secondary sheet (AA9:AA900)
-    async function writeImageLinksToSecondarySheet({ id, imageUrl, columns=['AA','AJ'], rangeStart=9, rangeEnd=866 }) {
-      const requests = columns.map((col) => ({
-        action: 'writeSecondaryLink',
-        spreadsheetId: '1_Kgl8UQXRsVATt_BOHYQjVWYKkRIBA12R-qnsBoSUzc',
-        sheetName: 'បញ្ជឺឈ្មោះរួម',
-        column: col,
-        rangeStart,
-        rangeEnd,
-        matchBy: 'ID',
-        id,
-        imageUrl
-      }));
-      // Send the writes in parallel; if one fails, throw
-      const resps = await Promise.all(requests.map(payload => fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload), redirect: 'follow' })));
-      for (const res of resps) {
-        if (!res.ok) throw new Error(`Server error: ${res.status}`);
-        const j = await res.json();
-        if (j.status !== 'success') throw new Error(j.message || 'Unknown server error.');
-      }
-      return true;
-    }
-
-    // === Camera & Capture ===
-    async function startCamera(facingMode=DEFAULT_FACING, mode='auto'){
+    // ============================
+    // Camera & Capture (scan page uses back camera by default)
+    // ============================
+    const DEFAULT_FACING = 'environment'; // scan page default: back camera
+    async function startCamera(facingMode='environment', mode='auto'){
       currentFacingMode=facingMode; currentCameraMode=mode;
       stableFrames = 0;
-      subtitle.textContent = `Scanning for: ${selectedStudent ? selectedStudent[1] : ''}`;
+      subtitle.textContent = `Scanning for: ${selectedStudent[1]}`;
       cameraSection.classList.remove('hidden'); selectionArea.classList.add('hidden');
       switchCameraBtn.classList.remove('hidden'); backBtn.classList.remove('hidden');
       uploadBtn.classList.add('hidden'); retakeBtn.classList.add('hidden'); photoPreview.classList.add('hidden');
@@ -767,7 +804,7 @@
       clearInterval(faceApiInterval);
       const ctx=captureCanvas.getContext('2d'); const size=512;
       captureCanvas.width=size; captureCanvas.height=size;
-      // IMPORTANT: no mirroring for user/front camera. Draw as-is.
+      // Do NOT mirror (no translate/scale)
       const vRatio=video.videoWidth/video.videoHeight;
       let sx=0, sy=0, sw=video.videoWidth, sh=video.videoHeight;
       if(vRatio>1){ sw=sh; sx=(video.videoWidth-sw)/2; } else { sh=sw; sy=(video.videoHeight-sh)/2; }
@@ -790,23 +827,26 @@
 
     manualCaptureBtn.onclick = captureFace;
 
+    // upload sends adminName to backend
     uploadBtn.onclick = async ()=>{
       if(isUploading) return;
       if(!selectedStudent){ showModal('error','Could not find student data.'); return; }
+      // check role on client to show nicer UX; actual permission enforced server-side
+      const currAdmin = adminData.find(a => a.name === (loggedInAdmin ? loggedInAdmin[0] : ''));
+      if (currAdmin && currAdmin.role === 'viewer') { showModal('error','Permission denied: viewer cannot upload'); return; }
+
       const imageData=captureCanvas.toDataURL('image/jpeg', .9).split(',')[1];
       showModal('loading','កំពុងបញ្ជូនរូបភាព...');
       isUploading = true;
       try{
-        const res=await fetch(SCRIPT_URL,{ method:'POST', body:JSON.stringify({ id:selectedStudent[0], name:selectedStudent[1], class:selectedStudent[2], group:selectedStudent[3], imageData }), redirect:'follow' });
+        const res=await fetch(SCRIPT_URL,{ method:'POST', body:JSON.stringify({ id:selectedStudent[0], name:selectedStudent[1], class:selectedStudent[2], group:selectedStudent[3], imageData, adminName: loggedInAdmin?loggedInAdmin[0]:'' }), redirect:'follow' });
         if(!res.ok) throw new Error(`Server error: ${res.status}`);
         const r=await res.json();
         if(r.status==='success'){
-          // Try to write the image link to the Secondary sheet (AA column)
+          // ensure secondary sheet AA/AJ updated; backend already does this in createRecord, but we fire a writeSecondaryLink for UI immediacy (optional)
           try {
-            if (r.imageUrl) {
-              await writeImageLinkToSecondarySheet({ id: selectedStudent[0], imageUrl: r.imageUrl });
-            }
-          } catch (ee) { console.warn('Secondary sheet update failed:', ee); }
+            await fetch(SCRIPT_URL,{ method:'POST', body:JSON.stringify({ action:'writeSecondaryLink', spreadsheetId: SECOND_SHEET_ID, sheetName: SECOND_SHEET_NAME, id: selectedStudent[0], imageUrl: r.imageUrl })});
+          } catch(e){}
           showModal('success',"រូបភាពរក្សាទុកបានជោគជ័យ!",{ 'OK':{ callback:async()=>{ resetToSelection(); await fetchStudents(); } }});
         } else throw new Error(r.message||"Unknown server error.");
       }catch(e){ showModal('error',`Upload failed: ${e.message}`); }
@@ -814,12 +854,13 @@
     };
 
     retakeBtn.onclick = ()=>{ photoPreview.classList.add('hidden'); uploadBtn.classList.add('hidden'); retakeBtn.classList.add('hidden'); videoWrapper.classList.remove('hidden'); faceStatus.classList.remove('hidden'); stableFrames=0; startCamera(currentFacingMode,currentCameraMode); };
-    // Toggle between back and front. Both will NOT mirror.
-    switchCameraBtn.onclick = ()=> startCamera(currentFacingMode===DEFAULT_FACING ? 'user' : DEFAULT_FACING, currentCameraMode);
+    switchCameraBtn.onclick = ()=> startCamera(currentFacingMode==='user' ? 'environment' : 'user', currentCameraMode);
     backBtn.onclick = ()=> resetToSelection();
     studentSearchInput.oninput = ()=> populateStudentList(studentSearchInput.value);
 
-    // === Storage Page ===
+    // ============================
+    // Storage links
+    // ============================
     function populateStorageLinks() {
       const container = document.getElementById('storage-links-container');
       const links = {
@@ -848,10 +889,12 @@
       }
     }
 
-    // === Navigation ===
+    // ============================
+    // Navigation wiring
+    // ============================
     const closeSidebar = () => { sidebar.classList.remove('is-open'); sidebarBackdrop.classList.add('hidden'); };
-    const navLinks = [navScan, navList, navRecords, navStorage];
-    const pages = [pageScan, pageList, pageRecords, pageStorage];
+    const navLinks = [navScan, navList, navRecords, navHistory, navStorage];
+    const pages = [pageScan, pageList, pageRecords, pageHistory, pageStorage];
 
     navLinks.forEach((link, index) => {
       link.onclick = (e) => {
@@ -864,6 +907,7 @@
         if (pages[index] === pageRecords) displaySavedRecords();
         if (pages[index] === pageList) displayStudentList();
         if (pages[index] === pageStorage) populateStorageLinks();
+        if (pages[index] === pageHistory) { histPage = 1; loadHistoryPage(true); }
         closeSidebar();
       }
     });
@@ -875,19 +919,181 @@
     recordsSearchInput.oninput = () => filterRecordsTable();
     listSearchInput.oninput = () => filterStudentListTable();
 
-    // === Initial load with session restore ===
+    // ============================
+    // Profile & Admin Manager UI
+    // ============================
+    function renderProfileUI() {
+      if (!loggedInAdmin) return;
+      sidebarProfileImg.src = loggedInAdmin[1];
+      sidebarProfileName.textContent = loggedInAdmin[0];
+      const a = adminData.find(x => x.name === loggedInAdmin[0]);
+      const role = a && a.role ? a.role : (a ? a.role : 'admin');
+      sidebarProfileRole.textContent = `Role: ${role}`;
+      profileModalImg.src = loggedInAdmin[1];
+      profileModalName.textContent = loggedInAdmin[0];
+      profileModalRole.textContent = `Role: ${role}`;
+      profileModalPosition.textContent = a && a.position ? a.position : '';
+      if (role === 'superadmin') profileAdminActions.classList.remove('hidden'); else profileAdminActions.classList.add('hidden');
+    }
+
+    openProfileBtn.onclick = () => { profileModal.classList.remove('hidden'); renderProfileUI(); };
+    document.getElementById('close-profile-modal').onclick = () => profileModal.classList.add('hidden');
+
+    document.getElementById('open-admin-manager').onclick = async () => {
+      profileModal.classList.add('hidden');
+      adminManagerModal.classList.remove('hidden');
+      await loadAdminManagerList();
+    };
+
+    adminManagerRefresh.onclick = loadAdminManagerList;
+    adminManagerClose.onclick = () => adminManagerModal.classList.add('hidden');
+
+    async function loadAdminManagerList(){
+      adminManagerList.innerHTML = '<div class="p-4 text-slate-400">Loading admins...</div>';
+      try {
+        const res = await fetch(`${SCRIPT_URL}?action=getAdmins`);
+        const json = await res.json();
+        const adata = Array.isArray(json.data) ? json.data : [];
+        adminManagerList.innerHTML = '';
+        for (let i = 0; i < adata.length; i++){
+          const item = adata[i];
+          const name = item.name;
+          const imageUrl = item.imageUrl;
+          const role = item.role || 'admin';
+          const disabled = item.disabled === true;
+          const card = document.createElement('div');
+          card.className = 'flex items-center gap-3 p-3 bg-slate-700/40 rounded-lg';
+          card.innerHTML = `
+            <img src="${imageUrl}" class="w-12 h-12 rounded-full" crossorigin="anonymous">
+            <div class="flex-1">
+              <div class="font-semibold">${name}</div>
+              <div class="text-sm text-slate-400 mb-2">role: <span class="admin-role">${role}</span> ${disabled ? ' (disabled)' : ''}</div>
+              <div class="flex gap-2 items-center">
+                <select class="filter-select admin-role-select">
+                  <option value="superadmin">Superadmin</option>
+                  <option value="admin">Admin</option>
+                  <option value="subadmin">Subadmin</option>
+                  <option value="viewer">Viewer</option>
+                </select>
+                <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="admin-disabled"> Disabled</label>
+                <button class="bg-red-600 text-white py-1 px-2 rounded ml-auto admin-update-btn">Save</button>
+              </div>
+            </div>
+          `;
+          const select = card.querySelector('.admin-role-select');
+          select.value = role;
+          const chk = card.querySelector('.admin-disabled');
+          chk.checked = disabled;
+          const updateBtn = card.querySelector('.admin-update-btn');
+          updateBtn.onclick = async () => {
+            if (!confirm(`Save changes for ${name} (role=${select.value}, disabled=${chk.checked})?`)) return;
+            const payload = { action: 'setAdminRole', name, role: select.value, disabled: chk.checked, requestedBy: loggedInAdmin ? loggedInAdmin[0] : '' };
+            try {
+              const r = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+              const jr = await r.json();
+              if (jr.status === 'success') {
+                card.querySelector('.admin-role').textContent = select.value;
+                alert('Updated');
+                await fetchAdmins();
+              } else {
+                alert('Update failed: ' + jr.message);
+              }
+            } catch (e) { alert('Update error: ' + e.message); }
+          };
+          adminManagerList.appendChild(card);
+        }
+        // enable sortable visual reorder
+        new Sortable(adminManagerList, { animation: 150, ghostClass: 'bg-slate-600/40' });
+      } catch (e) {
+        adminManagerList.innerHTML = `<div class="p-4 text-red-400">Error loading admins: ${e.message}</div>`;
+      }
+    }
+
+    // ============================
+    // History & Analytics: pagination, chart, exports
+    // ============================
+    let histChart = null;
+    let histPage = 1, histPageSize = 50, histLoading = false;
+
+    function populateHistoryAdminFilter(){
+      historyAdminFilter.innerHTML = '<option value="all">All Admins</option>';
+      (adminData || []).forEach(a => {
+        historyAdminFilter.innerHTML += `<option value="${a.name}">${a.name}</option>`;
+      });
+    }
+
+    async function loadHistoryPage(reset=false) {
+      if (histLoading) return;
+      histLoading = true;
+      if (reset) { histPage = 1; histListBody.innerHTML = ''; }
+      const s = historyStart.value ? historyStart.value : '';
+      const e = historyEnd.value ? historyEnd.value : '';
+      const adminName = historyAdminFilter.value === 'all' ? '' : historyAdminFilter.value;
+      const q = `${SCRIPT_URL}?action=getAdminActions&page=${histPage}&pageSize=${histPageSize}${s? '&start='+encodeURIComponent(s):''}${e? '&end='+encodeURIComponent(e):''}${adminName? '&admin='+encodeURIComponent(adminName):''}`;
+      try {
+        const res = await fetch(q);
+        const jr = await res.json();
+        (jr.rows || []).forEach(r => {
+          const tr = document.createElement('tr'); tr.className = 'border-b border-slate-700';
+          tr.innerHTML = `<td class="p-3">${new Date(r.timestamp).toLocaleString()}</td><td class="p-3">${r.admin}</td><td class="p-3">${r.action}</td><td class="p-3">${r.studentName} (${r.studentId})</td><td class="p-3"><a href="${r.imageUrl}" target="_blank">View</a></td>`;
+          histListBody.appendChild(tr);
+        });
+        histTotal.textContent = jr.total || 0;
+        histUploads.textContent = Object.values(jr.byAdmin || {}).reduce((a,b)=>a+(b.uploads||0),0) || 0;
+        histDeletes.textContent = Object.values(jr.byAdmin || {}).reduce((a,b)=>a+(b.deletes||0),0) || 0;
+        if ((histPage * histPageSize) >= (jr.total || 0)) historyLoadMoreBtn.style.display='none'; else historyLoadMoreBtn.style.display='inline-block';
+        // update chart
+        const byDay = jr.byDay || {};
+        const labels = Object.keys(byDay).sort();
+        const uploads = labels.map(d => byDay[d].uploads || 0);
+        const deletes = labels.map(d => byDay[d].deletes || 0);
+        if (histChart) histChart.destroy();
+        histChart = new Chart(histChartCtx, {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [
+              { label: 'Uploads', data: uploads },
+              { label: 'Deletes', data: deletes }
+            ]
+          },
+          options: { responsive:true, scales:{ x:{ stacked:false }, y:{ stacked:false } } }
+        });
+        histPage++;
+        histLoading=false;
+      } catch (e) { histLoading=false; showModal('error','Failed loading history: ' + e.message); }
+    }
+
+    historyLoadMoreBtn.onclick = ()=> loadHistoryPage(false);
+    historyApplyBtn.onclick = ()=> { histPage=1; loadHistoryPage(true); };
+
+    document.getElementById('export-csv').onclick = () => {
+      const s = historyStart.value ? historyStart.value : '';
+      const e = historyEnd.value ? historyEnd.value : '';
+      const adminName = historyAdminFilter.value === 'all' ? '' : historyAdminFilter.value;
+      const url = `${SCRIPT_URL}?action=exportAdminActions&format=csv${s? '&start='+encodeURIComponent(s):''}${e? '&end='+encodeURIComponent(e):''}${adminName? '&admin='+encodeURIComponent(adminName):''}`;
+      window.open(url, '_blank');
+    };
+    document.getElementById('export-json').onclick = () => {
+      const s = historyStart.value ? historyStart.value : '';
+      const e = historyEnd.value ? historyEnd.value : '';
+      const adminName = historyAdminFilter.value === 'all' ? '' : historyAdminFilter.value;
+      const url = `${SCRIPT_URL}?action=exportAdminActions&format=json${s? '&start='+encodeURIComponent(s):''}${e? '&end='+encodeURIComponent(e):''}${adminName? '&admin='+encodeURIComponent(adminName):''}`;
+      window.open(url, '_blank');
+    };
+
+    // ============================
+    // Initial load & session
+    // ============================
     window.onload = async ()=>{
       document.body.insertAdjacentHTML('afterbegin', `
         <div id="initial-loading" class="fixed inset-0 flex flex-col items-center justify-center bg-slate-900 z-50">
           <img src="https://i.postimg.cc/FHBn0Fdf/di3-copy.png" alt="Logo" class="w-24 h-24 rounded-full mb-4 shadow-lg">
           <p class="text-slate-300 text-lg">កំពុងទាញវិភាគផ្ទៃមុខ...</p>
         </div>`);
-
       await loadModels();
-
       const session = loadAdminSession();
       try { await fetchAdmins(); } catch (e) { console.warn('fetchAdmins failed:', e); }
-
       if (session && session.name && session.imageUrl) {
         loggedInAdmin = [session.name, session.imageUrl];
         adminProfileImgHeader.crossOrigin='anonymous';
@@ -897,16 +1103,14 @@
         adminNameSidebar.textContent = session.name;
         adminProfileImgHeader.classList.remove('hidden');
         adminProfileSidebar.classList.remove('hidden');
-
         loginScreen.classList.add('hidden');
         if (loginScreen.parentNode) loginScreen.parentNode.removeChild(loginScreen);
         mainAppWrapper.classList.remove('hidden');
-
+        renderProfileUI();
         await fetchStudents();
       }
-
       document.getElementById('initial-loading').style.display='none';
     };
   </script>
 </body>
-</html>
+</html> 
