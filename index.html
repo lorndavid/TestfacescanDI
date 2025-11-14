@@ -311,7 +311,7 @@
           id="sidebar"
           class="fixed top-0 left-0 w-72 h-full bg-slate-800/90 backdrop-blur-lg z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col"
         >
-          <div class="text-center py-5 mb-2 px-4">
+          <div class="text-center py-5 mb-2 px-4 border-b border-slate-700/40">
             <div class="flex items-center gap-3 justify-center">
               <img
                 id="sidebar-logo"
@@ -331,14 +331,14 @@
             </div>
           </div>
 
-          <nav class="px-4 flex-1 overflow-y-auto">
+          <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
             <ul class="space-y-2">
               <li>
                 <a
                   href="#"
                   id="nav-scan"
                   class="nav-link active flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"
-                  ><i class="fas fa-camera-retro fa-fw"></i
+                  ><i class="fas fa-camera-retro fa-fw w-5 text-center"></i
                   ><span class="font-semibold">ថតរូប</span></a
                 >
               </li>
@@ -347,7 +347,7 @@
                   href="#"
                   id="nav-list"
                   class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"
-                  ><i class="fas fa-users fa-fw"></i
+                  ><i class="fas fa-users fa-fw w-5 text-center"></i
                   ><span class="font-semibold">ទិន្នន័យរូបភាពនិស្សិត</span></a
                 >
               </li>
@@ -356,7 +356,7 @@
                   href="#"
                   id="nav-records"
                   class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"
-                  ><i class="fas fa-database fa-fw"></i
+                  ><i class="fas fa-database fa-fw w-5 text-center"></i
                   ><span class="font-semibold">រូបភាពបានរក្សាទុក</span></a
                 >
               </li>
@@ -365,30 +365,40 @@
                   href="#"
                   id="nav-storage"
                   class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"
-                  ><i class="fas fa-link fa-fw"></i
+                  ><i class="fas fa-link fa-fw w-5 text-center"></i
                   ><span class="font-semibold">Storage Links</span></a
                 >
               </li>
-
               <li>
                 <a
                   href="#"
                   id="nav-profile"
                   class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"
-                  ><i class="fas fa-user-circle fa-fw"></i
+                  ><i class="fas fa-user-circle fa-fw w-5 text-center"></i
                   ><span class="font-semibold">Profile</span></a
                 >
               </li>
+              <li>
+                <a
+                  href="#"
+                  id="nav-admin"
+                  class="nav-link hidden flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"
+                  ><i class="fas fa-shield-halved fa-fw w-5 text-center"></i
+                  ><span class="font-semibold">Admin Panel</span></a
+                >
+              </li>
             </ul>
+          </nav>
 
+          <div class="p-4 border-t border-slate-700/40 space-y-4">
             <div
               id="admin-profile-compact"
-              class="mt-6 p-4 rounded-lg bg-slate-700/30 hidden"
+              class="p-2 rounded-lg hover:bg-slate-700/50 cursor-pointer hidden"
             >
               <div class="flex items-center gap-3">
                 <img
                   id="admin-profile-img-sidebar"
-                  class="w-12 h-12 rounded-full"
+                  class="w-10 h-10 rounded-full"
                   src=""
                   alt="Admin"
                   crossorigin="anonymous"
@@ -402,94 +412,40 @@
                   </p>
                 </div>
               </div>
-              <div class="mt-3 grid grid-cols-3 gap-2 text-center text-sm">
-                <div class="p-2 bg-slate-800/40 rounded">
-                  <div id="stat-total" class="font-bold">-</div>
-                  <div class="text-slate-400">ទិន្នន័យ</div>
-                </div>
-                <div class="p-2 bg-slate-800/40 rounded">
-                  <div id="stat-mycount" class="font-bold">-</div>
-                  <div class="text-slate-400">រូបខ្ញុំ</div>
-                </div>
-                <div class="p-2 bg-slate-800/40 rounded">
-                  <div id="stat-others" class="font-bold">-</div>
-                  <div class="text-slate-400">ផ្សេងៗ</div>
-                </div>
-              </div>
-            </div>
-          </nav>
-
-          <div class="p-4 border-t border-slate-700/40">
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center gap-3">
-                <i class="fas fa-cog text-slate-300"></i>
-                <div class="text-sm">
-                  <div class="font-semibold">Settings</div>
-                  <div class="text-xs text-slate-400">Appearance & access</div>
-                </div>
-              </div>
-              <button id="toggle-settings" class="text-sm text-indigo-300">
-                Edit
-              </button>
             </div>
 
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <div class="text-sm">Theme</div>
-                <div class="flex items-center gap-2">
-                  <button
-                    id="btn-theme-toggle"
-                    class="px-3 py-1 rounded bg-slate-700/40"
-                  >
-                    Dark
-                  </button>
-                </div>
+            <div class="grid grid-cols-3 gap-2 text-center text-sm">
+              <div class="p-2 bg-slate-800/40 rounded">
+                <div id="stat-total" class="font-bold">-</div>
+                <div class="text-xs text-slate-400">ទិន្នន័យ</div>
               </div>
-
-              <div class="flex items-center justify-between">
-                <div class="text-sm">Language</div>
-                <div class="flex items-center gap-2">
-                  <button
-                    id="btn-lang"
-                    class="px-3 py-1 rounded bg-slate-700/40"
-                  >
-                    KH
-                  </button>
-                </div>
+              <div class="p-2 bg-slate-800/40 rounded">
+                <div id="stat-mycount" class="font-bold">-</div>
+                <div class="text-xs text-slate-400">រូបខ្ញុំ</div>
               </div>
-
-              <div class="flex items-center justify-between">
-                <div class="text-sm">Background color</div>
-                <input
-                  id="bg-color-picker"
-                  type="color"
-                  value="#0f172a"
-                  class="w-10 h-8 p-0 border-0 rounded"
-                />
+              <div class="p-2 bg-slate-800/40 rounded">
+                <div id="stat-others" class="font-bold">-</div>
+                <div class="text-xs text-slate-400">ផ្សេងៗ</div>
               </div>
+            </div>
 
-              <div
-                id="face-scan-toggle-row"
-                class="flex items-center justify-between hidden"
+            <div class="flex items-center justify-between gap-2">
+              <a
+                href="#"
+                id="logout-btn"
+                class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-slate-300 bg-red-600/50 hover:bg-red-600"
               >
-                <div class="text-sm">Allow face-scan</div>
-                <input type="checkbox" id="face-scan-enabled" class="w-6 h-6" />
-              </div>
-
-              <div class="mt-3 flex gap-2">
-                <button
-                  id="logout-btn"
-                  class="flex-1 bg-red-600 text-white py-2 rounded text-sm"
-                >
-                  Logout
-                </button>
-                <button
-                  id="profile-btn"
-                  class="flex-1 bg-indigo-600 text-white py-2 rounded text-sm"
-                >
-                  Profile
-                </button>
-              </div>
+                <i class="fas fa-sign-out-alt fa-fw"></i>
+                <span class="font-medium text-sm">Logout</span>
+              </a>
+              <a
+                href="#"
+                id="nav-settings-btn"
+                class="hidden h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-lg text-slate-300 bg-slate-700/50 hover:bg-slate-600"
+                title="Settings"
+              >
+                <i class="fas fa-cog fa-fw"></i>
+              </a>
             </div>
           </div>
         </aside>
@@ -820,6 +776,63 @@
                 class="grid grid-cols-2 md:grid-cols-4 gap-4"
               ></div>
             </div>
+            
+            <div
+              id="page-admin"
+              class="hidden main-content rounded-2xl p-6 h-full flex flex-col"
+            >
+              <h1 class="text-2xl text-white khmer-title mb-6">
+                Admin Panel (Superadmin)
+              </h1>
+              
+              <div class="space-y-4 max-w-md">
+                  <h3 class="text-lg font-semibold text-indigo-300">Appearance</h3>
+                  <div class="flex items-center justify-between p-3 bg-slate-800/40 rounded-lg">
+                    <div class="text-sm">Theme</div>
+                    <div class="flex items-center gap-2">
+                      <button
+                        id="btn-theme-toggle"
+                        class="px-3 py-1 rounded bg-slate-700/40"
+                      >
+                        Dark
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center justify-between p-3 bg-slate-800/40 rounded-lg">
+                    <div class="text-sm">Language</div>
+                    <div class="flex items-center gap-2">
+                      <button
+                        id="btn-lang"
+                        class="px-3 py-1 rounded bg-slate-700/40"
+                      >
+                        KH
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center justify-between p-3 bg-slate-800/40 rounded-lg">
+                    <div class="text-sm">Background color</div>
+                    <input
+                      id="bg-color-picker"
+                      type="color"
+                      value="#0f172a"
+                      class="w-10 h-8 p-0 border-0 rounded"
+                    />
+                  </div>
+
+                  <h3 class="text-lg font-semibold text-indigo-300 mt-6">Access</h3>
+                  <div
+                    id="face-scan-toggle-row"
+                    class="hidden flex items-center justify-between p-3 bg-slate-800/40 rounded-lg"
+                  >
+                    <div class="text-sm">Allow face-scan (for my account)</div>
+                    <input type="checkbox" id="face-scan-enabled" class="w-6 h-6" />
+                  </div>
+              </div>
+              
+            </div>
+            
           </main>
         </div>
       </div>
@@ -866,12 +879,16 @@
         pageRecords = document.getElementById("page-records"),
         pageList = document.getElementById("page-list"),
         pageStorage = document.getElementById("page-storage"),
-        pageProfile = document.getElementById("page-profile");
+        pageProfile = document.getElementById("page-profile"),
+        pageAdmin = document.getElementById("page-admin"); // NEW
+        
       const navScan = document.getElementById("nav-scan"),
         navRecords = document.getElementById("nav-records"),
         navList = document.getElementById("nav-list"),
         navStorage = document.getElementById("nav-storage"),
-        navProfile = document.getElementById("nav-profile");
+        navProfile = document.getElementById("nav-profile"),
+        navAdmin = document.getElementById("nav-admin"), // NEW
+        navSettingsBtn = document.getElementById("nav-settings-btn"); // NEW
 
       const sidebar = document.getElementById("sidebar"),
         menuBtn = document.getElementById("menu-btn"),
@@ -890,6 +907,11 @@
         listTable = document.getElementById("list-table"),
         listClassFilter = document.getElementById("list-class-filter"),
         listSearchInput = document.getElementById("list-search-input");
+      
+      // BUG FIX: Added these three variables
+      const listTotalCount = document.getElementById("list-total-count");
+      const listCompletedCount = document.getElementById("list-completed-count");
+      const listPendingCount = document.getElementById("list-pending-count");
 
       const loginScreen = document.getElementById("login-screen"),
         mainAppWrapper = document.getElementById("main-app-wrapper"),
@@ -926,9 +948,7 @@
           "face-scan-enabled"
         );
 
-      const logoutBtn = document.getElementById("logout-btn"),
-        profileBtn = document.getElementById("profile-btn"),
-        profilePanelBtn = document.getElementById("profile-btn");
+      const logoutBtn = document.getElementById("logout-btn");
 
       // profile page refs
       const profileImgLarge = document.getElementById("profile-img-large"),
@@ -1246,19 +1266,31 @@
         updateProfileSummary();
       }
 
+      // Updated Click Handlers for new sidebar
       logoutBtn.onclick = (e) => {
         e.preventDefault();
         clearAdminSession();
         location.reload();
       };
-      profileBtn.onclick = () => openProfilePage();
       headerLogo.onclick = () => openProfilePage();
       sidebarLogo.onclick = () => openProfilePage();
       adminProfileImgHeader.onclick = () => openProfilePage();
+      adminProfileSidebar.onclick = () => openProfilePage(); // Make compact profile clickable
       navProfile.onclick = (e) => {
         e.preventDefault();
         openProfilePage();
       };
+      
+      navSettingsBtn.onclick = (e) => {
+        e.preventDefault();
+        navLinks.forEach(l => l.classList.remove('active'));
+        pages.forEach(p => p.classList.add('hidden'));
+        navAdmin.classList.add('active');
+        pageAdmin.classList.remove('hidden');
+        stopCamera();
+        closeSidebar();
+      };
+
 
       /* --------------------------- STUDENTS & RECORDS --------------------------- */
       async function fetchStudents() {
@@ -1452,6 +1484,7 @@
                       action: "delete",
                       serialNumber,
                       imageUrl,
+                      adminName: loggedInAdmin ? loggedInAdmin.name : 'Unknown' // Pass admin name for audit
                     }),
                     redirect: "follow",
                   });
@@ -1461,9 +1494,9 @@
                     showModal("success", "រូបភាពត្រូវបានលុប!", {
                       "OK": {
                         callback: async () => {
-                          await fetchStudents();
-                          await displaySavedRecords();
-                          await displayStudentList();
+                          await fetchStudents(); // Refresh student list (counts)
+                          await displaySavedRecords(); // Refresh records page
+                          await displayStudentList(); // Refresh list page
                         },
                       },
                     });
@@ -1535,9 +1568,10 @@
             );
           });
         }
-        listTotalCount.textContent = arr.length;
-        listCompletedCount.textContent = done;
-        listPendingCount.textContent = arr.length - done;
+        // BUG FIX: Check if elements exist before setting text
+        if(listTotalCount) listTotalCount.textContent = arr.length;
+        if(listCompletedCount) listCompletedCount.textContent = done;
+        if(listPendingCount) listPendingCount.textContent = arr.length - done;
       }
 
       async function displayStudentList() {
@@ -1701,6 +1735,7 @@
               class: selectedStudent[2],
               group: selectedStudent[3],
               imageData,
+              adminName: loggedInAdmin ? loggedInAdmin.name : 'Unknown' // Pass admin name
             }),
             redirect: "follow",
           });
@@ -1824,6 +1859,7 @@
         navRecords,
         navStorage,
         navProfile,
+        navAdmin
       ];
       const pages = [
         pageScan,
@@ -1831,6 +1867,7 @@
         pageRecords,
         pageStorage,
         pageProfile,
+        pageAdmin
       ];
       function navLinksDeactivate() {
         navLinks.forEach((l) => l.classList.remove("active"));
@@ -1875,17 +1912,17 @@
         const links = {
           Sheets: {
             "Student List (DIList)":
-              "https_SHEET_URL_1",
+              "https://docs.google.com/spreadsheets/d/1eRyPoifzyvB4oBmruNyXcoKMKPRqjk6xDD6-bPNW6pc/edit",
             "Saved Info & Admins (InfoUsers)":
-              "https_SHEET_URL_2",
+              "https://docs.google.com/spreadsheets/d/1dleEg_Q5KV9IRGT4DpfHooZQ_p2bKLk-2yCGYootqPA/edit",
             "Secondary List (បញ្ជឺឈ្មោះរួម)":
-              "https_SHEET_URL_3",
+              "https://docs.google.com/spreadsheets/d/1_Kgl8UQXRsVATt_BOHYQjVWYKkRIBA12R-qnsBoSUzc/edit",
           },
           Folders: {
             "Default Uploads":
-              "https_FOLDER_URL_1",
+              "https://drive.google.com/drive/folders/10RyejYi9_J0c7gxrL5wgmODy4VfJZ6SA",
             "AD Class":
-              "https_FOLDER_URL_2",
+              "https://drive.google.com/drive/folders/140JXHUU9FIKB7VNEXUsv9rPJ4i8S_SMY",
           },
         };
         container.innerHTML = "";
@@ -1910,9 +1947,14 @@
           if (s.lang) settings.lang = s.lang;
           if (s.bgColor) settings.bgColor = s.bgColor;
         } catch (e) {}
-        applySettings(); // show face-scan toggle only if superadmin
-        if (loggedInAdmin && loggedInAdmin.role === "superadmin") {
+        applySettings(); 
+        
+        // show face-scan toggle only if superadmin
+        if (loggedInAdmin && (loggedInAdmin.role === "superadmin")) {
           faceScanToggleRow.classList.remove("hidden");
+          navAdmin.classList.remove("hidden"); // Show Admin Panel link
+          navSettingsBtn.classList.remove("hidden"); // Show settings cog
+          
           faceScanEnabledCheckbox.checked = loggedInAdmin.faceScan !== false;
           faceScanEnabledCheckbox.onchange = () => {
             loggedInAdmin.faceScan = faceScanEnabledCheckbox.checked;
@@ -1920,6 +1962,7 @@
             showModal("success", "Updated face-scan preference.");
           };
         }
+        
         btnThemeToggle.onclick = () => {
           settings.theme = settings.theme === "dark" ? "light" : "dark";
           applySettings();
