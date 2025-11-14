@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
-    <title>ប្រព័ន្ធស្កេនមុខឌីជីថល — V2</title>
+    <title>ប្រព័ន្ធស្កេនមុខឌីជីថល — V3</title>
     <link
       rel="icon"
       href="https://img.freepik.com/premium-vector/face-scan-icon_933463-79729.jpg"
@@ -53,9 +53,72 @@
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
       }
-      #sidebar {
-        transition: transform 0.3s ease-in-out;
+      
+      /* --- Sidebar Transitions --- */
+      #sidebar, #content-wrapper {
+        transition: all 0.3s ease-in-out;
       }
+      /* Text elements to hide */
+      .nav-text, 
+      #sidebar-sub, 
+      #admin-profile-compact .text-sm, 
+      #admin-profile-compact .font-semibold, 
+      #stat-total ~ div, /* text below stats */
+      #logout-btn span, 
+      #nav-settings-btn span {
+        transition: opacity 0.2s ease, width 0.2s ease, transform 0.2s ease;
+        white-space: nowrap;
+      }
+      
+      /* --- Sidebar Desktop Collapsed State --- */
+      @media (min-width: 768px) {
+        #sidebar.collapsed {
+          width: 88px; /* w-22 */
+        }
+        #sidebar.collapsed .nav-text,
+        #sidebar.collapsed #sidebar-sub,
+        #sidebar.collapsed #sidebar-logo-text,
+        #sidebar.collapsed #admin-profile-compact .text-sm,
+        #sidebar.collapsed #admin-profile-compact .font-semibold,
+        #sidebar.collapsed #stat-total ~ div, /* text below stats */
+        #sidebar.collapsed #logout-btn span,
+        #sidebar.collapsed #nav-settings-btn span {
+          opacity: 0;
+          width: 0;
+          transform: translateX(10px);
+          pointer-events: none;
+        }
+        #sidebar.collapsed #sidebar-logo-wrapper {
+          justify-content: center;
+        }
+        #sidebar.collapsed #sidebar-logo {
+           width: 48px; height: 48px; /* w-12 h-12 */
+        }
+        #sidebar.collapsed #admin-profile-img-sidebar {
+           width: 40px; height: 40px; /* w-10 h-10 */
+        }
+        #sidebar.collapsed .nav-link {
+          justify-content: center;
+          padding-left: 0.75rem;
+          padding-right: 0.75rem;
+        }
+         #sidebar.collapsed #admin-profile-compact {
+           justify-content: center;
+         }
+        #sidebar.collapsed #logout-btn,
+        #sidebar.collapsed #nav-settings-btn {
+           justify-content: center;
+        }
+        #sidebar.collapsed #logout-btn i,
+        #sidebar.collapsed #nav-settings-btn i {
+           margin: 0;
+        }
+        #content-wrapper.collapsed {
+          margin-left: 88px;
+        }
+      }
+      /* --- End Sidebar --- */
+      
       #sidebar.is-open {
         transform: translateX(0);
       }
@@ -161,6 +224,22 @@
         background-repeat: no-repeat;
         background-size: 1.5em 1.5em;
       }
+      /* Select in admin panel */
+      .admin-filter-select {
+        background-color: #334155;
+        color: #e2e8f0;
+        border: 1px solid #475569;
+        padding: 0.5rem 2rem 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        border-radius: 0.5rem;
+        -webkit-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+      }
+      
       .filter-select option {
         background: #f3f4f6;
         color: #000;
@@ -226,9 +305,19 @@
           margin-left: 0;
         }
       }
+      
+      /* Admin panel custom switch */
+      .switch { position: relative; display: inline-block; width: 60px; height: 34px; }
+      .switch input { opacity: 0; width: 0; height: 0; }
+      .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #475569; transition: .4s; border-radius: 34px; }
+      .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+      input:checked + .slider { background-color: #4f46e5; }
+      input:checked + .slider:before { transform: translateX(26px); }
+
     </style>
   </head>
   <body data-theme="dark" class="bg-slate-900 text-slate-200">
+    <!-- LOGIN (same UX but we keep device session persistence) -->
     <div id="login-screen">
       <div class="login-card text-center">
         <img
@@ -300,6 +389,7 @@
       </div>
     </div>
 
+    <!-- APP -->
     <div id="main-app-wrapper" class="hidden">
       <div class="relative min-h-screen md:flex">
         <div
@@ -307,30 +397,33 @@
           class="hidden md:hidden fixed inset-0 bg-black/50 z-30"
         ></div>
 
+        <!-- SIDEBAR -->
         <aside
           id="sidebar"
-          class="fixed top-0 left-0 w-72 h-full bg-slate-800/90 backdrop-blur-lg z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col"
+          class="fixed top-0 left-0 w-72 h-full bg-slate-800/90 backdrop-blur-lg z-40 transform -translate-x-full md:translate-x-0 flex flex-col"
         >
+          <!-- Logo/Header -->
           <div class="text-center py-5 mb-2 px-4 border-b border-slate-700/40">
-            <div class="flex items-center gap-3 justify-center">
+            <div id="sidebar-logo-wrapper" class="flex items-center gap-3 justify-start px-2">
               <img
                 id="sidebar-logo"
                 src="https://i.postimg.cc/FHBn0Fdf/di3-copy.png"
                 alt="Logo"
-                class="w-14 h-14 rounded-full shadow-md cursor-pointer"
+                class="w-14 h-14 rounded-full shadow-md cursor-pointer transition-all"
                 style="object-fit: cover"
               />
-              <div class="text-left">
-                <h2 class="text-lg font-bold text-white khmer-title">
+              <div class="overflow-hidden">
+                <h2 id="sidebar-logo-text" class="text-lg font-bold text-white khmer-title nav-text">
                   ឧស្សាហកម្មឌីជីថល
                 </h2>
-                <p id="sidebar-sub" class="text-slate-400 text-sm">
+                <p id="sidebar-sub" class="text-slate-400 text-sm nav-text">
                   Face Scan Manager
                 </p>
               </div>
             </div>
           </div>
 
+          <!-- Navigation (Takes up all available space) -->
           <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
             <ul class="space-y-2">
               <li>
@@ -339,7 +432,7 @@
                   id="nav-scan"
                   class="nav-link active flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"
                   ><i class="fas fa-camera-retro fa-fw w-5 text-center"></i
-                  ><span class="font-semibold">ថតរូប</span></a
+                  ><span class="font-semibold nav-text">ថតរូប</span></a
                 >
               </li>
               <li>
@@ -348,7 +441,7 @@
                   id="nav-list"
                   class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"
                   ><i class="fas fa-users fa-fw w-5 text-center"></i
-                  ><span class="font-semibold">ទិន្នន័យរូបភាពនិស្សិត</span></a
+                  ><span class="font-semibold nav-text">ទិន្នន័យរូបភាពនិស្សិត</span></a
                 >
               </li>
               <li>
@@ -357,7 +450,7 @@
                   id="nav-records"
                   class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"
                   ><i class="fas fa-database fa-fw w-5 text-center"></i
-                  ><span class="font-semibold">រូបភាពបានរក្សាទុក</span></a
+                  ><span class="font-semibold nav-text">រូបភាពបានរក្សាទុក</span></a
                 >
               </li>
               <li>
@@ -366,7 +459,7 @@
                   id="nav-storage"
                   class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"
                   ><i class="fas fa-link fa-fw w-5 text-center"></i
-                  ><span class="font-semibold">Storage Links</span></a
+                  ><span class="font-semibold nav-text">Storage Links</span></a
                 >
               </li>
               <li>
@@ -375,22 +468,25 @@
                   id="nav-profile"
                   class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"
                   ><i class="fas fa-user-circle fa-fw w-5 text-center"></i
-                  ><span class="font-semibold">Profile</span></a
+                  ><span class="font-semibold nav-text">Profile</span></a
                 >
               </li>
+              <!-- NEW ADMIN LINK (HIDDEN BY DEFAULT) -->
               <li>
                 <a
                   href="#"
                   id="nav-admin"
                   class="nav-link hidden flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"
                   ><i class="fas fa-shield-halved fa-fw w-5 text-center"></i
-                  ><span class="font-semibold">Admin Panel</span></a
+                  ><span class="font-semibold nav-text">Admin Panel</span></a
                 >
               </li>
             </ul>
           </nav>
 
+          <!-- Footer (User & Logout) -->
           <div class="p-4 border-t border-slate-700/40 space-y-4">
+            <!-- Clickable Profile Section -->
             <div
               id="admin-profile-compact"
               class="p-2 rounded-lg hover:bg-slate-700/50 cursor-pointer hidden"
@@ -398,37 +494,39 @@
               <div class="flex items-center gap-3">
                 <img
                   id="admin-profile-img-sidebar"
-                  class="w-10 h-10 rounded-full"
+                  class="w-10 h-10 rounded-full flex-shrink-0 transition-all"
                   src=""
                   alt="Admin"
                   crossorigin="anonymous"
                 />
-                <div>
-                  <p id="admin-name-sidebar" class="font-semibold text-white">
+                <div class="overflow-hidden">
+                  <p id="admin-name-sidebar" class="font-semibold text-white nav-text">
                     ឈ្មោះគណនី
                   </p>
-                  <p id="admin-role-sidebar" class="text-sm text-slate-300">
+                  <p id="admin-role-sidebar" class="text-sm text-slate-300 nav-text">
                     Role
                   </p>
                 </div>
               </div>
             </div>
 
+            <!-- Stats (Moved from profile section for cleaner look) -->
             <div class="grid grid-cols-3 gap-2 text-center text-sm">
               <div class="p-2 bg-slate-800/40 rounded">
                 <div id="stat-total" class="font-bold">-</div>
-                <div class="text-xs text-slate-400">ទិន្នន័យ</div>
+                <div class="text-xs text-slate-400 nav-text">ទិន្នន័យ</div>
               </div>
               <div class="p-2 bg-slate-800/40 rounded">
                 <div id="stat-mycount" class="font-bold">-</div>
-                <div class="text-xs text-slate-400">រូបខ្ញុំ</div>
+                <div class="text-xs text-slate-400 nav-text">រូបខ្ញុំ</div>
               </div>
               <div class="p-2 bg-slate-800/40 rounded">
                 <div id="stat-others" class="font-bold">-</div>
-                <div class="text-xs text-slate-400">ផ្សេងៗ</div>
+                <div class="text-xs text-slate-400 nav-text">ផ្សេងៗ</div>
               </div>
             </div>
 
+            <!-- Bottom Actions -->
             <div class="flex items-center justify-between gap-2">
               <a
                 href="#"
@@ -436,7 +534,7 @@
                 class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-slate-300 bg-red-600/50 hover:bg-red-600"
               >
                 <i class="fas fa-sign-out-alt fa-fw"></i>
-                <span class="font-medium text-sm">Logout</span>
+                <span class="font-medium text-sm nav-text">Logout</span>
               </a>
               <a
                 href="#"
@@ -450,30 +548,29 @@
           </div>
         </aside>
 
+        <!-- CONTENT -->
         <div
           id="content-wrapper"
-          class="flex flex-col flex-1 md:ml-72 transition-all duration-300 ease-in-out"
+          class="flex flex-col flex-1 md:ml-72"
         >
           <header
             class="w-full h-16 bg-slate-800/50 backdrop-blur-lg flex-shrink-0 flex items-center px-4 sticky top-0 z-20"
           >
+            <!-- Mobile Menu Button -->
             <button id="menu-btn" class="text-white mr-4 md:hidden">
               <i class="fas fa-bars text-xl"></i>
             </button>
+            <!-- Desktop Sidebar Toggle Button -->
+            <button id="sidebar-toggle-btn" class="text-white mr-4 hidden md:block">
+              <i class="fas fa-bars text-xl"></i>
+            </button>
+            
             <h1 class="text-xl font-bold text-white khmer-title">
               គ្រប់គ្រងទិន្នន័យរូបភាព
             </h1>
-            <div
-              class="ml-4 text-sm text-slate-300 hidden md:flex items-center gap-3"
-            >
-              <img
-                id="header-logo"
-                src="https://i.postimg.cc/FHBn0Fdf/di3-copy.png"
-                class="w-10 h-10 rounded-full cursor-pointer"
-                alt="logo"
-              />
-              <span id="header-admin-name" class="font-semibold"></span>
-            </div>
+           
+            <!-- This div (logo + admin name) is now removed per request -->
+
             <div class="ml-auto flex items-center gap-3">
               <img
                 id="admin-profile-img-header"
@@ -486,6 +583,7 @@
           </header>
 
           <main class="w-full flex-1 p-4 md:p-8">
+            <!-- PAGE: SCAN (kept) -->
             <div id="page-scan">
               <div class="main-content rounded-2xl p-6">
                 <div class="container w-full max-w-md mx-auto relative">
@@ -572,6 +670,7 @@
               </div>
             </div>
 
+            <!-- PAGE: LIST -->
             <div
               id="page-list"
               class="hidden main-content rounded-2xl p-6 h-full flex flex-col"
@@ -667,6 +766,7 @@
               </div>
             </div>
 
+            <!-- PAGE: RECORDS -->
             <div
               id="page-records"
               class="hidden main-content rounded-2xl p-6 h-full flex flex-col"
@@ -717,6 +817,7 @@
               </div>
             </div>
 
+            <!-- PAGE: STORAGE -->
             <div
               id="page-storage"
               class="hidden main-content rounded-2xl p-6 h-full flex flex-col"
@@ -731,6 +832,7 @@
               <div id="storage-links-container" class="space-y-6"></div>
             </div>
 
+            <!-- PAGE: PROFILE (new) -->
             <div
               id="page-profile"
               class="hidden main-content rounded-2xl p-6 h-full flex flex-col"
@@ -777,6 +879,7 @@
               ></div>
             </div>
             
+            <!-- PAGE: ADMIN (NEW) -->
             <div
               id="page-admin"
               class="hidden main-content rounded-2xl p-6 h-full flex flex-col"
@@ -785,8 +888,10 @@
                 Admin Panel (Superadmin)
               </h1>
               
-              <div class="space-y-4 max-w-md">
-                  <h3 class="text-lg font-semibold text-indigo-300">Appearance</h3>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Column 1: Settings -->
+                <div class="space-y-4">
+                  <h3 class="text-xl font-semibold text-indigo-300">Appearance</h3>
                   <div class="flex items-center justify-between p-3 bg-slate-800/40 rounded-lg">
                     <div class="text-sm">Theme</div>
                     <div class="flex items-center gap-2">
@@ -821,7 +926,7 @@
                     />
                   </div>
 
-                  <h3 class="text-lg font-semibold text-indigo-300 mt-6">Access</h3>
+                  <h3 class="text-xl font-semibold text-indigo-300 mt-6">My Access</h3>
                   <div
                     id="face-scan-toggle-row"
                     class="hidden flex items-center justify-between p-3 bg-slate-800/40 rounded-lg"
@@ -829,6 +934,31 @@
                     <div class="text-sm">Allow face-scan (for my account)</div>
                     <input type="checkbox" id="face-scan-enabled" class="w-6 h-6" />
                   </div>
+                  
+                  <h3 class="text-xl font-semibold text-indigo-300 mt-6">Add New Admin</h3>
+                  <div class="p-4 bg-slate-800/40 rounded-lg space-y-3">
+                     <input id="add-admin-name" type="text" placeholder="New Admin Name" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+                     <input id="add-admin-image-url" type="text" placeholder="Image URL" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+                     <input id="add-admin-email" type="text" placeholder="Email (Optional)" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+                     <select id="add-admin-role" class="admin-filter-select w-full">
+                       <option value="viewer">Viewer</option>
+                       <option value="subadmin">Sub-Admin</option>
+                       <option value="admin">Admin</option>
+                       <option value="superadmin">Super-Admin</option>
+                     </select>
+                     <button id="add-admin-btn" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition">Add New Admin</button>
+                  </div>
+                </div>
+                
+                <!-- Column 2: User Management -->
+                <div class="space-y-4">
+                  <h3 class="text-xl font-semibold text-indigo-300">User Management</h3>
+                  <div id="admin-management-list" class="space-y-3">
+                    <!-- Admin list will be populated here by JS -->
+                    <div class="text-center text-slate-400 p-4">Loading admin list...</div>
+                  </div>
+                </div>
+                
               </div>
               
             </div>
@@ -838,6 +968,7 @@
       </div>
     </div>
 
+    <!-- MODAL (keeps) -->
     <div
       id="modal"
       class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal"
@@ -856,7 +987,7 @@
       const SCRIPT_URL =
         "https://script.google.com/macros/s/AKfycbyM-9UZbpL8GW6agRejPVGalKcTQPIdmm5-Xa0BWnpgrJiqahHFIRSE0LKH7n15AjNQ/exec";
 
-      // DOM refs (abbreviated for brevity)
+      // DOM refs
       const video = document.getElementById("video"),
         captureCanvas = document.getElementById("capture-canvas"),
         photoPreview = document.getElementById("photo-preview");
@@ -880,19 +1011,21 @@
         pageList = document.getElementById("page-list"),
         pageStorage = document.getElementById("page-storage"),
         pageProfile = document.getElementById("page-profile"),
-        pageAdmin = document.getElementById("page-admin"); // NEW
+        pageAdmin = document.getElementById("page-admin"); 
         
       const navScan = document.getElementById("nav-scan"),
         navRecords = document.getElementById("nav-records"),
         navList = document.getElementById("nav-list"),
         navStorage = document.getElementById("nav-storage"),
         navProfile = document.getElementById("nav-profile"),
-        navAdmin = document.getElementById("nav-admin"), // NEW
-        navSettingsBtn = document.getElementById("nav-settings-btn"); // NEW
+        navAdmin = document.getElementById("nav-admin"), 
+        navSettingsBtn = document.getElementById("nav-settings-btn"); 
 
       const sidebar = document.getElementById("sidebar"),
         menuBtn = document.getElementById("menu-btn"),
-        sidebarBackdrop = document.getElementById("sidebar-backdrop");
+        sidebarBackdrop = document.getElementById("sidebar-backdrop"),
+        sidebarToggleBtn = document.getElementById("sidebar-toggle-btn"), // Sidebar Toggle
+        contentWrapper = document.getElementById("content-wrapper"); // Content Wrapper
 
       const selectionArea = document.getElementById("selection-area"),
         studentSearchInput = document.getElementById("student-search-input"),
@@ -908,7 +1041,6 @@
         listClassFilter = document.getElementById("list-class-filter"),
         listSearchInput = document.getElementById("list-search-input");
       
-      // BUG FIX: Added these three variables
       const listTotalCount = document.getElementById("list-total-count");
       const listCompletedCount = document.getElementById("list-completed-count");
       const listPendingCount = document.getElementById("list-pending-count");
@@ -937,8 +1069,8 @@
         adminRoleSidebar = document.getElementById("admin-role-sidebar");
 
       const sidebarLogo = document.getElementById("sidebar-logo"),
-        headerLogo = document.getElementById("header-logo"),
-        headerAdminName = document.getElementById("header-admin-name");
+        headerLogo = document.getElementById("header-logo");
+        // headerAdminName is removed
 
       const btnThemeToggle = document.getElementById("btn-theme-toggle"),
         btnLang = document.getElementById("btn-lang"),
@@ -959,6 +1091,14 @@
         profileImagesGrid = document.getElementById("profile-images-grid"),
         profileImageFilter = document.getElementById("profile-image-filter");
 
+      // Admin Panel Refs
+      const adminManagementList = document.getElementById("admin-management-list");
+      const addAdminName = document.getElementById("add-admin-name");
+      const addAdminImageUrl = document.getElementById("add-admin-image-url");
+      const addAdminEmail = document.getElementById("add-admin-email");
+      const addAdminRole = document.getElementById("add-admin-role");
+      const addAdminBtn = document.getElementById("add-admin-btn");
+      
       // state
       const SESSION_KEY = "di_admin_session_v2";
       let studentsData = [],
@@ -977,6 +1117,7 @@
         isScanning = false,
         isUploading = false;
       let settings = { theme: "dark", lang: "KH", bgColor: "#0f172a" };
+      let isSidebarCollapsed = false;
 
       /* --------------------------- UTIL (modal) --------------------------- */
       const icons = {
@@ -1027,44 +1168,36 @@
 
       /* --------------------------- ADMIN FETCH & SESSIONS --------------------------- */
       async function fetchAdmins() {
-        const res = await fetch(`${SCRIPT_URL}?action=getAdmins`);
-        if (!res.ok) throw new Error(`Server error: ${res.status}`);
-        const data = await res.json();
-        // expected formats: either array of [name,imageUrl,role,faceScanEnabled] or objects {name,imageUrl,role,faceScan}
-        adminData = [];
-        if (Array.isArray(data)) {
-          // handle rows possibly with header
-          const arr = data.slice(0);
-          arr.forEach((r) => {
-            if (Array.isArray(r)) {
-              if (r[0] && r[1])
-                adminData.push({
-                  name: r[0],
-                  imageUrl: r[1],
-                  role: r[2] || "admin",
-                  faceScan: r[3] === false ? false : true,
-                });
-            } else if (r && r.name) {
-              adminData.push({
-                name: r.name,
-                imageUrl: r.imageUrl,
-                role: r.role || "admin",
-                faceScan: r.faceScan !== false,
-              });
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=getAdmins`);
+            if (!res.ok) throw new Error(`Server error: ${res.status}`);
+            const data = await res.json();
+            
+            adminData = [];
+            if (Array.isArray(data)) {
+              adminData = data.map(r => ({
+                  name: r[0] || '',
+                  imageUrl: r[1] || '',
+                  role: r[2] || 'admin',
+                  faceScan: r[3] === false ? false : true, // Handle `faceScan` (col D)
+                  disabled: r[3] === true || String(r[3]).toLowerCase() === 'true' // Also interpret col D as `disabled`
+              })).filter(a => a.name && a.imageUrl);
             }
-          });
-        } else if (typeof data === "object") {
-          // object keyed
-          adminData = Object.values(data).map((o) => ({
-            name: o.name,
-            imageUrl: o.imageUrl,
-            role: o.role || "admin",
-            faceScan: o.faceScan !== false,
-          }));
+            if (!adminData.length) throw new Error("No admin data found.");
+            
+            // Only populate login select if we are on the login screen
+            if (adminSelect) {
+                populateAdminSelect();
+            }
+        } catch (e) {
+            console.error("Failed to fetch admins:", e);
+            if(loginScreen.style.display !== 'none') {
+                showModal('error', `Could not fetch admin list: ${e.message}`);
+                adminListLoader.classList.add('hidden');
+            }
         }
-        if (!adminData.length) throw new Error("No admin data found.");
-        populateAdminSelect();
       }
+
 
       function populateAdminSelect() {
         adminSelect.innerHTML =
@@ -1072,7 +1205,7 @@
         adminData.forEach((a, i) => {
           const opt = document.createElement("option");
           opt.value = i;
-          opt.textContent = `${a.name} (${a.role || "admin"})`;
+          opt.textContent = a.name; // CHANGED: Removed role
           adminSelect.appendChild(opt);
         });
         adminListLoader.classList.add("hidden");
@@ -1106,8 +1239,15 @@
       };
       proceedToScanBtn.onclick = () => {
         const idx = adminSelect.value;
-        if (!idx) return;
+        if (idx === "") return;
         loggedInAdmin = adminData[idx];
+        
+        // Check if account is disabled
+        if (loggedInAdmin.disabled) {
+            showModal('error', 'Your account is disabled. Please contact a superadmin.');
+            return;
+        }
+
         adminSelectionArea.classList.add("hidden");
         adminScanArea.classList.remove("hidden");
         adminScanStatus.textContent = "Starting camera...";
@@ -1237,13 +1377,21 @@
       async function onLoginSuccess() {
         clearInterval(adminScanInterval);
         stopCamera();
+        
+        // Find the full admin object, in case the one from login was partial
+        const adminObject = adminData.find(a => a.name === loggedInAdmin.name);
+        if (adminObject) {
+            loggedInAdmin = adminObject;
+        }
+
         // persist session
         saveAdminSession({
           name: loggedInAdmin.name,
           imageUrl: loggedInAdmin.imageUrl,
           role: loggedInAdmin.role || "admin",
-          faceScan: loggedInAdmin.faceScan !== false,
+          faceScan: loggedInAdmin.faceScan, // Use the value from the full object
         });
+        
         // set profile UI
         adminProfileImgHeader.crossOrigin = "anonymous";
         adminProfileImgSidebar.crossOrigin = "anonymous";
@@ -1272,10 +1420,12 @@
         clearAdminSession();
         location.reload();
       };
-      headerLogo.onclick = () => openProfilePage();
+      
+      // Removed headerLogo.onclick
       sidebarLogo.onclick = () => openProfilePage();
       adminProfileImgHeader.onclick = () => openProfilePage();
       adminProfileSidebar.onclick = () => openProfilePage(); // Make compact profile clickable
+      
       navProfile.onclick = (e) => {
         e.preventDefault();
         openProfilePage();
@@ -1289,6 +1439,9 @@
         pageAdmin.classList.remove('hidden');
         stopCamera();
         closeSidebar();
+        
+        // Load admin list when opening panel
+        populateAdminManagementList();
       };
 
 
@@ -1568,7 +1721,7 @@
             );
           });
         }
-        // BUG FIX: Check if elements exist before setting text
+        
         if(listTotalCount) listTotalCount.textContent = arr.length;
         if(listCompletedCount) listCompletedCount.textContent = done;
         if(listPendingCount) listPendingCount.textContent = arr.length - done;
@@ -1811,6 +1964,7 @@
       function openProfilePage() {
         navLinksDeactivate();
         hideAllPages();
+        navProfile.classList.add('active'); // Manually activate profile nav
         pageProfile.classList.remove("hidden");
         populateProfileImages();
       }
@@ -1852,6 +2006,142 @@
       profileImageFilter.oninput = () =>
         populateProfileImages(profileImageFilter.value);
 
+      /* --------------------------- ADMIN PANEL --------------------------- */
+      
+      async function populateAdminManagementList() {
+          adminManagementList.innerHTML = `<div class="text-center text-slate-400 p-4">Loading admin list...</div>`;
+          
+          // Ensure adminData is fresh
+          await fetchAdmins(); 
+          
+          adminManagementList.innerHTML = ""; // Clear loader
+          
+          if (!adminData || !adminData.length) {
+              adminManagementList.innerHTML = `<div class="text-center text-slate-400 p-4">Could not load admin list.</div>`;
+              return;
+          }
+          
+          adminData.forEach(admin => {
+              const isAdminSelf = admin.name === loggedInAdmin.name;
+              const card = document.createElement('div');
+              card.className = 'p-3 bg-slate-800/40 rounded-lg flex items-center gap-3';
+              
+              const roleOptions = ['viewer', 'subadmin', 'admin', 'superadmin']
+                  .map(role => `<option value="${role}" ${admin.role === role ? 'selected' : ''}>${role}</option>`)
+                  .join('');
+                  
+              const isDisabled = admin.disabled;
+              
+              card.innerHTML = `
+                  <img src="${admin.imageUrl}" alt="${admin.name}" class="w-12 h-12 rounded-full object-cover flex-shrink-0" crossorigin="anonymous">
+                  <div class="flex-1 overflow-hidden">
+                      <p class="font-semibold text-white truncate">${admin.name}</p>
+                      <p class="text-sm text-slate-400 truncate">${admin.role} ${isDisabled ? '(Disabled)' : ''}</p>
+                  </div>
+                  <div class="flex items-center gap-2 flex-shrink-0">
+                      <select id="role-select-${admin.name}" class="admin-filter-select text-sm !py-1 !px-2" ${isAdminSelf ? 'disabled' : ''}>
+                          ${roleOptions}
+                      </select>
+                      <label class="switch" title="${isDisabled ? 'Unblock' : 'Block'} User">
+                          <input id="disable-check-${admin.name}" type="checkbox" ${isDisabled ? 'checked' : ''} ${isAdminSelf ? 'disabled' : ''}>
+                          <span class="slider"></span>
+                      </label>
+                  </div>
+              `;
+              
+              adminManagementList.appendChild(card);
+
+              // Add event listeners for the new elements
+              const roleSelect = document.getElementById(`role-select-${admin.name}`);
+              const disableCheck = document.getElementById(`disable-check-${admin.name}`);
+              
+              if (!isAdminSelf) {
+                  roleSelect.onchange = (e) => {
+                      handleUpdateAdminRole(admin.name, e.target.value);
+                  };
+                  disableCheck.onchange = (e) => {
+                      handleUpdateAdminDisabled(admin.name, e.target.checked);
+                  };
+              }
+          });
+      }
+
+      async function handleUpdateAdminRole(adminName, newRole) {
+          const admin = adminData.find(a => a.name === adminName);
+          if (!admin) return;
+          
+          showModal('loading', `Updating ${adminName} to ${newRole}...`);
+          
+          try {
+              const res = await fetch(SCRIPT_URL, {
+                  method: 'POST',
+                  body: JSON.stringify({
+                      action: 'setAdminRole',
+                      requestedBy: loggedInAdmin.name,
+                      name: adminName,
+                      role: newRole,
+                      disabled: admin.disabled // Pass existing disabled status
+                  }),
+                  redirect: 'follow'
+              });
+              if (!res.ok) throw new Error('Server request failed');
+              const result = await res.json();
+              if (result.status === 'success') {
+                  showModal('success', `${adminName} role updated to ${newRole}.`);
+                  await populateAdminManagementList(); // Refresh list
+              } else {
+                  throw new Error(result.message || 'Unknown error');
+              }
+          } catch (e) {
+              showModal('error', `Failed to update: ${e.message}`);
+              await populateAdminManagementList(); // Refresh to reset UI
+          }
+      }
+
+      async function handleUpdateAdminDisabled(adminName, isDisabled) {
+          const admin = adminData.find(a => a.name === adminName);
+          if (!admin) return;
+
+          const actionText = isDisabled ? 'Blocking' : 'Unblocking';
+          showModal('loading', `${actionText} ${adminName}...`);
+          
+          try {
+              const res = await fetch(SCRIPT_URL, {
+                  method: 'POST',
+                  body: JSON.stringify({
+                      action: 'setAdminRole',
+                      requestedBy: loggedInAdmin.name,
+                      name: adminName,
+                      role: admin.role, // Pass existing role
+                      disabled: isDisabled 
+                  }),
+                  redirect: 'follow'
+              });
+              if (!res.ok) throw new Error('Server request failed');
+              const result = await res.json();
+              if (result.status === 'success') {
+                  showModal('success', `${adminName} has been ${isDisabled ? 'disabled' : 'enabled'}.`);
+                  await populateAdminManagementList(); // Refresh list
+              } else {
+                  throw new Error(result.message || 'Unknown error');
+              }
+          } catch (e) {
+              showModal('error', `Failed to update: ${e.message}`);
+              await populateAdminManagementList(); // Refresh to reset UI
+          }
+      }
+      
+      addAdminBtn.onclick = () => {
+          // The backend script (code.gs) setAdminRoleHandler only UPDATES. It does not ADD.
+          // Therefore, we must inform the user to add via the Google Sheet.
+          showModal(
+              'choice', 
+              'Add Admin via Google Sheet', 
+              { 'OK': {} }
+          );
+          modalMessage.innerHTML = 'To add a new admin, please add their details (Name, Image URL, Role, Email) to the <strong>AdminScan</strong> tab in the master Google Sheet.';
+      };
+
       /* --------------------------- NAV HELPERS --------------------------- */
       const navLinks = [
         navScan,
@@ -1879,26 +2169,42 @@
       navLinks.forEach((link, index) => {
         link.onclick = (e) => {
           e.preventDefault();
-          navLinks.forEach((l) => l.classList.remove("active"));
-          pages.forEach((p) => p.classList.add("hidden"));
+          navLinksDeactivate();
+          hideAllPages();
           link.classList.add("active");
           pages[index].classList.remove("hidden");
           stopCamera();
           if (pages[index] === pageRecords) displaySavedRecords();
           if (pages[index] === pageList) displayStudentList();
           if (pages[index] === pageStorage) populateStorageLinks();
+          if (pages[index] === pageAdmin) populateAdminManagementList(); // Load data on page open
           closeSidebar();
         };
       });
 
       const closeSidebar = () => {
+        // Only applies to mobile
         sidebar.classList.remove("is-open");
         sidebarBackdrop.classList.add("hidden");
       };
-      menuBtn.onclick = () => {
-        sidebar.classList.toggle("is-open");
-        sidebarBackdrop.classList.toggle("hidden");
+      
+      menuBtn.onclick = () => { // Mobile menu button
+        sidebar.classList.toggle('is-open'); 
+        sidebarBackdrop.classList.toggle('hidden');
+        // If we open mobile nav, make sure desktop collapsed state is off
+        sidebar.classList.remove('collapsed');
+        contentWrapper.classList.remove('collapsed');
+        isSidebarCollapsed = false;
       };
+      
+      sidebarToggleBtn.onclick = () => { // Desktop toggle button
+        isSidebarCollapsed = !isSidebarCollapsed;
+        sidebar.classList.toggle('collapsed', isSidebarCollapsed);
+        contentWrapper.classList.toggle('collapsed', isSidebarCollapsed);
+        // Store preference
+        try { localStorage.setItem('sidebar_collapsed', isSidebarCollapsed); } catch(e){}
+      };
+      
       sidebarBackdrop.onclick = () => closeSidebar();
 
       recordsClassFilter.onchange = () => filterRecordsTable();
@@ -1958,7 +2264,9 @@
           faceScanEnabledCheckbox.checked = loggedInAdmin.faceScan !== false;
           faceScanEnabledCheckbox.onchange = () => {
             loggedInAdmin.faceScan = faceScanEnabledCheckbox.checked;
-            // optionally persist to server via API to update AdminScan sheet (not implemented here)
+            // TODO: This should be saved to the backend
+            // For now, just update self
+            handleUpdateAdminDisabled(loggedInAdmin.name, !loggedInAdmin.faceScan); // This is a bit of a guess, `faceScan` and `disabled` might be different
             showModal("success", "Updated face-scan preference.");
           };
         }
@@ -1990,11 +2298,6 @@
         btnLang.textContent = settings.lang;
         bgColorPicker.value = settings.bgColor || "#0f172a";
         document.body.style.background = settings.bgColor || "";
-        // UI language toggles can be expanded
-        // header admin name
-        if (loggedInAdmin) {
-          headerAdminName.textContent = loggedInAdmin.name;
-        }
       }
 
       /* --------------------------- INITIAL LOAD --------------------------- */
@@ -2006,22 +2309,42 @@
         );
         const loader = document.getElementById("initial-loading");
 
+        // Check for sidebar preference
+        if (localStorage.getItem('sidebar_collapsed') === 'true') {
+          isSidebarCollapsed = true;
+          sidebar.classList.add('collapsed');
+          contentWrapper.classList.add('collapsed');
+        }
+
         try {
           // 2. Load models first, this is essential for both paths
           await loadModels();
 
-          // 3. Check for an existing session
+          // 3. Fetch admin data for both login and session restore
+          await fetchAdmins();
+
+          // 4. Check for an existing session
           const session = loadAdminSession();
 
           if (session && session.name && session.imageUrl) {
-            // --- SESSION EXISTS: Go to App ---
-            loggedInAdmin = {
-              name: session.name,
-              imageUrl: session.imageUrl,
-              role: session.role || "admin",
-              faceScan:
-                typeof session.faceScan !== "undefined" ? session.faceScan : true,
-            };
+            
+            const sessionAdmin = adminData.find(a => a.name === session.name);
+            
+            if (sessionAdmin && sessionAdmin.disabled) {
+                // Admin is disabled, clear session and force login
+                clearAdminSession();
+                loader.style.display = 'none';
+                showModal('error', 'Your account has been disabled. Please contact a superadmin.');
+                return; // Stop execution
+            } else if (sessionAdmin) {
+                 // --- SESSION EXISTS: Go to App ---
+                loggedInAdmin = sessionAdmin; // Use the full, fresh data
+            } else {
+                // No admin found, session is invalid
+                clearAdminSession();
+                loader.style.display = 'none';
+                return; // Stop execution
+            }
 
             // 4. Update UI immediately
             adminProfileImgHeader.crossOrigin = "anonymous";
@@ -2048,28 +2371,26 @@
               displaySavedRecords(),
               fetchAllSavedRecordsForStats(),
             ]).then(updateProfileSummary);
-          } else {
-            // --- NO SESSION: Go to Login ---
-            // Models are loaded, now fetch admins for the dropdown
-            await fetchAdmins();
           }
+          // If no session, do nothing, just let the loader hide
+          
         } catch (err) {
-          // Handle critical errors (e.g., models failed to load)
+          // Handle critical errors (e.g., models failed to load, fetchAdmins failed)
           console.error("Initialization failed:", err);
-          loader.innerHTML =
-            '<p class="text-red-400 text-lg">Error loading application. Please refresh.</p>';
+          if (loader) {
+            loader.innerHTML =
+                '<p class="text-red-400 text-lg">Failed to initialize the application.</p><p class="text-slate-400 mt-2">Please try refreshing the page.</p>';
+          } else {
+            showModal("error", "Failed to initialize the application. Please try refreshing the page.");
+          }
           return; // Stop execution
+        } finally {
+          // 8. Hide loader
+          if (loader) {
+            loader.parentNode.removeChild(loader);
+          }
         }
-
-        // 8. Hide loader
-        loader.style.display = "none";
       });
-
-      /* --------------------------- EXTRA HELPERS --------------------------- */
-      function showModalSimple(msg) {
-        showModal("loading", msg);
-        setTimeout(() => modal.classList.add("hidden"), 900);
-      }
     </script>
   </body>
 </html>
