@@ -1235,33 +1235,33 @@ async function onLoginSuccess() {
 }
 
 // Updated Click Handlers for new sidebar
-logoutBtn.onclick = (e) => {
-    e.preventDefault();
-    clearAdminSession();
-    location.reload();
-};
+// logoutBtn.onclick = (e) => {
+//     e.preventDefault();
+//     clearAdminSession();
+//     location.reload();
+// };
 
-sidebarLogo.onclick = () => openProfilePage();
-adminProfileImgHeader.onclick = () => openProfilePage();
-adminProfileSidebar.onclick = () => openProfilePage();
+// sidebarLogo.onclick = () => openProfilePage();
+// adminProfileImgHeader.onclick = () => openProfilePage();
+// adminProfileSidebar.onclick = () => openProfilePage();
 
-navProfile.onclick = (e) => {
-    e.preventDefault();
-    openProfilePage();
-};
+// navProfile.onclick = (e) => {
+//     e.preventDefault();
+//     openProfilePage();
+// };
 
-navSettingsBtn.onclick = (e) => {
-    e.preventDefault();
-    navLinks.forEach(l => l.classList.remove('active'));
-    pages.forEach(p => p.classList.add('hidden'));
-    navAdmin.classList.add('active');
-    pageAdmin.classList.remove('hidden');
-    stopCamera();
-    closeSidebar();
+// navSettingsBtn.onclick = (e) => {
+//     e.preventDefault();
+//     navLinks.forEach(l => l.classList.remove('active'));
+//     pages.forEach(p => p.classList.add('hidden'));
+//     navAdmin.classList.add('active');
+//     pageAdmin.classList.remove('hidden');
+//     stopCamera();
+//     closeSidebar();
     
-    // Load admin list when opening panel
-    populateAdminManagementList();
-};
+//     // Load admin list when opening panel
+//     populateAdminManagementList();
+// };
 
 /* --------------------------- STUDENTS & RECORDS --------------------------- */
 async function fetchStudents() {
