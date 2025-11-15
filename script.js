@@ -1,14 +1,144 @@
 /* --------------------------- CONFIG & DOM --------------------------- */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM-9UZbpL8GW6agRejPVGalKcTQPIdmm5-Xa0BWnpgrJiqahHFIRSE0LKH7n15AjNQ/exec";
 
-
 // Add these new variables at the top of the file
 let isFirstLogin = false;
 let tourSteps = [];
 let currentTourStep = 0;
 let isTourActive = false;
 
-// Add these new DOM element references
+// DOM refs
+const video = document.getElementById("video"),
+    captureCanvas = document.getElementById("capture-canvas"),
+    photoPreview = document.getElementById("photo-preview");
+const uploadBtn = document.getElementById("upload-btn"),
+    retakeBtn = document.getElementById("retake-btn"),
+    cameraSection = document.getElementById("camera-section");
+const videoWrapper = document.getElementById("video-wrapper"),
+    faceStatus = document.getElementById("face-status"),
+    subtitle = document.getElementById("subtitle");
+const switchCameraBtn = document.getElementById("switch-camera-btn"),
+    backBtn = document.getElementById("back-btn"),
+    manualCaptureBtn = document.getElementById("manual-capture-btn");
+
+const modal = document.getElementById("modal"),
+    modalIcon = document.getElementById("modal-icon"),
+    modalMessage = document.getElementById("modal-message"),
+    modalButtons = document.getElementById("modal-buttons");
+
+const pageScan = document.getElementById("page-scan"),
+    pageRecords = document.getElementById("page-records"),
+    pageList = document.getElementById("page-list"),
+    pageStorage = document.getElementById("page-storage"),
+    pageProfile = document.getElementById("page-profile"),
+    pageAdmin = document.getElementById("page-admin"),
+    pageAnalytics = document.getElementById("page-analytics");
+
+const navScan = document.getElementById("nav-scan"),
+    navRecords = document.getElementById("nav-records"),
+    navList = document.getElementById("nav-list"),
+    navStorage = document.getElementById("nav-storage"),
+    navProfile = document.getElementById("nav-profile"),
+    navAdmin = document.getElementById("nav-admin"),
+    navAnalytics = document.getElementById("nav-analytics"),
+    navSettingsBtn = document.getElementById("nav-settings-btn");
+
+const sidebar = document.getElementById("sidebar"),
+    menuBtn = document.getElementById("menu-btn"),
+    sidebarBackdrop = document.getElementById("sidebar-backdrop"),
+    sidebarToggleBtn = document.getElementById("sidebar-toggle-btn"),
+    contentWrapper = document.getElementById("content-wrapper");
+
+const selectionArea = document.getElementById("selection-area"),
+    studentSearchInput = document.getElementById("student-search-input"),
+    studentList = document.getElementById("student-list");
+
+const recordsLoading = document.getElementById("records-loading"),
+    recordsTable = document.getElementById("records-table"),
+    recordsClassFilter = document.getElementById("records-class-filter"),
+    recordsSearchInput = document.getElementById("records-search-input");
+
+const listLoading = document.getElementById("list-loading"),
+    listTable = document.getElementById("list-table"),
+    listClassFilter = document.getElementById("list-class-filter"),
+    listSearchInput = document.getElementById("list-search-input");
+
+const listTotalCount = document.getElementById("list-total-count");
+const listCompletedCount = document.getElementById("list-completed-count");
+const listPendingCount = document.getElementById("list-pending-count");
+
+const loginScreen = document.getElementById("login-screen"),
+    mainAppWrapper = document.getElementById("main-app-wrapper"),
+    adminListLoader = document.getElementById("admin-list-loader"),
+    adminSelect = document.getElementById("admin-select"),
+    proceedToScanBtn = document.getElementById("proceed-to-scan-btn"),
+    adminSelectionArea = document.getElementById("admin-selection-area"),
+    adminScanArea = document.getElementById("admin-scan-area"),
+    adminVideoWrapper = document.getElementById("admin-video-wrapper"),
+    adminVideo = document.getElementById("admin-video"),
+    adminScanStatus = document.getElementById("admin-scan-status"),
+    adminManualScanBtn = document.getElementById("admin-manual-scan-btn"),
+    adminBackBtn = document.getElementById("admin-back-btn");
+
+const adminProfileImgHeader = document.getElementById("admin-profile-img-header"),
+    adminProfileSidebar = document.getElementById("admin-profile-compact"),
+    adminProfileImgSidebar = document.getElementById("admin-profile-img-sidebar"),
+    adminNameSidebar = document.getElementById("admin-name-sidebar"),
+    adminRoleSidebar = document.getElementById("admin-role-sidebar");
+
+const sidebarLogo = document.getElementById("sidebar-logo");
+
+const btnThemeToggle = document.getElementById("btn-theme-toggle"),
+    btnLang = document.getElementById("btn-lang"),
+    bgColorPicker = document.getElementById("bg-color-picker"),
+    faceScanToggleRow = document.getElementById("face-scan-toggle-row"),
+    faceScanEnabledCheckbox = document.getElementById("face-scan-enabled");
+
+const logoutBtn = document.getElementById("logout-btn");
+
+// profile page refs
+const profileImgLarge = document.getElementById("profile-img-large"),
+    profileNameLarge = document.getElementById("profile-name-large"),
+    profileRoleLarge = document.getElementById("profile-role-large"),
+    profileTotalAll = document.getElementById("profile-total-all"),
+    profileTotalMy = document.getElementById("profile-total-my"),
+    profileImagesGrid = document.getElementById("profile-images-grid"),
+    profileImageFilter = document.getElementById("profile-image-filter");
+
+// Admin Panel Refs
+const adminManagementList = document.getElementById("admin-management-list");
+const addAdminName = document.getElementById("add-admin-name");
+const addAdminImageUrl = document.getElementById("add-admin-image-url");
+const addAdminEmail = document.getElementById("add-admin-email");
+const addAdminRole = document.getElementById("add-admin-role");
+const addAdminBtn = document.getElementById("add-admin-btn");
+
+// Analytics Refs
+const scansTodayEl = document.getElementById("scans-today");
+const activeUsersEl = document.getElementById("active-users");
+const completionRateEl = document.getElementById("completion-rate");
+const storageUsedEl = document.getElementById("storage-used");
+const weeklyActivityChart = document.getElementById("weekly-activity-chart");
+const classCompletionChart = document.getElementById("class-completion-chart");
+
+// Notification Toast Refs
+const notificationToast = document.getElementById("notification-toast");
+const notificationIcon = document.getElementById("notification-icon");
+const notificationTitle = document.getElementById("notification-title");
+const notificationMessage = document.getElementById("notification-message");
+const notificationClose = document.getElementById("notification-close");
+
+// New Feature Refs
+const voiceSearchBtn = document.getElementById("voice-search-btn");
+const batchScanBtn = document.getElementById("batch-scan-btn");
+const qrScanBtn = document.getElementById("qr-scan-btn");
+const exportListBtn = document.getElementById("export-list-btn");
+const exportRecordsBtn = document.getElementById("export-records-btn");
+
+// Voice Search Indicator
+const voiceSearchIndicator = document.getElementById("voice-search-indicator");
+
+// Modal refs for new features
 const welcomeModal = document.getElementById("welcome-modal");
 const welcomeAvatar = document.getElementById("welcome-avatar");
 const welcomeTitle = document.getElementById("welcome-title");
@@ -43,193 +173,174 @@ const tourContent = document.getElementById("tour-content");
 const tourSkip = document.getElementById("tour-skip");
 const tourNext = document.getElementById("tour-next");
 
-// Update the onLoginSuccess function to handle first-time login
-async function onLoginSuccess() {
-    clearInterval(adminScanInterval);
-    stopCamera();
-    
-    // Find the full admin object, in case the one from login was partial
-    const adminObject = adminData.find(a => a.name === loggedInAdmin.name);
-    if (adminObject) {
-        loggedInAdmin = adminObject;
-    }
+// state
+const SESSION_KEY = "di_admin_session_v2";
+let studentsData = [],
+    savedRecordsData = [],
+    allStudentsListData = [],
+    adminData = [];
+let currentStream,
+    faceApiInterval,
+    stableFrames = 0,
+    currentFacingMode = "environment",
+    selectedStudent = null,
+    currentCameraMode = "auto";
+let loggedInAdmin = null,
+    adminFaceMatcher = null,
+    adminScanInterval = null,
+    isScanning = false,
+    isUploading = false;
+let settings = { theme: "dark", lang: "KH", bgColor: "#0f172a" };
+let isSidebarCollapsed = false;
 
-    // Check if this is the first time login
-    const sessionData = loadAdminSession();
-    isFirstLogin = !sessionData || !sessionData.hasLoggedInBefore;
-    
-    // persist session
-    saveAdminSession({
-        name: loggedInAdmin.name,
-        imageUrl: loggedInAdmin.imageUrl,
-        role: loggedInAdmin.role || "admin",
-        faceScan: loggedInAdmin.faceScan,
-        hasLoggedInBefore: true
-    });
-    
-    // set profile UI
-    adminProfileImgHeader.crossOrigin = "anonymous";
-    adminProfileImgSidebar.crossOrigin = "anonymous";
-    adminProfileImgHeader.src = loggedInAdmin.imageUrl;
-    adminProfileImgSidebar.src = loggedInAdmin.imageUrl;
-    adminNameSidebar.textContent = loggedInAdmin.name;
-    adminRoleSidebar.textContent = loggedInAdmin.role || "admin";
-    adminProfileImgHeader.classList.remove("hidden");
-    adminProfileSidebar.classList.remove("hidden");
-    
-    // remove login screen permanently
-    loginScreen.classList.add("hidden");
-    if (loginScreen.parentNode)
-        loginScreen.parentNode.removeChild(loginScreen);
-    mainAppWrapper.classList.remove("hidden");
-    
-    // Show appropriate modal based on first-time login
-    if (isFirstLogin) {
-        showWelcomeModal();
+// Voice recognition
+let recognition = null;
+let isListening = false;
+
+// QR Scanner
+let qrScanner = null;
+
+// Batch scan data
+let batchScanData = [];
+
+// Analytics data
+let analyticsData = {
+    scansToday: 0,
+    activeUsers: 0,
+    completionRate: 0,
+    storageUsed: 0,
+    weeklyActivity: [],
+    classCompletion: []
+};
+
+/* --------------------------- UTIL (modal) --------------------------- */
+const icons = {
+    success: `<svg class="w-full h-full text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+    error: `<svg class="w-full h-full text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+    loading: `<div class="w-16 h-16 border-4 border-slate-500 border-t-indigo-500 rounded-full animate-spin"></div>`,
+    choice: `<svg class="w-full h-full text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m4 13-4-4M3 10h12M3 15h4M4 19h16a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1z"/></svg>`,
+};
+
+function showModal(type, message, actions = {}) {
+    modalIcon.innerHTML = icons[type] || "";
+    modalMessage.textContent = message;
+    modal.classList.remove("hidden");
+    modalButtons.innerHTML = "";
+    if (type === "loading") return;
+    if (Object.keys(actions).length) {
+        for (const [txt, action] of Object.entries(actions)) {
+            const b = document.createElement("button");
+            b.className = action.className || "w-full bg-slate-600 text-white py-2 rounded-lg font-semibold hover:bg-slate-700 transition";
+            b.textContent = txt;
+            b.onclick = () => {
+                modal.classList.add("hidden");
+                if (action.callback) action.callback();
+            };
+            modalButtons.appendChild(b);
+        }
     } else {
-        showRoleInfoModal();
+        const b = document.createElement("button");
+        b.className = "w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition";
+        b.textContent = settings.lang === "EN" ? "OK" : "យល់ព្រម";
+        b.onclick = () => modal.classList.add("hidden");
+        modalButtons.appendChild(b);
     }
-    
-    // apply settings UI (face-scan toggle visible only for superadmin)
-    setupSettingsUI();
-    
-    // Fetch data in background
-    Promise.all([
-        fetchStudents(),
-        displaySavedRecords(),
-        fetchAllSavedRecordsForStats(),
-    ]).then(updateProfileSummary);
 }
 
-// Add function to show welcome modal for first-time users
-function showWelcomeModal() {
-    // Set welcome modal content
-    welcomeAvatar.src = loggedInAdmin.imageUrl;
-    welcomeName.textContent = loggedInAdmin.name;
-    welcomeRole.textContent = loggedInAdmin.role || "admin";
+/* --------------------------- NOTIFICATION TOAST --------------------------- */
+function showNotification(title, message, type = 'info') {
+    notificationTitle.textContent = title;
+    notificationMessage.textContent = message;
     
-    // Set language based on settings
-    if (settings.lang === "KH") {
-        welcomeTitle.textContent = "សូមស្វាគមន៍មកកាន់ប្រព័ន្ធស្កេនមុខ";
-        welcomeSubtitle.textContent = "តើមានអ្វីជាមួយនឹងការណែនាំរយៈពេលខ្លី";
-        
-        // Update feature descriptions in Khmer
-        const featureTitles = document.querySelectorAll('.welcome-feature-title');
-        const featureDescriptions = document.querySelectorAll('.welcome-feature-description');
-        
-        if (featureTitles[0]) featureTitles[0].textContent = "ឈ្មោះ";
-        if (featureTitles[1]) featureTitles[1].textContent = "តួនាទី";
-        if (featureTitles[2]) featureTitles[0].textContent = "ការស្កេនមុខ";
-        if (featureDescriptions[2]) featureDescriptions[2].textContent = "ថតរូបភាពនិស្សិតជាមួយនឹងការរកឃើញមុខដោយស្វ័យប្រវត្តិ";
-        if (featureTitles[3]) featureTitles[3].textContent = "ការស្កេន QR Code";
-        if (featureDescriptions[3]) featureDescriptions[3].textContent = "កំណត់អត្តសញ្ញាណនិស្សិតយ៉ាងរហ័សដោយប្រើ QR Code";
-        if (featureTitles[4]) featureTitles[4].textContent = "ការស្កេនជាក្រុម";
-        if (featureDescriptions[4]) featureDescriptions[4].textContent = "ដំណើរការនិស្សិតច្រើននាក់ក្នុងមួយសម័យ";
-        if (featureTitles[5]) featureTitles[5].textContent = "ការវិភាគ";
-        if (featureDescriptions[5]) featureDescriptions[5].textContent = "មើលស្ថិតិ និងរបាយការណ៍ដំណើរការ";
-        
-        // Update onboarding steps in Khmer
-        const stepTitles = document.querySelectorAll('.onboarding-step-title');
-        const stepDescriptions = document.querySelectorAll('.onboarding-step-description');
-        
-        if (stepTitles[0]) stepTitles[0].textContent = "ជ្រើសរើសនិស្សិត";
-        if (stepDescriptions[0]) stepDescriptions[0].textContent = "ជ្រើសរើសនិស្សិតពីបញ្ជី ឬស្វែងរកតាមឈ្មោះ/ID";
-        
-        if (stepTitles[1]) stepTitles[1].textContent = "ថតរូបភាព";
-        if (stepDescriptions[1]) stepDescriptions[1].textContent = "ប្រើការរកឃើញមុខដោយស្វ័យប្រវត្តិ ឬថតដោយដៃ";
-        
-        if (stepTitles[2]) stepTitles[2].textContent = "បញ្ជូន និងរក្សាទុក";
-        if (stepDescriptions[2]) stepDescriptions[2].textContent = "បញ្ជាក់ និងបញ្ជូនរូបភាពទៅក្នុងប្រព័ន្ធ";
-        
-        // Update buttons in Khmer
-        startTourBtn.innerHTML = '<i class="fas fa-play"></i> ចាប់ផ្តើមការណែនាំអន្តរកម្ម';
-        skipTourBtn.innerHTML = '<i class="fas fa-forward"></i> �ំលងការណែនាំ';
+    // Set icon based on type
+    let iconHtml = '';
+    switch(type) {
+        case 'success':
+            iconHtml = '<i class="fas fa-check-circle text-green-400"></i>';
+            break;
+        case 'error':
+            iconHtml = '<i class="fas fa-exclamation-circle text-red-400"></i>';
+            break;
+        case 'warning':
+            iconHtml = '<i class="fas fa-exclamation-triangle text-yellow-400"></i>';
+            break;
+        default:
+            iconHtml = '<i class="fas fa-info-circle text-blue-400"></i>';
     }
+    notificationIcon.innerHTML = iconHtml;
     
-    welcomeModal.classList.remove("hidden");
+    // Show notification
+    notificationToast.classList.add('show');
+    
+    // Auto hide after 5 seconds
+    setTimeout(() => {
+        notificationToast.classList.remove('show');
+    }, 5000);
 }
 
-// Add function to show role info modal for returning users
-function showRoleInfoModal() {
-    // Set role info modal content
-    roleBadgeText.textContent = loggedInAdmin.role || "admin";
-    roleTitle.textContent = `${loggedInAdmin.name} - ${loggedInAdmin.role || "admin"}`;
-    
-    // Set language based on settings
-    if (settings.lang === "KH") {
-        roleDescription.textContent = "នេះជាអ្វីដែលអ្នកអាចធ្វើបាននៅក្នុងប្រព័ន្ធ";
+notificationClose.addEventListener('click', () => {
+    notificationToast.classList.remove('show');
+});
+
+/* --------------------------- FACEAPI MODELS --------------------------- */
+async function loadModels() {
+    const MODEL_URL = "./models";
+    await Promise.all([
+        faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+        faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
+    ]);
+}
+
+/* --------------------------- VOICE RECOGNITION --------------------------- */
+function initVoiceRecognition() {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = settings.lang === "KH" ? 'km-KH' : 'en-US';
         
-        // Update button text in Khmer
-        viewDashboardBtn.innerHTML = '<i class="fas fa-tachometer-alt"></i> ទៅកាន់ផ្ទាំងគ្រប់គ្រង';
-        closeRoleBtn.innerHTML = '<i class="fas fa-times"></i> បិទ';
+        recognition.onstart = () => {
+            isListening = true;
+            voiceSearchIndicator.classList.add('active');
+            showNotification('Voice Search', settings.lang === "KH" ? 'កំពុងស្តាប់...' : 'Listening...', 'info');
+        };
+        
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            studentSearchInput.value = transcript;
+            populateStudentList(transcript);
+            isListening = false;
+            voiceSearchIndicator.classList.remove('active');
+            showNotification('Voice Search', settings.lang === "KH" ? `ស្វែងរក: ${transcript}` : `Search for: ${transcript}`, 'success');
+        };
+        
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            isListening = false;
+            voiceSearchIndicator.classList.remove('active');
+            showNotification('Voice Search Error', settings.lang === "KH" ? 'សូមព្យាយាមម្ដងទៀត' : 'Please try again', 'error');
+        };
+        
+        recognition.onend = () => {
+            isListening = false;
+            voiceSearchIndicator.classList.remove('active');
+        };
     } else {
-        roleDescription.textContent = "Here's what you can do in the system";
-        
-        // Update button text in English
-        viewDashboardBtn.innerHTML = '<i class="fas fa-tachometer-alt"></i> Go to Dashboard';
-        closeRoleBtn.innerHTML = '<i class="fas fa-times"></i> Close';
+        voiceSearchBtn.style.display = 'none';
+        console.log('Speech recognition not supported');
     }
-    
-    // Set permissions based on role
-    permissionList.innerHTML = "";
-    const permissions = getRolePermissions(loggedInAdmin.role || "admin");
-    
-    permissions.forEach(permission => {
-        const li = document.createElement("li");
-        li.className = "permission-item";
-        li.innerHTML = `
-            <i class="fas ${permission.icon} permission-icon"></i>
-            <span class="permission-text">${permission.text}</span>
-        `;
-        permissionList.appendChild(li);
-    });
-    
-    roleInfoModal.classList.remove("hidden");
 }
 
-// Function to get permissions based on role
-function getRolePermissions(role) {
-    const permissions = {
-        viewer: [
-            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលទិន្នន័យនិស្សិត" : "View student data" },
-            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលរូបភាពដែលបានរក្សាទុក" : "View saved photos" },
-            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលការវិភាគ" : "View analytics" }
-        ],
-        subadmin: [
-            { icon: "fa-camera", text: settings.lang === "KH" ? "ថតរូបភាពនិស្សិត" : "Capture student photos" },
-            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលទិន្នន័យនិស្សិត" : "View student data" },
-            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលរូបភាពដែលបានរក្សាទុក" : "View saved photos" },
-            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលការវិភាគ" : "View analytics" },
-            { icon: "fa-download", text: settings.lang === "KH" ? "នាំចេញទិន្នន័យ" : "Export data" }
-        ],
-        admin: [
-            { icon: "fa-camera", text: settings.lang === "KH" ? "ថតរូបភាពនិស្សិត" : "Capture student photos" },
-            { icon: "fa-trash", text: settings.lang === "KH" ? "លុបរូបភាព" : "Delete photos" },
-            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលទិន្នន័យនិស្សិត" : "View student data" },
-            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលរូបភាពដែលបានរក្សាទុក" : "View saved photos" },
-            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលការវិភាគ" : "View analytics" },
-            { icon: "fa-download", text: settings.lang === "KH" ? "នាំចេញទិន្នន័យ" : "Export data" },
-            { icon: "fa-qrcode", text: settings.lang === "KH" ? "ស្កេន QR Code" : "Scan QR codes" },
-            { icon: "fa-layer-group", text: settings.lang === "KH" ? "ស្កេនជាក្រុម" : "Batch scanning" }
-        ],
-        superadmin: [
-            { icon: "fa-camera", text: settings.lang === "KH" ? "ថតរូបភាពនិស្សិត" : "Capture student photos" },
-            { icon: "fa-trash", text: settings.lang === "KH" ? "លុបរូបភាព" : "Delete photos" },
-            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលទិន្នន័យនិស្សិត" : "View student data" },
-            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលរូបភាពដែលបានរក្សាទុក" : "View saved photos" },
-            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលការវិភាគ" : "View analytics" },
-            { icon: "fa-download", text: settings.lang === "KH" ? "នាំចេញទិន្នន័យ" : "Export data" },
-            { icon: "fa-qrcode", text: settings.lang === "KH" ? "ស្កេន QR Code" : "Scan QR codes" },
-            { icon: "fa-layer-group", text: settings.lang === "KH" ? "ស្កេនជាក្រុម" : "Batch scanning" },
-            { icon: "fa-users-cog", text: settings.lang === "KH" ? "គ្រប់គ្រងគណនីអ្នកគ្រប់គ្រង" : "Manage admin accounts" },
-            { icon: "fa-cog", text: settings.lang === "KH" ? "កែប្រែការកំណត់ប្រព័ន្ធ" : "Change system settings" }
-        ]
-    };
-    
-    return permissions[role] || permissions.viewer;
-}
+voiceSearchBtn.addEventListener('click', () => {
+    if (recognition && !isListening) {
+        recognition.start();
+    }
+});
 
-// Initialize QR Scanner
+/* --------------------------- QR SCANNER --------------------------- */
 function initQRScanner() {
     qrScanBtn.addEventListener('click', () => {
         openQRScanner();
@@ -260,7 +371,7 @@ function openQRScanner() {
     
     qrScanner.start().catch(error => {
         console.error('Failed to start QR scanner:', error);
-        showNotification('QR Scanner Error', 'Failed to start camera', 'error');
+        showNotification('QR Scanner Error', settings.lang === "KH" ? 'បរាជ័យក្នុងការចាប់ផ្ដើមកាមេរ៉ា' : 'Failed to start camera', 'error');
         closeQRScanner();
     });
 }
@@ -290,7 +401,7 @@ function handleQRResult(result) {
     }
 }
 
-// Initialize Batch Scanner
+/* --------------------------- BATCH SCAN --------------------------- */
 function initBatchScan() {
     batchScanBtn.addEventListener('click', () => {
         openBatchScanModal();
@@ -430,7 +541,83 @@ async function processBatchStudent(index) {
     };
 }
 
-// Initialize Tour Guide
+/* --------------------------- EXPORT FUNCTIONALITY --------------------------- */
+function initExportFunctions() {
+    exportListBtn.addEventListener('click', () => {
+        exportData('list');
+    });
+    
+    exportRecordsBtn.addEventListener('click', () => {
+        exportData('records');
+    });
+}
+
+function exportData(type) {
+    let data, filename;
+    
+    if (type === 'list') {
+        data = allStudentsListData.map(s => ({
+            ID: s[0],
+            Name: s[1],
+            Class: s[2],
+            Group: s[3],
+            PhotoCount: s[4]
+        }));
+        filename = 'student_list.csv';
+    } else if (type === 'records') {
+        data = savedRecordsData.map(r => ({
+            Serial: r[0],
+            Name: r[1],
+            ID: r[2],
+            Class: r[3],
+            Group: r[4],
+            ImageURL: r[5]
+        }));
+        filename = 'saved_records.csv';
+    }
+    
+    // Convert to CSV
+    const csv = convertToCSV(data);
+    
+    // Create download link
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showNotification('Export Success', settings.lang === "KH" ? `ទិន្នន័យត្រូវបាននាំចេញទៅ ${filename}` : `Data exported to ${filename}`, 'success');
+}
+
+function convertToCSV(data) {
+    if (!data || data.length === 0) return '';
+    
+    // Get headers
+    const headers = Object.keys(data[0]);
+    
+    // Create CSV content
+    const csvContent = [
+        headers.join(','),
+        ...data.map(row => 
+            headers.map(header => {
+                const value = row[header];
+                // Escape commas and quotes
+                if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+                    return `"${value.replace(/"/g, '""')}"`;
+                }
+                return value;
+            }).join(',')
+        )
+    ].join('\n');
+    
+    return csvContent;
+}
+
+/* --------------------------- TOUR GUIDE --------------------------- */
 function initTourGuide() {
     // Define tour steps
     tourSteps = [
@@ -495,7 +682,7 @@ function initTourGuide() {
     // Add event listeners
     startTourBtn.addEventListener('click', startTour);
     skipTourBtn.addEventListener('click', () => {
-        welcomeModal.classList.add('hidden');
+        welcomeModal.classList.add("hidden");
         showRoleInfoModal();
     });
     
@@ -504,7 +691,7 @@ function initTourGuide() {
 }
 
 function startTour() {
-    welcomeModal.classList.add('hidden');
+    welcomeModal.classList.add("hidden");
     isTourActive = true;
     currentTourStep = 0;
     showTourStep();
@@ -615,9 +802,142 @@ function endTour() {
     showRoleInfoModal();
 }
 
+/* --------------------------- WELCOME & ROLE MODALS --------------------------- */
+function showWelcomeModal() {
+    // Set welcome modal content
+    welcomeAvatar.src = loggedInAdmin.imageUrl;
+    welcomeName.textContent = loggedInAdmin.name;
+    welcomeRole.textContent = loggedInAdmin.role || "admin";
+    
+    // Set language based on settings
+    if (settings.lang === "KH") {
+        welcomeTitle.textContent = "សូមស្វាគមន៍មកកាន់ប្រព័ន្ធស្កេនមុខ";
+        welcomeSubtitle.textContent = "តើមានអ្វីជាមួយនឹងការណែនាំរយៈពេលខ្លី";
+        
+        // Update feature descriptions in Khmer
+        const featureTitles = document.querySelectorAll('.welcome-feature-title');
+        const featureDescriptions = document.querySelectorAll('.welcome-feature-description');
+        
+        if (featureTitles[0]) featureTitles[0].textContent = "ឈ្មោះ";
+        if (featureTitles[1]) featureTitles[1].textContent = "តួនាទី";
+        if (featureTitles[2]) featureTitles[2].textContent = "ការស្កេនមុខ";
+        if (featureDescriptions[2]) featureDescriptions[2].textContent = "ថតរូបភាពនិស្សិតជាមួយនឹងការរកឃើញមុខដោយស្វ័យប្រវត្តិ";
+        if (featureTitles[3]) featureTitles[3].textContent = "ការស្កេន QR Code";
+        if (featureDescriptions[3]) featureDescriptions[3].textContent = "កំណត់អត្តសញ្ញាណនិស្សិតយ៉ាងរហ័សដោយប្រើ QR Code";
+        if (featureTitles[4]) featureTitles[4].textContent = "ការស្កេនជាក្រុម";
+        if (featureDescriptions[4]) featureDescriptions[4].textContent = "ដំណើរការនិស្សិតច្រើននាក់ក្នុងមួយសម័យ";
+        if (featureTitles[5]) featureTitles[5].textContent = "ការវិភាគ";
+        if (featureDescriptions[5]) featureDescriptions[5].textContent = "មើលស្ថិតិ និងរបាយការណ៍ដំណើរការ";
+        
+        // Update onboarding steps in Khmer
+        const stepTitles = document.querySelectorAll('.onboarding-step-title');
+        const stepDescriptions = document.querySelectorAll('.onboarding-step-description');
+        
+        if (stepTitles[0]) stepTitles[0].textContent = "ជ្រើសរើសនិស្សិត";
+        if (stepDescriptions[0]) stepDescriptions[0].textContent = "ជ្រើសរើសនិស្សិតពីបញ្ជី ឬស្វែងរកតាមឈ្មោះ/ID";
+        
+        if (stepTitles[1]) stepTitles[1].textContent = "ថតរូបភាព";
+        if (stepDescriptions[1]) stepDescriptions[1].textContent = "ប្រើការរកឃើញមុខដោយស្វ័យប្រវត្តិ ឬថតដោយដៃ";
+        
+        if (stepTitles[2]) stepTitles[2].textContent = "បញ្ជូន និងរក្សាទុក";
+        if (stepDescriptions[2]) stepDescriptions[2].textContent = "បញ្ជាក់ និងបញ្ជូនរូបភាពទៅក្នុងប្រព័ន្ធ";
+        
+        // Update buttons in Khmer
+        startTourBtn.innerHTML = '<i class="fas fa-play"></i> ចាប់ផ្តើមការណែនាំអន្តរកម្ម';
+        skipTourBtn.innerHTML = '<i class="fas fa-forward"></i> លំងាប់ការណែនាំ';
+    } else {
+        welcomeTitle.textContent = "Welcome to the Face Scan System";
+        welcomeSubtitle.textContent = "Would you like a quick tour?";
+        
+        // Update buttons in English
+        startTourBtn.innerHTML = '<i class="fas fa-play"></i> Start Interactive Tour';
+        skipTourBtn.innerHTML = '<i class="fas fa-forward"></i> Skip Tour';
+    }
+    
+    welcomeModal.classList.remove("hidden");
+}
+
+function showRoleInfoModal() {
+    // Set role info modal content
+    roleBadgeText.textContent = loggedInAdmin.role || "admin";
+    roleTitle.textContent = `${loggedInAdmin.name} - ${loggedInAdmin.role || "admin"}`;
+    
+    // Set language based on settings
+    if (settings.lang === "KH") {
+        roleDescription.textContent = "នេះជាអ្វីដែលអ្នកអាចធ្វើបាននៅក្នុងប្រព័ន្ធ";
+        
+        // Update button text in Khmer
+        viewDashboardBtn.innerHTML = '<i class="fas fa-tachometer-alt"></i> ទៅកាន់ផ្ទាំងគ្រប់គ្រង';
+        closeRoleBtn.innerHTML = '<i class="fas fa-times"></i> បិទ';
+    } else {
+        roleDescription.textContent = "Here's what you can do in the system";
+        
+        // Update button text in English
+        viewDashboardBtn.innerHTML = '<i class="fas fa-tachometer-alt"></i> Go to Dashboard';
+        closeRoleBtn.innerHTML = '<i class="fas fa-times"></i> Close';
+    }
+    
+    // Set permissions based on role
+    permissionList.innerHTML = "";
+    const permissions = getRolePermissions(loggedInAdmin.role || "admin");
+    
+    permissions.forEach(permission => {
+        const li = document.createElement("li");
+        li.className = "permission-item";
+        li.innerHTML = `
+            <i class="fas ${permission.icon} permission-icon"></i>
+            <span class="permission-text">${permission.text}</span>
+        `;
+        permissionList.appendChild(li);
+    });
+    
+    roleInfoModal.classList.remove("hidden");
+}
+
+function getRolePermissions(role) {
+    const permissions = {
+        viewer: [
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលទិន្នន័យនិស្សិត" : "View student data" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលរូបភាពដែលបានរក្សាទុក" : "View saved photos" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលការវិភាគ" : "View analytics" }
+        ],
+        subadmin: [
+            { icon: "fa-camera", text: settings.lang === "KH" ? "ថតរូបភាពនិស្សិត" : "Capture student photos" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលទិន្នន័យនិស្សិត" : "View student data" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលរូបភាពដែលបានរក្សាទុក" : "View saved photos" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលការវិភាគ" : "View analytics" },
+            { icon: "fa-download", text: settings.lang === "KH" ? "នាំចេញទិន្នន័យ" : "Export data" }
+        ],
+        admin: [
+            { icon: "fa-camera", text: settings.lang === "KH" ? "ថតរូបភាពនិស្សិត" : "Capture student photos" },
+            { icon: "fa-trash", text: settings.lang === "KH" ? "លុបរូបភាព" : "Delete photos" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលទិន្នន័យនិស្សិត" : "View student data" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលរូបភាពដែលបានរក្សាទុក" : "View saved photos" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលការវិភាគ" : "View analytics" },
+            { icon: "fa-download", text: settings.lang === "KH" ? "នាំចេញទិន្នន័យ" : "Export data" },
+            { icon: "fa-qrcode", text: settings.lang === "KH" ? "ស្កេន QR Code" : "Scan QR codes" },
+            { icon: "fa-layer-group", text: settings.lang === "KH" ? "ស្កេនជាក្រុម" : "Batch scanning" }
+        ],
+        superadmin: [
+            { icon: "fa-camera", text: settings.lang === "KH" ? "ថតរូបភាពនិស្សិត" : "Capture student photos" },
+            { icon: "fa-trash", text: settings.lang === "KH" ? "លុបរូបភាព" : "Delete photos" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលទិន្នន័យនិស្សិត" : "View student data" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលរូបភាពដែលបានរក្សាទុក" : "View saved photos" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលការវិភាគ" : "View analytics" },
+            { icon: "fa-download", text: settings.lang === "KH" ? "នាំចេញទិន្នន័យ" : "Export data" },
+            { icon: "fa-qrcode", text: settings.lang === "KH" ? "ស្កេន QR Code" : "Scan QR codes" },
+            { icon: "fa-layer-group", text: settings.lang === "KH" ? "ស្កេនជាក្រុម" : "Batch scanning" },
+            { icon: "fa-users-cog", text: settings.lang === "KH" ? "គ្រប់គ្រងគណនីអ្នកគ្រប់គ្រង" : "Manage admin accounts" },
+            { icon: "fa-cog", text: settings.lang === "KH" ? "កែប្រែការកំណត់ប្រព័ន្ធ" : "Change system settings" }
+        ]
+    };
+    
+    return permissions[role] || permissions.viewer;
+}
+
 // Update the event listeners for the modal buttons
 viewDashboardBtn.addEventListener('click', () => {
-    roleInfoModal.classList.add('hidden');
+    roleInfoModal.classList.add("hidden");
     // Default to scan page
     navLinksDeactivate();
     hideAllPages();
@@ -626,603 +946,13 @@ viewDashboardBtn.addEventListener('click', () => {
 });
 
 closeRoleBtn.addEventListener('click', () => {
-    roleInfoModal.classList.add('hidden');
+    roleInfoModal.classList.add("hidden");
     // Default to scan page
     navLinksDeactivate();
     hideAllPages();
     navScan.classList.add('active');
     pageScan.classList.remove('hidden');
 });
-
-// Update the DOMContentLoaded event listener to initialize the new features
-document.addEventListener("DOMContentLoaded", async () => {
-    // ... existing code ...
-    
-    // Initialize new features
-    initTourGuide();
-    initQRScanner();
-    initBatchScan();
-    
-    // ... rest of existing code ...
-});
-
-
-
-// DOM refs
-const video = document.getElementById("video"),
-    captureCanvas = document.getElementById("capture-canvas"),
-    photoPreview = document.getElementById("photo-preview");
-const uploadBtn = document.getElementById("upload-btn"),
-    retakeBtn = document.getElementById("retake-btn"),
-    cameraSection = document.getElementById("camera-section");
-const videoWrapper = document.getElementById("video-wrapper"),
-    faceStatus = document.getElementById("face-status"),
-    subtitle = document.getElementById("subtitle");
-const switchCameraBtn = document.getElementById("switch-camera-btn"),
-    backBtn = document.getElementById("back-btn"),
-    manualCaptureBtn = document.getElementById("manual-capture-btn");
-
-const modal = document.getElementById("modal"),
-    modalIcon = document.getElementById("modal-icon"),
-    modalMessage = document.getElementById("modal-message"),
-    modalButtons = document.getElementById("modal-buttons");
-
-const pageScan = document.getElementById("page-scan"),
-    pageRecords = document.getElementById("page-records"),
-    pageList = document.getElementById("page-list"),
-    pageStorage = document.getElementById("page-storage"),
-    pageProfile = document.getElementById("page-profile"),
-    pageAdmin = document.getElementById("page-admin"),
-    pageAnalytics = document.getElementById("page-analytics");
-
-const navScan = document.getElementById("nav-scan"),
-    navRecords = document.getElementById("nav-records"),
-    navList = document.getElementById("nav-list"),
-    navStorage = document.getElementById("nav-storage"),
-    navProfile = document.getElementById("nav-profile"),
-    navAdmin = document.getElementById("nav-admin"),
-    navAnalytics = document.getElementById("nav-analytics"),
-    navSettingsBtn = document.getElementById("nav-settings-btn");
-
-const sidebar = document.getElementById("sidebar"),
-    menuBtn = document.getElementById("menu-btn"),
-    sidebarBackdrop = document.getElementById("sidebar-backdrop"),
-    sidebarToggleBtn = document.getElementById("sidebar-toggle-btn"),
-    contentWrapper = document.getElementById("content-wrapper");
-
-const selectionArea = document.getElementById("selection-area"),
-    studentSearchInput = document.getElementById("student-search-input"),
-    studentList = document.getElementById("student-list");
-
-const recordsLoading = document.getElementById("records-loading"),
-    recordsTable = document.getElementById("records-table"),
-    recordsClassFilter = document.getElementById("records-class-filter"),
-    recordsSearchInput = document.getElementById("records-search-input");
-
-const listLoading = document.getElementById("list-loading"),
-    listTable = document.getElementById("list-table"),
-    listClassFilter = document.getElementById("list-class-filter"),
-    listSearchInput = document.getElementById("list-search-input");
-
-const listTotalCount = document.getElementById("list-total-count");
-const listCompletedCount = document.getElementById("list-completed-count");
-const listPendingCount = document.getElementById("list-pending-count");
-
-const loginScreen = document.getElementById("login-screen"),
-    mainAppWrapper = document.getElementById("main-app-wrapper"),
-    adminListLoader = document.getElementById("admin-list-loader"),
-    adminSelect = document.getElementById("admin-select"),
-    proceedToScanBtn = document.getElementById("proceed-to-scan-btn"),
-    adminSelectionArea = document.getElementById("admin-selection-area"),
-    adminScanArea = document.getElementById("admin-scan-area"),
-    adminVideoWrapper = document.getElementById("admin-video-wrapper"),
-    adminVideo = document.getElementById("admin-video"),
-    adminScanStatus = document.getElementById("admin-scan-status"),
-    adminManualScanBtn = document.getElementById("admin-manual-scan-btn"),
-    adminBackBtn = document.getElementById("admin-back-btn");
-
-const adminProfileImgHeader = document.getElementById("admin-profile-img-header"),
-    adminProfileSidebar = document.getElementById("admin-profile-compact"),
-    adminProfileImgSidebar = document.getElementById("admin-profile-img-sidebar"),
-    adminNameSidebar = document.getElementById("admin-name-sidebar"),
-    adminRoleSidebar = document.getElementById("admin-role-sidebar");
-
-const sidebarLogo = document.getElementById("sidebar-logo");
-
-const btnThemeToggle = document.getElementById("btn-theme-toggle"),
-    btnLang = document.getElementById("btn-lang"),
-    bgColorPicker = document.getElementById("bg-color-picker"),
-    faceScanToggleRow = document.getElementById("face-scan-toggle-row"),
-    faceScanEnabledCheckbox = document.getElementById("face-scan-enabled");
-
-const logoutBtn = document.getElementById("logout-btn");
-
-// profile page refs
-const profileImgLarge = document.getElementById("profile-img-large"),
-    profileNameLarge = document.getElementById("profile-name-large"),
-    profileRoleLarge = document.getElementById("profile-role-large"),
-    profileTotalAll = document.getElementById("profile-total-all"),
-    profileTotalMy = document.getElementById("profile-total-my"),
-    profileImagesGrid = document.getElementById("profile-images-grid"),
-    profileImageFilter = document.getElementById("profile-image-filter");
-
-// Admin Panel Refs
-const adminManagementList = document.getElementById("admin-management-list");
-const addAdminName = document.getElementById("add-admin-name");
-const addAdminImageUrl = document.getElementById("add-admin-image-url");
-const addAdminEmail = document.getElementById("add-admin-email");
-const addAdminRole = document.getElementById("add-admin-role");
-const addAdminBtn = document.getElementById("add-admin-btn");
-
-// Analytics Refs
-const scansTodayEl = document.getElementById("scans-today");
-const activeUsersEl = document.getElementById("active-users");
-const completionRateEl = document.getElementById("completion-rate");
-const storageUsedEl = document.getElementById("storage-used");
-const weeklyActivityChart = document.getElementById("weekly-activity-chart");
-const classCompletionChart = document.getElementById("class-completion-chart");
-
-// Notification Toast Refs
-const notificationToast = document.getElementById("notification-toast");
-const notificationIcon = document.getElementById("notification-icon");
-const notificationTitle = document.getElementById("notification-title");
-const notificationMessage = document.getElementById("notification-message");
-const notificationClose = document.getElementById("notification-close");
-
-// New Feature Refs
-const voiceSearchBtn = document.getElementById("voice-search-btn");
-const batchScanBtn = document.getElementById("batch-scan-btn");
-const qrScanBtn = document.getElementById("qr-scan-btn");
-const exportListBtn = document.getElementById("export-list-btn");
-const exportRecordsBtn = document.getElementById("export-records-btn");
-
-// Voice Search Indicator
-const voiceSearchIndicator = document.getElementById("voice-search-indicator");
-
-// state
-const SESSION_KEY = "di_admin_session_v2";
-let studentsData = [],
-    savedRecordsData = [],
-    allStudentsListData = [],
-    adminData = [];
-let currentStream,
-    faceApiInterval,
-    stableFrames = 0,
-    currentFacingMode = "environment",
-    selectedStudent = null,
-    currentCameraMode = "auto";
-let loggedInAdmin = null,
-    adminFaceMatcher = null,
-    adminScanInterval = null,
-    isScanning = false,
-    isUploading = false;
-let settings = { theme: "dark", lang: "KH", bgColor: "#0f172a" };
-let isSidebarCollapsed = false;
-
-// Voice recognition
-let recognition = null;
-let isListening = false;
-
-// QR Scanner
-let qrScanner = null;
-
-// Batch scan data
-let batchScanData = [];
-
-// Analytics data
-let analyticsData = {
-    scansToday: 0,
-    activeUsers: 0,
-    completionRate: 0,
-    storageUsed: 0,
-    weeklyActivity: [],
-    classCompletion: []
-};
-
-/* --------------------------- UTIL (modal) --------------------------- */
-const icons = {
-    success: `<svg class="w-full h-full text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
-    error: `<svg class="w-full h-full text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
-    loading: `<div class="w-16 h-16 border-4 border-slate-500 border-t-indigo-500 rounded-full animate-spin"></div>`,
-    choice: `<svg class="w-full h-full text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m4 13-4-4M3 10h12M3 15h4M4 19h16a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1z"/></svg>`,
-};
-
-function showModal(type, message, actions = {}) {
-    modalIcon.innerHTML = icons[type] || "";
-    modalMessage.textContent = message;
-    modal.classList.remove("hidden");
-    modalButtons.innerHTML = "";
-    if (type === "loading") return;
-    if (Object.keys(actions).length) {
-        for (const [txt, action] of Object.entries(actions)) {
-            const b = document.createElement("button");
-            b.className = action.className || "w-full bg-slate-600 text-white py-2 rounded-lg font-semibold hover:bg-slate-700 transition";
-            b.textContent = txt;
-            b.onclick = () => {
-                modal.classList.add("hidden");
-                if (action.callback) action.callback();
-            };
-            modalButtons.appendChild(b);
-        }
-    } else {
-        const b = document.createElement("button");
-        b.className = "w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition";
-        b.textContent = settings.lang === "EN" ? "OK" : "យល់ព្រម";
-        b.onclick = () => modal.classList.add("hidden");
-        modalButtons.appendChild(b);
-    }
-}
-
-/* --------------------------- NOTIFICATION TOAST --------------------------- */
-function showNotification(title, message, type = 'info') {
-    notificationTitle.textContent = title;
-    notificationMessage.textContent = message;
-    
-    // Set icon based on type
-    let iconHtml = '';
-    switch(type) {
-        case 'success':
-            iconHtml = '<i class="fas fa-check-circle text-green-400"></i>';
-            break;
-        case 'error':
-            iconHtml = '<i class="fas fa-exclamation-circle text-red-400"></i>';
-            break;
-        case 'warning':
-            iconHtml = '<i class="fas fa-exclamation-triangle text-yellow-400"></i>';
-            break;
-        default:
-            iconHtml = '<i class="fas fa-info-circle text-blue-400"></i>';
-    }
-    notificationIcon.innerHTML = iconHtml;
-    
-    // Show notification
-    notificationToast.classList.add('show');
-    
-    // Auto hide after 5 seconds
-    setTimeout(() => {
-        notificationToast.classList.remove('show');
-    }, 5000);
-}
-
-notificationClose.addEventListener('click', () => {
-    notificationToast.classList.remove('show');
-});
-
-/* --------------------------- FACEAPI MODELS --------------------------- */
-async function loadModels() {
-    const MODEL_URL = "./models";
-    await Promise.all([
-        faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
-        faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
-    ]);
-}
-
-/* --------------------------- VOICE RECOGNITION --------------------------- */
-function initVoiceRecognition() {
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.lang = 'km-KH'; // Khmer language
-        
-        recognition.onstart = () => {
-            isListening = true;
-            voiceSearchIndicator.classList.add('active');
-            showNotification('Voice Search', 'Listening...', 'info');
-        };
-        
-        recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript;
-            studentSearchInput.value = transcript;
-            populateStudentList(transcript);
-            isListening = false;
-            voiceSearchIndicator.classList.remove('active');
-            showNotification('Voice Search', `Search for: ${transcript}`, 'success');
-        };
-        
-        recognition.onerror = (event) => {
-            console.error('Speech recognition error:', event.error);
-            isListening = false;
-            voiceSearchIndicator.classList.remove('active');
-            showNotification('Voice Search Error', 'Please try again', 'error');
-        };
-        
-        recognition.onend = () => {
-            isListening = false;
-            voiceSearchIndicator.classList.remove('active');
-        };
-    } else {
-        voiceSearchBtn.style.display = 'none';
-        console.log('Speech recognition not supported');
-    }
-}
-
-voiceSearchBtn.addEventListener('click', () => {
-    if (recognition && !isListening) {
-        recognition.start();
-    }
-});
-
-/* --------------------------- QR SCANNER --------------------------- */
-function initQRScanner() {
-    qrScanBtn.addEventListener('click', () => {
-        openQRScanner();
-    });
-}
-
-function openQRScanner() {
-    // Create modal if it doesn't exist
-    if (!qrScannerModal) {
-        const modal = document.createElement('div');
-        modal.id = 'qr-scanner-modal';
-        modal.innerHTML = `
-            <button class="close-btn"><i class="fas fa-times"></i></button>
-            <video id="qr-video"></video>
-            <div id="qr-result"></div>
-        `;
-        document.body.appendChild(modal);
-        
-        // Add close button event
-        modal.querySelector('.close-btn').addEventListener('click', closeQRScanner);
-    }
-    
-    qrScannerModal = document.getElementById('qr-scanner-modal');
-    qrScannerModal.style.display = 'flex';
-    
-    const video = document.getElementById('qr-video');
-    
-    // Initialize QR scanner
-    qrScanner = new QrScanner(
-        video,
-        result => {
-            handleQRResult(result);
-            closeQRScanner();
-        },
-        {
-            highlightScanRegion: true,
-            highlightCodeOutline: true,
-        }
-    );
-    
-    qrScanner.start().catch(error => {
-        console.error('Failed to start QR scanner:', error);
-        showNotification('QR Scanner Error', 'Failed to start camera', 'error');
-        closeQRScanner();
-    });
-}
-
-function closeQRScanner() {
-    if (qrScanner) {
-        qrScanner.stop();
-        qrScanner = null;
-    }
-    
-    if (qrScannerModal) {
-        qrScannerModal.style.display = 'none';
-    }
-}
-
-function handleQRResult(result) {
-    // Assuming QR code contains student ID
-    const studentId = result.data;
-    const student = studentsData.find(s => s[0] === studentId);
-    
-    if (student) {
-        selectedStudent = student;
-        showCameraModeSelection();
-    } else {
-        showNotification('QR Scan Result', `Student with ID ${studentId} not found`, 'error');
-    }
-}
-
-/* --------------------------- BATCH SCAN --------------------------- */
-function initBatchScan() {
-    batchScanBtn.addEventListener('click', () => {
-        openBatchScanModal();
-    });
-}
-
-function openBatchScanModal() {
-    // Create modal if it doesn't exist
-    if (!batchScanModal) {
-        const modal = document.createElement('div');
-        modal.id = 'batch-scan-modal';
-        modal.innerHTML = `
-            <div class="modal-content">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl font-bold text-white">Batch Scan</h2>
-                    <button class="close-btn text-white text-xl"><i class="fas fa-times"></i></button>
-                </div>
-                <div class="mb-4">
-                    <p class="text-slate-300 mb-2">Select students to scan in batch:</p>
-                    <div class="batch-list" id="batch-list"></div>
-                </div>
-                <div class="flex justify-end gap-2">
-                    <button id="batch-cancel-btn" class="px-4 py-2 bg-slate-600 text-white rounded-lg">Cancel</button>
-                    <button id="batch-start-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">Start Batch Scan</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
-        
-        // Add event listeners
-        modal.querySelector('.close-btn').addEventListener('click', closeBatchScanModal);
-        document.getElementById('batch-cancel-btn').addEventListener('click', closeBatchScanModal);
-        document.getElementById('batch-start-btn').addEventListener('click', startBatchScan);
-    }
-    
-    batchScanModal = document.getElementById('batch-scan-modal');
-    batchScanModal.style.display = 'flex';
-    
-    // Populate batch list with students who don't have photos
-    const batchList = document.getElementById('batch-list');
-    batchList.innerHTML = '';
-    
-    const studentsWithoutPhotos = studentsData.filter(s => s[4] === 0);
-    
-    if (studentsWithoutPhotos.length === 0) {
-        batchList.innerHTML = '<p class="text-slate-400">All students have photos!</p>';
-        return;
-    }
-    
-    studentsWithoutPhotos.forEach(student => {
-        const item = document.createElement('div');
-        item.className = 'batch-item';
-        item.innerHTML = `
-            <input type="checkbox" class="batch-checkbox" data-id="${student[0]}" data-name="${student[1]}">
-            <div class="info">
-                <div class="font-semibold">${student[1]}</div>
-                <div class="text-sm text-slate-400">ID: ${student[0]}</div>
-            </div>
-            <div class="status">Pending</div>
-        `;
-        batchList.appendChild(item);
-    });
-}
-
-function closeBatchScanModal() {
-    if (batchScanModal) {
-        batchScanModal.style.display = 'none';
-        batchScanData = [];
-    }
-}
-
-function startBatchScan() {
-    // Get selected students
-    const checkboxes = document.querySelectorAll('.batch-checkbox:checked');
-    
-    if (checkboxes.length === 0) {
-        showNotification('Batch Scan', 'Please select at least one student', 'warning');
-        return;
-    }
-    
-    batchScanData = Array.from(checkboxes).map(cb => ({
-        id: cb.dataset.id,
-        name: cb.dataset.name,
-        status: 'pending',
-        photo: null
-    }));
-    
-    closeBatchScanModal();
-    
-    // Start with first student
-    processBatchStudent(0);
-}
-
-async function processBatchStudent(index) {
-    if (index >= batchScanData.length) {
-        // All students processed
-        showNotification('Batch Scan Complete', `Successfully scanned ${batchScanData.filter(s => s.status === 'completed').length} students`, 'success');
-        return;
-    }
-    
-    const student = batchScanData[index];
-    const studentData = studentsData.find(s => s[0] === student.id);
-    
-    if (!studentData) {
-        student.status = 'error';
-        processBatchStudent(index + 1);
-        return;
-    }
-    
-    selectedStudent = studentData;
-    
-    // Show current student info
-    showNotification('Batch Scan', `Now scanning: ${student.name}`, 'info');
-    
-    // Start camera for this student
-    await startCamera("environment", "manual");
-    
-    // Override upload button to process next student
-    uploadBtn.onclick = async () => {
-        await uploadPhoto();
-        
-        // Mark as completed
-        student.status = 'completed';
-        
-        // Move to next student
-        processBatchStudent(index + 1);
-    };
-}
-
-/* --------------------------- EXPORT FUNCTIONALITY --------------------------- */
-function initExportFunctions() {
-    exportListBtn.addEventListener('click', () => {
-        exportData('list');
-    });
-    
-    exportRecordsBtn.addEventListener('click', () => {
-        exportData('records');
-    });
-}
-
-function exportData(type) {
-    let data, filename;
-    
-    if (type === 'list') {
-        data = allStudentsListData.map(s => ({
-            ID: s[0],
-            Name: s[1],
-            Class: s[2],
-            Group: s[3],
-            PhotoCount: s[4]
-        }));
-        filename = 'student_list.csv';
-    } else if (type === 'records') {
-        data = savedRecordsData.map(r => ({
-            Serial: r[0],
-            Name: r[1],
-            ID: r[2],
-            Class: r[3],
-            Group: r[4],
-            ImageURL: r[5]
-        }));
-        filename = 'saved_records.csv';
-    }
-    
-    // Convert to CSV
-    const csv = convertToCSV(data);
-    
-    // Create download link
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    showNotification('Export Success', `Data exported to ${filename}`, 'success');
-}
-
-function convertToCSV(data) {
-    if (!data || data.length === 0) return '';
-    
-    // Get headers
-    const headers = Object.keys(data[0]);
-    
-    // Create CSV content
-    const csvContent = [
-        headers.join(','),
-        ...data.map(row => 
-            headers.map(header => {
-                const value = row[header];
-                // Escape commas and quotes
-                if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
-                    return `"${value.replace(/"/g, '""')}"`;
-                }
-                return value;
-            }).join(',')
-        )
-    ].join('\n');
-    
-    return csvContent;
-}
 
 /* --------------------------- ADMIN FETCH & SESSIONS --------------------------- */
 async function fetchAdmins() {
@@ -1268,11 +998,11 @@ function populateAdminSelect() {
     adminSelect.classList.remove("hidden");
 }
 
-function saveAdminSession({ name, imageUrl, role, faceScan }) {
+function saveAdminSession({ name, imageUrl, role, faceScan, hasLoggedInBefore }) {
     try {
         localStorage.setItem(
             SESSION_KEY,
-            JSON.stringify({ name, imageUrl, role, faceScan, ts: Date.now() })
+            JSON.stringify({ name, imageUrl, role, faceScan, hasLoggedInBefore, ts: Date.now() })
         );
     } catch (e) {}
 }
@@ -1303,24 +1033,28 @@ proceedToScanBtn.onclick = () => {
     
     // Check if account is disabled
     if (loggedInAdmin.disabled) {
-        showModal('error', 'Your account is disabled. Please contact a superadmin.');
+        showModal('error', settings.lang === "KH" ? 'គណនីរបស់អ្នកត្រូវបានទប់ស្កាត់។ សូមទាក់ទង superadmin។' : 'Your account is disabled. Please contact a superadmin.');
         return;
     }
 
     adminSelectionArea.classList.add("hidden");
     adminScanArea.classList.remove("hidden");
-    adminScanStatus.textContent = "Starting camera...";
+    adminScanStatus.textContent = settings.lang === "KH" ? "កំពុងចាប់ផ្តើមកាមេរ៉ា..." : "Starting camera...";
     startAdminLoginScan();
 };
 
 async function startAdminLoginScan() {
-    adminScanStatus.textContent = `Loading reference for ${loggedInAdmin.name}...`;
+    adminScanStatus.textContent = settings.lang === "KH" 
+        ? `កំពុងផ្ទុកឯកសារយោងសម្រាប់ ${loggedInAdmin.name}...` 
+        : `Loading reference for ${loggedInAdmin.name}...`;
     adminFaceMatcher = await createFaceMatcher(
         loggedInAdmin.imageUrl,
         loggedInAdmin.name
     );
     if (!adminFaceMatcher) {
-        adminScanStatus.textContent = "Could not load reference image. Please go back.";
+        adminScanStatus.textContent = settings.lang === "KH" 
+            ? "មិនអាចផ្ទុករូបភាពយោង។ សូមត្រឡប់ក្រោយ។" 
+            : "Could not load reference image. Please go back.";
         adminVideoWrapper.classList.add("fail");
         return;
     }
@@ -1332,12 +1066,14 @@ async function startAdminLoginScan() {
         currentStream = stream;
         adminVideo.srcObject = stream;
         adminVideo.onloadedmetadata = () => {
-            adminScanStatus.textContent = "Look at the camera. Auto-scanning...";
+            adminScanStatus.textContent = settings.lang === "KH" 
+                ? "សូមមើលកាមេរ៉ា។ កំពុងស្កេនដោយស្វ័យប្រវត្តិ..." 
+                : "Look at the camera. Auto-scanning...";
             adminVideoWrapper.classList.add("ready");
             startAdminScanInterval();
         };
     } catch (err) {
-        showModal("error", "Please allow camera access.");
+        showModal("error", settings.lang === "KH" ? "សូមអនុញ្ញាតឱ្យចូលដំណើរការកាមេរ៉ា។" : "Please allow camera access.");
         resetToAdminSelection();
     }
 }
@@ -1356,7 +1092,9 @@ async function createFaceMatcher(imageUrl, label) {
         return new faceapi.FaceMatcher(desc, 0.5);
     } catch (e) {
         console.error(e);
-        adminScanStatus.innerHTML = "Error loading reference image (check CORS).";
+        adminScanStatus.innerHTML = settings.lang === "KH" 
+            ? "កំហុសក្នុងការផ្ទុករូបភាពយោង (ពិនិត្យ CORS)។" 
+            : "Error loading reference image (check CORS).";
         return null;
     }
 }
@@ -1386,17 +1124,23 @@ async function performAdminScan() {
     if (det) {
         const best = adminFaceMatcher.findBestMatch(det.descriptor);
         if (best.label !== "unknown" && best.distance < 0.5) {
-            adminScanStatus.textContent = `Welcome, ${best.label}!`;
+            adminScanStatus.textContent = settings.lang === "KH" 
+                ? `សូមស្វាគមន៍, ${best.label}!` 
+                : `Welcome, ${best.label}!`;
             adminVideoWrapper.classList.remove("fail");
             adminVideoWrapper.classList.add("ready");
             return true;
         } else {
-            adminScanStatus.textContent = "Face does not match. Trying...";
+            adminScanStatus.textContent = settings.lang === "KH" 
+                ? "មុខមិនត្រូវគ្នា។ កំពុងព្យាយាម..." 
+                : "Face does not match. Trying...";
             adminVideoWrapper.classList.add("fail");
             return false;
         }
     } else {
-        adminScanStatus.textContent = "No face detected. Please center your face.";
+        adminScanStatus.textContent = settings.lang === "KH" 
+            ? "រកមិនឃើញមុខ។ សូមដាក់មុខអ្នកនៅកណ្តាល។" 
+            : "No face detected. Please center your face.";
         adminVideoWrapper.classList.remove("fail");
         return false;
     }
@@ -1405,11 +1149,13 @@ async function performAdminScan() {
 adminManualScanBtn.onclick = async () => {
     if (isScanning) clearInterval(adminScanInterval);
     isScanning = false;
-    adminScanStatus.textContent = "Manual scan... processing...";
+    adminScanStatus.textContent = settings.lang === "KH" ? "កំពុងស្កេនដោយដៃ..." : "Manual scan... processing...";
     const ok = await performAdminScan();
     if (ok) onLoginSuccess();
     else {
-        adminScanStatus.textContent = "Manual scan failed. Resuming auto-scan...";
+        adminScanStatus.textContent = settings.lang === "KH" 
+            ? "ការស្កេនដោយដៃបរាជ័យ។ កំពុងបន្តការស្កេនដោយស្វ័យប្រវត្តិ..." 
+            : "Manual scan failed. Resuming auto-scan...";
         setTimeout(() => {
             if (!isScanning) startAdminScanInterval();
         }, 2000);
@@ -1430,6 +1176,7 @@ function resetToAdminSelection() {
 
 adminBackBtn.onclick = resetToAdminSelection;
 
+// Update the onLoginSuccess function to handle first-time login
 async function onLoginSuccess() {
     clearInterval(adminScanInterval);
     stopCamera();
@@ -1440,12 +1187,17 @@ async function onLoginSuccess() {
         loggedInAdmin = adminObject;
     }
 
+    // Check if this is the first time login
+    const sessionData = loadAdminSession();
+    isFirstLogin = !sessionData || !sessionData.hasLoggedInBefore;
+    
     // persist session
     saveAdminSession({
         name: loggedInAdmin.name,
         imageUrl: loggedInAdmin.imageUrl,
         role: loggedInAdmin.role || "admin",
         faceScan: loggedInAdmin.faceScan,
+        hasLoggedInBefore: true
     });
     
     // set profile UI
@@ -1457,18 +1209,29 @@ async function onLoginSuccess() {
     adminRoleSidebar.textContent = loggedInAdmin.role || "admin";
     adminProfileImgHeader.classList.remove("hidden");
     adminProfileSidebar.classList.remove("hidden");
+    
     // remove login screen permanently
     loginScreen.classList.add("hidden");
     if (loginScreen.parentNode)
         loginScreen.parentNode.removeChild(loginScreen);
     mainAppWrapper.classList.remove("hidden");
+    
+    // Show appropriate modal based on first-time login
+    if (isFirstLogin) {
+        showWelcomeModal();
+    } else {
+        showRoleInfoModal();
+    }
+    
     // apply settings UI (face-scan toggle visible only for superadmin)
     setupSettingsUI();
-    await fetchStudents();
-    await displaySavedRecords();
-    await fetchAllSavedRecordsForStats();
-    updateProfileSummary();
-    fetchAnalyticsData();
+    
+    // Fetch data in background
+    Promise.all([
+        fetchStudents(),
+        displaySavedRecords(),
+        fetchAllSavedRecordsForStats(),
+    ]).then(updateProfileSummary);
 }
 
 // Updated Click Handlers for new sidebar
@@ -1514,7 +1277,7 @@ async function fetchStudents() {
         allStudentsListData = studentsData;
         populateStudentList();
     } catch (e) {
-        showModal("error", `Could not fetch student data: ${e.message}`);
+        showModal("error", settings.lang === "KH" ? `មិនអាចទាញយកទិន្នន័យនិស្សិត: ${e.message}` : `Could not fetch student data: ${e.message}`);
     }
 }
 
@@ -1527,7 +1290,7 @@ function populateStudentList(filter = "") {
             (s[1] || "").toLowerCase().includes(f)
     );
     if (!filtered.length) {
-        studentList.innerHTML = `<li class="text-center text-slate-400 p-4">No students found.</li>`;
+        studentList.innerHTML = `<li class="text-center text-slate-400 p-4">${settings.lang === "KH" ? "រកមិនឃើញនិស្សិត" : "No students found"}.</li>`;
         return;
     }
     filtered.forEach((s) => {
@@ -1544,7 +1307,7 @@ function populateStudentList(filter = "") {
             // permission: viewer cannot capture
             if (loggedInAdmin && loggedInAdmin.role === "viewer") {
                 li.classList.add("opacity-60");
-                li.title = "View only account";
+                li.title = settings.lang === "KH" ? "គណនីមើលតែប៉ុណ្ណោះ" : "View only account";
             } else {
                 li.onclick = () => {
                     selectedStudent = s;
@@ -1560,18 +1323,18 @@ function populateStudentList(filter = "") {
 function showCameraModeSelection() {
     // if face-scan disabled for this device
     if (loggedInAdmin && loggedInAdmin.faceScan === false) {
-        showModal("error", "Face-scan is disabled for this account.");
+        showModal("error", settings.lang === "KH" ? "ការស្កេនមុខត្រូវបានបិទសម្រាប់គណនីនេះ។" : "Face-scan is disabled for this account.");
         return;
     }
     showModal(
         "choice",
-        "សូមជ្រើសរើសប្រតិបត្តិកាមេរ៉ា",
+        settings.lang === "KH" ? "សូមជ្រើសរើសប្រតិបត្តិកាមេរ៉ា" : "Select camera mode",
         {
-            "ថតរូបស្វ័យប្រវត្តិ": {
+            [settings.lang === "KH" ? "ថតរូបស្វ័យប្រវត្តិ" : "Auto Capture"]: {
                 callback: () => startCamera("environment", "auto"),
                 className: "w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition",
             },
-            "ថតរូបដោយខ្លួនឯង": {
+            [settings.lang === "KH" ? "ថតរូបដោយខ្លួនឯង" : "Manual Capture"]: {
                 callback: () => startCamera("environment", "manual"),
                 className: "w-full bg-slate-600 text-white py-3 rounded-lg font-semibold hover:bg-slate-700 transition",
             },
@@ -1596,7 +1359,7 @@ async function displaySavedRecords() {
         recordsLoading.style.display = "none";
         recordsTable.classList.remove("hidden");
     } catch (e) {
-        recordsLoading.innerHTML = `<p class="text-red-400">Error: ${e.message}</p>`;
+        recordsLoading.innerHTML = `<p class="text-red-400">${settings.lang === "KH" ? "កំហុស" : "Error"}: ${e.message}</p>`;
     }
 }
 
@@ -1609,7 +1372,7 @@ function populateClassFilter(records, filterElement) {
                 .filter(Boolean)
         ),
     ];
-    filterElement.innerHTML = '<option value="all">All Classes</option>';
+    filterElement.innerHTML = `<option value="all">${settings.lang === "KH" ? "ថ្នាក់ទាំងអស់" : "All Classes"}</option>`;
     classes
         .sort()
         .forEach(
@@ -1630,7 +1393,7 @@ function filterRecordsTable() {
         return cOk && sOk;
     });
     if (!rows.length) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center p-4 text-slate-400">No records found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center p-4 text-slate-400">${settings.lang === "KH" ? "រកមិនឃើញកំណត់ត្រា" : "No records found"}.</td></tr>`;
         return;
     }
     rows.forEach((r) => {
@@ -1638,7 +1401,7 @@ function filterRecordsTable() {
             url = r[5];
         const tr = document.createElement("tr");
         tr.className = "border-b border-slate-700";
-        tr.innerHTML = `<td class="p-3">${serial}</td><td class="p-3 whitespace-nowrap">${r[1]}</td><td class="p-3">${r[2]}</td><td class="p-3">${r[3]}</td><td class="p-3">${r[4]}</td><td class="p-3"><a href="${url}" target="_blank" rel="noopener noreferrer" class="relative block w-16 h-16 group rounded-lg overflow-hidden"><img src="${url}" crossorigin="anonymous" class="w-full h-full object-cover" alt="Student photo"></a></td><td class="p-3 text-center">${renderRecordControls(serial, url)}</td>`;
+        tr.innerHTML = `<td class="p-3">${serial}</td><td class="p-3 whitespace-nowrap">${r[1]}</td><td class="p-3">${r[2]}</td><td class="p-3">${r[3]}</td><td class="p-3">${r[4]}</td><td class="p-3"><a href="${url}" target="_blank" rel="noopener noreferrer" class="relative block w-16 h-16 group rounded-lg overflow-hidden"><img src="${url}" crossorigin="anonymous" class="w-full h-full object-cover" alt="${settings.lang === "KH" ? "រូបភាពនិស្សិត" : "Student photo"}"></a></td><td class="p-3 text-center">${renderRecordControls(serial, url)}</td>`;
         tbody.appendChild(tr);
     });
 }
@@ -1650,8 +1413,8 @@ function renderRecordControls(serial, url) {
     if (role === "superadmin" || role === "admin")
         return `<button class="text-red-400 hover:text-red-600 transition delete-btn" data-serial="${serial}" data-url="${url}"><i class="fas fa-trash-alt"></i></button>`;
     if (role === "subadmin")
-        return `<span class="text-slate-400">No delete</span>`;
-    return `<span class="text-slate-400">View only</span>`;
+        return `<span class="text-slate-400">${settings.lang === "KH" ? "មិនអាចលុប" : "No delete"}</span>`;
+    return `<span class="text-slate-400">${settings.lang === "KH" ? "មើលតែប៉ុណ្ណោះ" : "View only"}</span>`;
 }
 
 document.addEventListener("click", async (e) => {
@@ -1666,15 +1429,15 @@ document.addEventListener("click", async (e) => {
 async function handleDelete(serialNumber, imageUrl) {
     showModal(
         "confirm",
-        "តើអ្នកប្រាកដទេថាចង់លុបរូបភាពនេះ?",
+        settings.lang === "KH" ? "តើអ្នកប្រាកដទេថាចង់លុបរូបភាពនេះ?" : "Are you sure you want to delete this image?",
         {
-            "បោះបង់": {
+            [settings.lang === "KH" ? "បោះបង់" : "Cancel"]: {
                 callback: null,
                 className: "w-full bg-slate-600 text-white py-2 rounded-lg font-semibold hover:bg-slate-700 transition",
             },
-            "លុប": {
+            [settings.lang === "KH" ? "លុប" : "Delete"]: {
                 callback: async () => {
-                    showModal("loading", "កំពុងលុប...");
+                    showModal("loading", settings.lang === "KH" ? "កំពុងលុប..." : "Deleting...");
                     try {
                         const res = await fetch(SCRIPT_URL, {
                             method: "POST",
@@ -1689,7 +1452,7 @@ async function handleDelete(serialNumber, imageUrl) {
                         if (!res.ok) throw new Error(`Server error: ${res.status}`);
                         const r = await res.json();
                         if (r.status === "success") {
-                            showModal("success", "រូបភាពត្រូវបានលុប!", {
+                            showModal("success", settings.lang === "KH" ? "រូបភាពត្រូវបានលុប!" : "Image deleted!", {
                                 "OK": {
                                     callback: async () => {
                                         await fetchStudents();
@@ -1700,7 +1463,7 @@ async function handleDelete(serialNumber, imageUrl) {
                             });
                         } else throw new Error(r.message || "Unknown server error.");
                     } catch (e) {
-                        showModal("error", `Delete failed: ${e.message}`);
+                        showModal("error", settings.lang === "KH" ? `ការលុបបរាជ័យ: ${e.message}` : `Delete failed: ${e.message}`);
                     }
                 },
                 className: "w-full bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition",
@@ -1719,7 +1482,7 @@ function populateListClassFilterV2() {
                 .filter(Boolean)
         ),
     ];
-    listClassFilter.innerHTML = '<option value="all">All Students</option><option value="with_photos">With Photos</option>';
+    listClassFilter.innerHTML = `<option value="all">${settings.lang === "KH" ? "និស្សិតទាំងអស់" : "All Students"}</option><option value="with_photos">${settings.lang === "KH" ? "មានរូបភាព" : "With Photos"}</option>`;
     classes
         .sort()
         .forEach(
@@ -1747,13 +1510,13 @@ function filterStudentListTable() {
     );
     const done = arr.filter((s) => s[4] > 0).length;
     if (!arr.length) {
-        tbody.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-slate-400">No students found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-slate-400">${settings.lang === "KH" ? "រកមិនឃើញនិស្សិត" : "No students found"}.</td></tr>`;
     } else {
         arr.forEach((s) => {
             const ok = s[4] > 0;
             const url = ok ? imgMap.get(String(s[0])) : null;
             const cell = url
-                ? `<a href="${url}" target="_blank" rel="noopener noreferrer" class="relative block w-12 h-12 group rounded-lg overflow-hidden mx-auto"><img src="${url}" crossorigin="anonymous" class="w-full h-full object-cover" alt="Student photo"></a>`
+                ? `<a href="${url}" target="_blank" rel="noopener noreferrer" class="relative block w-12 h-12 group rounded-lg overflow-hidden mx-auto"><img src="${url}" crossorigin="anonymous" class="w-full h-full object-cover" alt="${settings.lang === "KH" ? "រូបភាពនិស្សិត" : "Student photo"}"></a>`
                 : `<span class="text-slate-500">-</span>`;
             const icon = ok
                 ? `<i class="fas fa-check-circle text-green-400"></i>`
@@ -2655,3 +2418,60 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 });
+/* --------------------------- SETTINGS UI --------------------------- */
+function setupSettingsUI() {
+    // load saved settings
+    try {
+        const s = JSON.parse(
+            localStorage.getItem("di_settings_v1") || "{}"
+        );
+        if (s.theme) settings.theme = s.theme;
+        if (s.lang) settings.lang = s.lang;
+        if (s.bgColor) settings.bgColor = s.bgColor;
+    } catch (e) {}
+    applySettings(); 
+    
+    // show face-scan toggle only if superadmin
+    if (loggedInAdmin && (loggedInAdmin.role === "superadmin")) {
+        faceScanToggleRow.classList.remove("hidden");
+        navAdmin.classList.remove("hidden"); // Show Admin Panel link
+        navSettingsBtn.classList.remove("hidden"); // Show settings cog
+        
+        faceScanEnabledCheckbox.checked = loggedInAdmin.faceScan !== false;
+        faceScanEnabledCheckbox.onchange = () => {
+            loggedInAdmin.faceScan = faceScanEnabledCheckbox.checked;
+            // TODO: This should be saved to the backend
+            // For now, just update self
+            handleUpdateAdminDisabled(loggedInAdmin.name, !loggedInAdmin.faceScan);
+            showModal("success", "Updated face-scan preference.");
+        };
+    }
+    
+    btnThemeToggle.onclick = () => {
+        settings.theme = settings.theme === "dark" ? "light" : "dark";
+        applySettings();
+        localStorage.setItem("di_settings_v1", JSON.stringify(settings));
+    };
+    btnLang.onclick = () => {
+        settings.lang = settings.lang === "KH" ? "EN" : "KH";
+        applySettings();
+        localStorage.setItem("di_settings_v1", JSON.stringify(settings));
+    };
+    bgColorPicker.onchange = (e) => {
+        settings.bgColor = e.target.value;
+        document.body.style.background = settings.bgColor;
+        localStorage.setItem("di_settings_v1", JSON.stringify(settings));
+    };
+}
+
+function applySettings() {
+    document.body.setAttribute(
+        "data-theme",
+        settings.theme === "dark" ? "dark" : "light"
+    );
+    btnThemeToggle.textContent =
+        settings.theme === "dark" ? "Dark" : "Light";
+    btnLang.textContent = settings.lang;
+    bgColorPicker.value = settings.bgColor || "#0f172a";
+    document.body.style.background = settings.bgColor || "";
+}
