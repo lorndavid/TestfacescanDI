@@ -1,6 +1,653 @@
 /* --------------------------- CONFIG & DOM --------------------------- */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM-9UZbpL8GW6agRejPVGalKcTQPIdmm5-Xa0BWnpgrJiqahHFIRSE0LKH7n15AjNQ/exec";
 
+
+// Add these new variables at the top of the file
+let isFirstLogin = false;
+let tourSteps = [];
+let currentTourStep = 0;
+let isTourActive = false;
+
+// Add these new DOM element references
+const welcomeModal = document.getElementById("welcome-modal");
+const welcomeAvatar = document.getElementById("welcome-avatar");
+const welcomeTitle = document.getElementById("welcome-title");
+const welcomeSubtitle = document.getElementById("welcome-subtitle");
+const welcomeName = document.getElementById("welcome-name");
+const welcomeRole = document.getElementById("welcome-role");
+const startTourBtn = document.getElementById("start-tour-btn");
+const skipTourBtn = document.getElementById("skip-tour-btn");
+
+const roleInfoModal = document.getElementById("role-info-modal");
+const roleBadgeText = document.getElementById("role-badge-text");
+const roleTitle = document.getElementById("role-title");
+const roleDescription = document.getElementById("role-description");
+const permissionList = document.getElementById("permission-list");
+const viewDashboardBtn = document.getElementById("view-dashboard-btn");
+const closeRoleBtn = document.getElementById("close-role-btn");
+
+const qrScannerModal = document.getElementById("qr-scanner-modal");
+const closeQrScannerBtn = document.getElementById("close-qr-scanner");
+const qrVideo = document.getElementById("qr-video");
+
+const batchScanModal = document.getElementById("batch-scan-modal");
+const closeBatchScanBtn = document.getElementById("close-batch-scan");
+const batchList = document.getElementById("batch-list");
+const selectedCountEl = document.getElementById("selected-count");
+const cancelBatchScanBtn = document.getElementById("cancel-batch-scan");
+const startBatchScanBtn = document.getElementById("start-batch-scan");
+
+const tourGuide = document.getElementById("tour-guide");
+const tourTitle = document.getElementById("tour-title");
+const tourContent = document.getElementById("tour-content");
+const tourSkip = document.getElementById("tour-skip");
+const tourNext = document.getElementById("tour-next");
+
+// Update the onLoginSuccess function to handle first-time login
+async function onLoginSuccess() {
+    clearInterval(adminScanInterval);
+    stopCamera();
+    
+    // Find the full admin object, in case the one from login was partial
+    const adminObject = adminData.find(a => a.name === loggedInAdmin.name);
+    if (adminObject) {
+        loggedInAdmin = adminObject;
+    }
+
+    // Check if this is the first time login
+    const sessionData = loadAdminSession();
+    isFirstLogin = !sessionData || !sessionData.hasLoggedInBefore;
+    
+    // persist session
+    saveAdminSession({
+        name: loggedInAdmin.name,
+        imageUrl: loggedInAdmin.imageUrl,
+        role: loggedInAdmin.role || "admin",
+        faceScan: loggedInAdmin.faceScan,
+        hasLoggedInBefore: true
+    });
+    
+    // set profile UI
+    adminProfileImgHeader.crossOrigin = "anonymous";
+    adminProfileImgSidebar.crossOrigin = "anonymous";
+    adminProfileImgHeader.src = loggedInAdmin.imageUrl;
+    adminProfileImgSidebar.src = loggedInAdmin.imageUrl;
+    adminNameSidebar.textContent = loggedInAdmin.name;
+    adminRoleSidebar.textContent = loggedInAdmin.role || "admin";
+    adminProfileImgHeader.classList.remove("hidden");
+    adminProfileSidebar.classList.remove("hidden");
+    
+    // remove login screen permanently
+    loginScreen.classList.add("hidden");
+    if (loginScreen.parentNode)
+        loginScreen.parentNode.removeChild(loginScreen);
+    mainAppWrapper.classList.remove("hidden");
+    
+    // Show appropriate modal based on first-time login
+    if (isFirstLogin) {
+        showWelcomeModal();
+    } else {
+        showRoleInfoModal();
+    }
+    
+    // apply settings UI (face-scan toggle visible only for superadmin)
+    setupSettingsUI();
+    
+    // Fetch data in background
+    Promise.all([
+        fetchStudents(),
+        displaySavedRecords(),
+        fetchAllSavedRecordsForStats(),
+    ]).then(updateProfileSummary);
+}
+
+// Add function to show welcome modal for first-time users
+function showWelcomeModal() {
+    // Set welcome modal content
+    welcomeAvatar.src = loggedInAdmin.imageUrl;
+    welcomeName.textContent = loggedInAdmin.name;
+    welcomeRole.textContent = loggedInAdmin.role || "admin";
+    
+    // Set language based on settings
+    if (settings.lang === "KH") {
+        welcomeTitle.textContent = "សូមស្វាគមន៍មកកាន់ប្រព័ន្ធស្កេនមុខ";
+        welcomeSubtitle.textContent = "តើមានអ្វីជាមួយនឹងការណែនាំរយៈពេលខ្លី";
+        
+        // Update feature descriptions in Khmer
+        const featureTitles = document.querySelectorAll('.welcome-feature-title');
+        const featureDescriptions = document.querySelectorAll('.welcome-feature-description');
+        
+        if (featureTitles[0]) featureTitles[0].textContent = "ឈ្មោះ";
+        if (featureTitles[1]) featureTitles[1].textContent = "តួនាទី";
+        if (featureTitles[2]) featureTitles[0].textContent = "ការស្កេនមុខ";
+        if (featureDescriptions[2]) featureDescriptions[2].textContent = "ថតរូបភាពនិស្សិតជាមួយនឹងការរកឃើញមុខដោយស្វ័យប្រវត្តិ";
+        if (featureTitles[3]) featureTitles[3].textContent = "ការស្កេន QR Code";
+        if (featureDescriptions[3]) featureDescriptions[3].textContent = "កំណត់អត្តសញ្ញាណនិស្សិតយ៉ាងរហ័សដោយប្រើ QR Code";
+        if (featureTitles[4]) featureTitles[4].textContent = "ការស្កេនជាក្រុម";
+        if (featureDescriptions[4]) featureDescriptions[4].textContent = "ដំណើរការនិស្សិតច្រើននាក់ក្នុងមួយសម័យ";
+        if (featureTitles[5]) featureTitles[5].textContent = "ការវិភាគ";
+        if (featureDescriptions[5]) featureDescriptions[5].textContent = "មើលស្ថិតិ និងរបាយការណ៍ដំណើរការ";
+        
+        // Update onboarding steps in Khmer
+        const stepTitles = document.querySelectorAll('.onboarding-step-title');
+        const stepDescriptions = document.querySelectorAll('.onboarding-step-description');
+        
+        if (stepTitles[0]) stepTitles[0].textContent = "ជ្រើសរើសនិស្សិត";
+        if (stepDescriptions[0]) stepDescriptions[0].textContent = "ជ្រើសរើសនិស្សិតពីបញ្ជី ឬស្វែងរកតាមឈ្មោះ/ID";
+        
+        if (stepTitles[1]) stepTitles[1].textContent = "ថតរូបភាព";
+        if (stepDescriptions[1]) stepDescriptions[1].textContent = "ប្រើការរកឃើញមុខដោយស្វ័យប្រវត្តិ ឬថតដោយដៃ";
+        
+        if (stepTitles[2]) stepTitles[2].textContent = "បញ្ជូន និងរក្សាទុក";
+        if (stepDescriptions[2]) stepDescriptions[2].textContent = "បញ្ជាក់ និងបញ្ជូនរូបភាពទៅក្នុងប្រព័ន្ធ";
+        
+        // Update buttons in Khmer
+        startTourBtn.innerHTML = '<i class="fas fa-play"></i> ចាប់ផ្តើមការណែនាំអន្តរកម្ម';
+        skipTourBtn.innerHTML = '<i class="fas fa-forward"></i> �ំលងការណែនាំ';
+    }
+    
+    welcomeModal.classList.remove("hidden");
+}
+
+// Add function to show role info modal for returning users
+function showRoleInfoModal() {
+    // Set role info modal content
+    roleBadgeText.textContent = loggedInAdmin.role || "admin";
+    roleTitle.textContent = `${loggedInAdmin.name} - ${loggedInAdmin.role || "admin"}`;
+    
+    // Set language based on settings
+    if (settings.lang === "KH") {
+        roleDescription.textContent = "នេះជាអ្វីដែលអ្នកអាចធ្វើបាននៅក្នុងប្រព័ន្ធ";
+        
+        // Update button text in Khmer
+        viewDashboardBtn.innerHTML = '<i class="fas fa-tachometer-alt"></i> ទៅកាន់ផ្ទាំងគ្រប់គ្រង';
+        closeRoleBtn.innerHTML = '<i class="fas fa-times"></i> បិទ';
+    } else {
+        roleDescription.textContent = "Here's what you can do in the system";
+        
+        // Update button text in English
+        viewDashboardBtn.innerHTML = '<i class="fas fa-tachometer-alt"></i> Go to Dashboard';
+        closeRoleBtn.innerHTML = '<i class="fas fa-times"></i> Close';
+    }
+    
+    // Set permissions based on role
+    permissionList.innerHTML = "";
+    const permissions = getRolePermissions(loggedInAdmin.role || "admin");
+    
+    permissions.forEach(permission => {
+        const li = document.createElement("li");
+        li.className = "permission-item";
+        li.innerHTML = `
+            <i class="fas ${permission.icon} permission-icon"></i>
+            <span class="permission-text">${permission.text}</span>
+        `;
+        permissionList.appendChild(li);
+    });
+    
+    roleInfoModal.classList.remove("hidden");
+}
+
+// Function to get permissions based on role
+function getRolePermissions(role) {
+    const permissions = {
+        viewer: [
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលទិន្នន័យនិស្សិត" : "View student data" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលរូបភាពដែលបានរក្សាទុក" : "View saved photos" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលការវិភាគ" : "View analytics" }
+        ],
+        subadmin: [
+            { icon: "fa-camera", text: settings.lang === "KH" ? "ថតរូបភាពនិស្សិត" : "Capture student photos" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលទិន្នន័យនិស្សិត" : "View student data" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលរូបភាពដែលបានរក្សាទុក" : "View saved photos" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលការវិភាគ" : "View analytics" },
+            { icon: "fa-download", text: settings.lang === "KH" ? "នាំចេញទិន្នន័យ" : "Export data" }
+        ],
+        admin: [
+            { icon: "fa-camera", text: settings.lang === "KH" ? "ថតរូបភាពនិស្សិត" : "Capture student photos" },
+            { icon: "fa-trash", text: settings.lang === "KH" ? "លុបរូបភាព" : "Delete photos" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលទិន្នន័យនិស្សិត" : "View student data" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលរូបភាពដែលបានរក្សាទុក" : "View saved photos" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលការវិភាគ" : "View analytics" },
+            { icon: "fa-download", text: settings.lang === "KH" ? "នាំចេញទិន្នន័យ" : "Export data" },
+            { icon: "fa-qrcode", text: settings.lang === "KH" ? "ស្កេន QR Code" : "Scan QR codes" },
+            { icon: "fa-layer-group", text: settings.lang === "KH" ? "ស្កេនជាក្រុម" : "Batch scanning" }
+        ],
+        superadmin: [
+            { icon: "fa-camera", text: settings.lang === "KH" ? "ថតរូបភាពនិស្សិត" : "Capture student photos" },
+            { icon: "fa-trash", text: settings.lang === "KH" ? "លុបរូបភាព" : "Delete photos" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលទិន្នន័យនិស្សិត" : "View student data" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលរូបភាពដែលបានរក្សាទុក" : "View saved photos" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលការវិភាគ" : "View analytics" },
+            { icon: "fa-download", text: settings.lang === "KH" ? "នាំចេញទិន្នន័យ" : "Export data" },
+            { icon: "fa-qrcode", text: settings.lang === "KH" ? "ស្កេន QR Code" : "Scan QR codes" },
+            { icon: "fa-layer-group", text: settings.lang === "KH" ? "ស្កេនជាក្រុម" : "Batch scanning" },
+            { icon: "fa-users-cog", text: settings.lang === "KH" ? "គ្រប់គ្រងគណនីអ្នកគ្រប់គ្រង" : "Manage admin accounts" },
+            { icon: "fa-cog", text: settings.lang === "KH" ? "កែប្រែការកំណត់ប្រព័ន្ធ" : "Change system settings" }
+        ]
+    };
+    
+    return permissions[role] || permissions.viewer;
+}
+
+// Initialize QR Scanner
+function initQRScanner() {
+    qrScanBtn.addEventListener('click', () => {
+        openQRScanner();
+    });
+    
+    closeQrScannerBtn.addEventListener('click', () => {
+        closeQRScanner();
+    });
+}
+
+function openQRScanner() {
+    qrScannerModal.classList.add('active');
+    
+    // Initialize QR scanner
+    if (!qrScanner) {
+        qrScanner = new QrScanner(
+            qrVideo,
+            result => {
+                handleQRResult(result);
+                closeQRScanner();
+            },
+            {
+                highlightScanRegion: true,
+                highlightCodeOutline: true,
+            }
+        );
+    }
+    
+    qrScanner.start().catch(error => {
+        console.error('Failed to start QR scanner:', error);
+        showNotification('QR Scanner Error', 'Failed to start camera', 'error');
+        closeQRScanner();
+    });
+}
+
+function closeQRScanner() {
+    qrScannerModal.classList.remove('active');
+    
+    if (qrScanner) {
+        qrScanner.stop();
+    }
+}
+
+function handleQRResult(result) {
+    // Assuming QR code contains student ID
+    const studentId = result.data;
+    const student = studentsData.find(s => s[0] === studentId);
+    
+    if (student) {
+        selectedStudent = student;
+        closeQRScanner();
+        showCameraModeSelection();
+    } else {
+        const message = settings.lang === "KH" 
+            ? `រកមិនឃើញនិស្សិតដែលមាន ID ${studentId}` 
+            : `Student with ID ${studentId} not found`;
+        showNotification('QR Scan Result', message, 'error');
+    }
+}
+
+// Initialize Batch Scanner
+function initBatchScan() {
+    batchScanBtn.addEventListener('click', () => {
+        openBatchScanModal();
+    });
+    
+    closeBatchScanBtn.addEventListener('click', () => {
+        closeBatchScanModal();
+    });
+    
+    cancelBatchScanBtn.addEventListener('click', () => {
+        closeBatchScanModal();
+    });
+    
+    startBatchScanBtn.addEventListener('click', () => {
+        startBatchScanning();
+    });
+}
+
+function openBatchScanModal() {
+    batchScanModal.classList.add('active');
+    populateBatchList();
+}
+
+function closeBatchScanModal() {
+    batchScanModal.classList.remove('active');
+    batchScanData = [];
+}
+
+function populateBatchList() {
+    batchList.innerHTML = '';
+    
+    const studentsWithoutPhotos = studentsData.filter(s => s[4] === 0);
+    
+    if (studentsWithoutPhotos.length === 0) {
+        const message = settings.lang === "KH" 
+            ? "និស្សិតទាំងអស់មានរូបភាពរួចហើយ!" 
+            : "All students have photos!";
+        batchList.innerHTML = `<div class="text-center text-slate-400 p-4">${message}</div>`;
+        startBatchScanBtn.disabled = true;
+        return;
+    }
+    
+    studentsWithoutPhotos.forEach(student => {
+        const item = document.createElement('div');
+        item.className = 'batch-item';
+        item.innerHTML = `
+            <input type="checkbox" class="batch-checkbox" data-id="${student[0]}" data-name="${student[1]}">
+            <div class="info">
+                <div class="name">${student[1]}</div>
+                <div class="id">ID: ${student[0]}</div>
+            </div>
+            <div class="status pending">Pending</div>
+        `;
+        batchList.appendChild(item);
+    });
+    
+    // Add event listeners to checkboxes
+    const checkboxes = document.querySelectorAll('.batch-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateSelectedCount);
+    });
+    
+    updateSelectedCount();
+}
+
+function updateSelectedCount() {
+    const checkboxes = document.querySelectorAll('.batch-checkbox:checked');
+    selectedCountEl.textContent = checkboxes.length;
+    startBatchScanBtn.disabled = checkboxes.length === 0;
+}
+
+async function startBatchScanning() {
+    // Get selected students
+    const checkboxes = document.querySelectorAll('.batch-checkbox:checked');
+    
+    if (checkboxes.length === 0) {
+        const message = settings.lang === "KH" 
+            ? "សូមជ្រើសរើសនិស្សិតយ៉ាងហោចណាស់មួយ" 
+            : "Please select at least one student";
+        showNotification('Batch Scan', message, 'warning');
+        return;
+    }
+    
+    batchScanData = Array.from(checkboxes).map(cb => ({
+        id: cb.dataset.id,
+        name: cb.dataset.name,
+        status: 'pending',
+        photo: null
+    }));
+    
+    closeBatchScanModal();
+    
+    // Start with first student
+    processBatchStudent(0);
+}
+
+async function processBatchStudent(index) {
+    if (index >= batchScanData.length) {
+        // All students processed
+        const completed = batchScanData.filter(s => s.status === 'completed').length;
+        const message = settings.lang === "KH" 
+            ? `ការស្កេនជាក្រុមបានបញ្ចប់! បានស្កេននិស្សិត ${completed} នាក់ដោយជោគជ័យ` 
+            : `Batch Scan Complete! Successfully scanned ${completed} students`;
+        showNotification('Batch Scan Complete', message, 'success');
+        return;
+    }
+    
+    const student = batchScanData[index];
+    const studentData = studentsData.find(s => s[0] === student.id);
+    
+    if (!studentData) {
+        student.status = 'error';
+        processBatchStudent(index + 1);
+        return;
+    }
+    
+    selectedStudent = studentData;
+    
+    // Show current student info
+    const message = settings.lang === "KH" 
+        ? `កំពុងស្កេន: ${student.name}` 
+        : `Now scanning: ${student.name}`;
+    showNotification('Batch Scan', message, 'info');
+    
+    // Start camera for this student
+    await startCamera("environment", "manual");
+    
+    // Override upload button to process next student
+    uploadBtn.onclick = async () => {
+        await uploadPhoto();
+        
+        // Mark as completed
+        student.status = 'completed';
+        
+        // Move to next student
+        processBatchStudent(index + 1);
+    };
+}
+
+// Initialize Tour Guide
+function initTourGuide() {
+    // Define tour steps
+    tourSteps = [
+        {
+            element: '#nav-scan',
+            title: settings.lang === "KH" ? "ថតរូប" : "Scan Photos",
+            content: settings.lang === "KH" 
+                ? "នេះជាកន្លែងដែលអ្នកអាចថតរូបភាពនិស្សិតថ្មីៗ។ ជ្រើសរើសនិស្សិតហើយបន្ទាប់មកប្រើកាមេរ៉ាដើម្បីថតរូបភាពរបស់ពួកគេ។" 
+                : "This is where you can capture new student photos. Select a student and then use the camera to take their photo.",
+            position: 'bottom'
+        },
+        {
+            element: '#nav-list',
+            title: settings.lang === "KH" ? "បញ្ជីនិស្សិត" : "Student List",
+            content: settings.lang === "KH" 
+                ? "មើលបញ្ជីនិស្សិតទាំងអស់ និងត្រូវបានឬមិនទាន់បានថតរូបភាព។ អ្នកក៏អាចស្វែងរកនិងត្រង់បញ្ជីតាមថ្នាក់។" 
+                : "View all students and see who has or hasn't had their photo taken. You can also search and filter the list by class.",
+            position: 'bottom'
+        },
+        {
+            element: '#nav-records',
+            title: settings.lang === "KH" ? "រូបភាពដែលបានរក្សាទុក" : "Saved Photos",
+            content: settings.lang === "KH" 
+                ? "មើលរូបភាពដែលបានរក្សាទុកទាំងអស់។ អ្នកអាចលុបរូបភាពបានប្រសិនបើអ្នកមានសិទ្ធិ។" 
+                : "View all saved photos. You can delete photos if you have the necessary permissions.",
+            position: 'bottom'
+        },
+        {
+            element: '#nav-analytics',
+            title: settings.lang === "KH" ? "ការវិភាគ" : "Analytics",
+            content: settings.lang === "KH" 
+                ? "មើលស្ថិតិ និងរបាយការណ៍អំពីការប្រើប្រាស់ប្រព័ន្ធ។ រួមមានចំនួននិស្សិតដែលបានថត អត្រាការបញ្ចប់ និងច្រើនទៀត។" 
+                : "View statistics and reports about system usage. Including number of students scanned, completion rates, and more.",
+            position: 'bottom'
+        },
+        {
+            element: '#student-search-input',
+            title: settings.lang === "KH" ? "ស្វែងរកនិស្សិត" : "Search Students",
+            content: settings.lang === "KH" 
+                ? "ប្រើប្រអាដ្ឋាននេះដើម្បីស្វែងរកនិស្សិតតាមឈ្មោះ ឬលេខ ID។ អ្នកក៏អាចប្រើប៊ូតុងសំឡេងដើម្បីស្វែងរកដោយសំឡេង។" 
+                : "Use this field to search for students by name or ID. You can also use the voice button to search by voice.",
+            position: 'top'
+        },
+        {
+            element: '#batch-scan-btn',
+            title: settings.lang === "KH" ? "ការស្កេនជាក្រុម" : "Batch Scanning",
+            content: settings.lang === "KH" 
+                ? "បើកមុខងារស្កេនជាក្រុមដើម្បីដំណើរការនិស្សិតច្រើននាក់ក្នុងមួយសម័យ។ ជ្រើសរើសនិស្សិតដែលអ្នកចង់ថត ហើយប្រព័ន្ធនឹងណែនាំអ្នកតាមរយៈលំដាប់។" 
+                : "Enable batch scanning to process multiple students in one session. Select the students you want to scan and the system will guide you through them sequentially.",
+            position: 'top'
+        },
+        {
+            element: '#qr-scan-btn',
+            title: settings.lang === "KH" ? "ការស្កេន QR Code" : "QR Code Scanning",
+            content: settings.lang === "KH" 
+                ? "ប្រើកាមេរ៉ាដើម្បីស្កេន QR Codes ដែលមានព័ត៌មាននិស្សិត។ នេះជាវិធីរហ័សនិងងាយស្រួលក្នុងការកំណត់អត្តសញ្ញាណនិស្សិត។" 
+                : "Use the camera to scan QR codes containing student information. This is a quick and easy way to identify students.",
+            position: 'top'
+        }
+    ];
+    
+    // Add event listeners
+    startTourBtn.addEventListener('click', startTour);
+    skipTourBtn.addEventListener('click', () => {
+        welcomeModal.classList.add('hidden');
+        showRoleInfoModal();
+    });
+    
+    tourSkip.addEventListener('click', endTour);
+    tourNext.addEventListener('click', nextTourStep);
+}
+
+function startTour() {
+    welcomeModal.classList.add('hidden');
+    isTourActive = true;
+    currentTourStep = 0;
+    showTourStep();
+}
+
+function showTourStep() {
+    if (currentTourStep >= tourSteps.length) {
+        endTour();
+        return;
+    }
+    
+    const step = tourSteps[currentTourStep];
+    const element = document.querySelector(step.element);
+    
+    if (!element) {
+        nextTourStep();
+        return;
+    }
+    
+    // Position the tour guide
+    const rect = element.getBoundingClientRect();
+    const guideWidth = 300; // Approximate width of tour guide
+    const guideHeight = 200; // Approximate height of tour guide
+    
+    let top, left, arrowClass;
+    
+    switch (step.position) {
+        case 'top':
+            top = rect.top - guideHeight - 20;
+            left = rect.left + (rect.width / 2) - (guideWidth / 2);
+            arrowClass = 'bottom';
+            break;
+        case 'bottom':
+            top = rect.bottom + 20;
+            left = rect.left + (rect.width / 2) - (guideWidth / 2);
+            arrowClass = 'top';
+            break;
+        case 'left':
+            top = rect.top + (rect.height / 2) - (guideHeight / 2);
+            left = rect.left - guideWidth - 20;
+            arrowClass = 'right';
+            break;
+        case 'right':
+            top = rect.top + (rect.height / 2) - (guideHeight / 2);
+            left = rect.right + 20;
+            arrowClass = 'left';
+            break;
+        default:
+            top = rect.bottom + 20;
+            left = rect.left + (rect.width / 2) - (guideWidth / 2);
+            arrowClass = 'top';
+    }
+    
+    // Adjust if out of bounds
+    if (left < 10) left = 10;
+    if (left + guideWidth > window.innerWidth - 10) left = window.innerWidth - guideWidth - 10;
+    if (top < 10) top = 10;
+    if (top + guideHeight > window.innerHeight - 10) top = window.innerHeight - guideHeight - 10;
+    
+    // Update tour guide content
+    tourTitle.textContent = step.title;
+    tourContent.textContent = step.content;
+    
+    // Update arrow
+    tourGuide.querySelector('.tour-guide-arrow').className = `tour-guide-arrow ${arrowClass}`;
+    
+    // Position and show tour guide
+    tourGuide.style.top = `${top}px`;
+    tourGuide.style.left = `${left}px`;
+    tourGuide.classList.remove('hidden');
+    
+    // Highlight element
+    element.classList.add('feature-highlight');
+    
+    // Update button text
+    if (currentTourStep === tourSteps.length - 1) {
+        tourNext.textContent = settings.lang === "KH" ? "បញ្ចប់" : "Finish";
+    } else {
+        tourNext.textContent = settings.lang === "KH" ? "បន្ទាប់" : "Next";
+    }
+}
+
+function nextTourStep() {
+    // Remove highlight from current element
+    const currentElement = document.querySelector(tourSteps[currentTourStep].element);
+    if (currentElement) {
+        currentElement.classList.remove('feature-highlight');
+    }
+    
+    // Move to next step
+    currentTourStep++;
+    showTourStep();
+}
+
+function endTour() {
+    isTourActive = false;
+    tourGuide.classList.add('hidden');
+    
+    // Remove all highlights
+    tourSteps.forEach(step => {
+        const element = document.querySelector(step.element);
+        if (element) {
+            element.classList.remove('feature-highlight');
+        }
+    });
+    
+    // Show role info modal
+    showRoleInfoModal();
+}
+
+// Update the event listeners for the modal buttons
+viewDashboardBtn.addEventListener('click', () => {
+    roleInfoModal.classList.add('hidden');
+    // Default to scan page
+    navLinksDeactivate();
+    hideAllPages();
+    navScan.classList.add('active');
+    pageScan.classList.remove('hidden');
+});
+
+closeRoleBtn.addEventListener('click', () => {
+    roleInfoModal.classList.add('hidden');
+    // Default to scan page
+    navLinksDeactivate();
+    hideAllPages();
+    navScan.classList.add('active');
+    pageScan.classList.remove('hidden');
+});
+
+// Update the DOMContentLoaded event listener to initialize the new features
+document.addEventListener("DOMContentLoaded", async () => {
+    // ... existing code ...
+    
+    // Initialize new features
+    initTourGuide();
+    initQRScanner();
+    initBatchScan();
+    
+    // ... rest of existing code ...
+});
+
+
+
 // DOM refs
 const video = document.getElementById("video"),
     captureCanvas = document.getElementById("capture-canvas"),
@@ -131,12 +778,6 @@ const exportRecordsBtn = document.getElementById("export-records-btn");
 
 // Voice Search Indicator
 const voiceSearchIndicator = document.getElementById("voice-search-indicator");
-
-// QR Scanner Modal
-const qrScannerModal = document.getElementById("qr-scanner-modal");
-
-// Batch Scan Modal
-const batchScanModal = document.getElementById("batch-scan-modal");
 
 // state
 const SESSION_KEY = "di_admin_session_v2";

@@ -475,6 +475,209 @@
         </div>
     </div>
 
+    <!-- Add these modals before the closing body tag -->
+
+<!-- First Login Welcome Modal -->
+<div id="welcome-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="welcome-modal">
+        <div class="welcome-header">
+            <img id="welcome-avatar" src="" alt="Admin Avatar" class="welcome-avatar">
+            <h2 id="welcome-title" class="welcome-title">Welcome to Face Scan System</h2>
+            <p id="welcome-subtitle" class="welcome-subtitle">Let's get you started with a quick tour</p>
+        </div>
+        <div class="welcome-body">
+            <div class="welcome-section">
+                <h3 class="welcome-section-title">
+                    <i class="fas fa-user-circle"></i>
+                    Your Profile
+                </h3>
+                <div class="welcome-features">
+                    <div class="welcome-feature">
+                        <div class="welcome-feature-icon">
+                            <i class="fas fa-id-badge"></i>
+                        </div>
+                        <h4 class="welcome-feature-title">Name</h4>
+                        <p id="welcome-name" class="welcome-feature-description">Admin Name</p>
+                    </div>
+                    <div class="welcome-feature">
+                        <div class="welcome-feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h4 class="welcome-feature-title">Role</h4>
+                        <p id="welcome-role" class="welcome-feature-description">Admin Role</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="welcome-section">
+                <h3 class="welcome-section-title">
+                    <i class="fas fa-rocket"></i>
+                    Key Features
+                </h3>
+                <div class="welcome-features">
+                    <div class="welcome-feature">
+                        <div class="welcome-feature-icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <h4 class="welcome-feature-title">Face Scanning</h4>
+                        <p class="welcome-feature-description">Capture student photos with automatic face detection</p>
+                    </div>
+                    <div class="welcome-feature">
+                        <div class="welcome-feature-icon">
+                            <i class="fas fa-qrcode"></i>
+                        </div>
+                        <h4 class="welcome-feature-title">QR Code Scanning</h4>
+                        <p class="welcome-feature-description">Quickly identify students using QR codes</p>
+                    </div>
+                    <div class="welcome-feature">
+                        <div class="welcome-feature-icon">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <h4 class="welcome-feature-title">Batch Scanning</h4>
+                        <p class="welcome-feature-description">Process multiple students in one session</p>
+                    </div>
+                    <div class="welcome-feature">
+                        <div class="welcome-feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h4 class="welcome-feature-title">Analytics</h4>
+                        <p class="welcome-feature-description">View statistics and progress reports</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="welcome-section">
+                <h3 class="welcome-section-title">
+                    <i class="fas fa-question-circle"></i>
+                    Getting Started
+                </h3>
+                <div class="onboarding-container">
+                    <div class="onboarding-step">
+                        <div class="onboarding-step-number">1</div>
+                        <div class="onboarding-step-content">
+                            <h4 class="onboarding-step-title">Select a Student</h4>
+                            <p class="onboarding-step-description">Choose a student from the list or search by name/ID</p>
+                        </div>
+                    </div>
+                    <div class="onboarding-step">
+                        <div class="onboarding-step-number">2</div>
+                        <div class="onboarding-step-content">
+                            <h4 class="onboarding-step-title">Capture Photo</h4>
+                            <p class="onboarding-step-description">Use automatic face detection or manual capture</p>
+                        </div>
+                    </div>
+                    <div class="onboarding-step">
+                        <div class="onboarding-step-number">3</div>
+                        <div class="onboarding-step-content">
+                            <h4 class="onboarding-step-title">Upload & Save</h4>
+                            <p class="onboarding-step-description">Confirm and upload the photo to the system</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="welcome-actions">
+                <button id="start-tour-btn" class="welcome-btn welcome-btn-primary">
+                    <i class="fas fa-play"></i>
+                    Start Interactive Tour
+                </button>
+                <button id="skip-tour-btn" class="welcome-btn welcome-btn-secondary">
+                    <i class="fas fa-forward"></i>
+                    Skip Tour
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Role Info Modal -->
+<div id="role-info-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="role-info-modal">
+        <div class="role-info-header">
+            <div class="role-badge">
+                <i class="fas fa-shield-alt"></i>
+                <span id="role-badge-text">Admin Role</span>
+            </div>
+            <h2 id="role-title" class="role-title">Your Role & Permissions</h2>
+            <p id="role-description" class="role-description">Here's what you can do in the system</p>
+        </div>
+        <div class="role-info-body">
+            <div class="role-permissions">
+                <h3 class="role-permissions-title">Your Permissions</h3>
+                <ul id="permission-list" class="permission-list">
+                    <!-- Permissions will be populated by JavaScript -->
+                </ul>
+            </div>
+            
+            <div class="role-actions">
+                <button id="view-dashboard-btn" class="role-btn role-btn-primary">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Go to Dashboard
+                </button>
+                <button id="close-role-btn" class="role-btn role-btn-secondary">
+                    <i class="fas fa-times"></i>
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- QR Scanner Modal -->
+<div id="qr-scanner-modal">
+    <div class="modal-header">
+        <h3 class="modal-title">QR Code Scanner</h3>
+        <button class="close-btn" id="close-qr-scanner">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="scan-region">
+        <video id="qr-video"></video>
+    </div>
+    <div class="instructions">
+        <p>Position the QR code within the frame to scan</p>
+        <p>The scanner will automatically detect and process the QR code</p>
+    </div>
+</div>
+
+<!-- Batch Scan Modal -->
+<div id="batch-scan-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Batch Scanning</h3>
+            <button class="close-btn" id="close-batch-scan">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="instructions">
+            <p>Select students without photos to scan in batch mode</p>
+        </div>
+        <div class="batch-list" id="batch-list">
+            <!-- Batch list will be populated by JavaScript -->
+        </div>
+        <div class="modal-footer">
+            <div class="selected-count">
+                <span id="selected-count">0</span> students selected
+            </div>
+            <div class="actions">
+                <button class="btn btn-cancel" id="cancel-batch-scan">Cancel</button>
+                <button class="btn btn-start" id="start-batch-scan" disabled>Start Batch Scan</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tour Guide -->
+<div id="tour-guide" class="tour-guide hidden">
+    <div class="tour-guide-arrow"></div>
+    <h3 class="tour-guide-title" id="tour-title">Tour Title</h3>
+    <p class="tour-guide-content" id="tour-content">Tour content goes here</p>
+    <div class="tour-guide-actions">
+        <button class="tour-guide-skip" id="tour-skip">Skip Tour</button>
+        <button class="tour-guide-next" id="tour-next">Next</button>
+    </div>
+</div>
+
     <!-- MODAL -->
     <div id="modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal">
         <div class="modal-content w-full max-w-sm p-6 rounded-2xl shadow-2xl text-center">
