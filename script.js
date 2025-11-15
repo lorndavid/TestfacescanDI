@@ -1,0 +1,2016 @@
+/* --------------------------- CONFIG & DOM --------------------------- */
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM-9UZbpL8GW6agRejPVGalKcTQPIdmm5-Xa0BWnpgrJiqahHFIRSE0LKH7n15AjNQ/exec";
+
+// DOM refs
+const video = document.getElementById("video"),
+    captureCanvas = document.getElementById("capture-canvas"),
+    photoPreview = document.getElementById("photo-preview");
+const uploadBtn = document.getElementById("upload-btn"),
+    retakeBtn = document.getElementById("retake-btn"),
+    cameraSection = document.getElementById("camera-section");
+const videoWrapper = document.getElementById("video-wrapper"),
+    faceStatus = document.getElementById("face-status"),
+    subtitle = document.getElementById("subtitle");
+const switchCameraBtn = document.getElementById("switch-camera-btn"),
+    backBtn = document.getElementById("back-btn"),
+    manualCaptureBtn = document.getElementById("manual-capture-btn");
+
+const modal = document.getElementById("modal"),
+    modalIcon = document.getElementById("modal-icon"),
+    modalMessage = document.getElementById("modal-message"),
+    modalButtons = document.getElementById("modal-buttons");
+
+const pageScan = document.getElementById("page-scan"),
+    pageRecords = document.getElementById("page-records"),
+    pageList = document.getElementById("page-list"),
+    pageStorage = document.getElementById("page-storage"),
+    pageProfile = document.getElementById("page-profile"),
+    pageAdmin = document.getElementById("page-admin"),
+    pageAnalytics = document.getElementById("page-analytics");
+
+const navScan = document.getElementById("nav-scan"),
+    navRecords = document.getElementById("nav-records"),
+    navList = document.getElementById("nav-list"),
+    navStorage = document.getElementById("nav-storage"),
+    navProfile = document.getElementById("nav-profile"),
+    navAdmin = document.getElementById("nav-admin"),
+    navAnalytics = document.getElementById("nav-analytics"),
+    navSettingsBtn = document.getElementById("nav-settings-btn");
+
+const sidebar = document.getElementById("sidebar"),
+    menuBtn = document.getElementById("menu-btn"),
+    sidebarBackdrop = document.getElementById("sidebar-backdrop"),
+    sidebarToggleBtn = document.getElementById("sidebar-toggle-btn"),
+    contentWrapper = document.getElementById("content-wrapper");
+
+const selectionArea = document.getElementById("selection-area"),
+    studentSearchInput = document.getElementById("student-search-input"),
+    studentList = document.getElementById("student-list");
+
+const recordsLoading = document.getElementById("records-loading"),
+    recordsTable = document.getElementById("records-table"),
+    recordsClassFilter = document.getElementById("records-class-filter"),
+    recordsSearchInput = document.getElementById("records-search-input");
+
+const listLoading = document.getElementById("list-loading"),
+    listTable = document.getElementById("list-table"),
+    listClassFilter = document.getElementById("list-class-filter"),
+    listSearchInput = document.getElementById("list-search-input");
+
+const listTotalCount = document.getElementById("list-total-count");
+const listCompletedCount = document.getElementById("list-completed-count");
+const listPendingCount = document.getElementById("list-pending-count");
+
+const loginScreen = document.getElementById("login-screen"),
+    mainAppWrapper = document.getElementById("main-app-wrapper"),
+    adminListLoader = document.getElementById("admin-list-loader"),
+    adminSelect = document.getElementById("admin-select"),
+    proceedToScanBtn = document.getElementById("proceed-to-scan-btn"),
+    adminSelectionArea = document.getElementById("admin-selection-area"),
+    adminScanArea = document.getElementById("admin-scan-area"),
+    adminVideoWrapper = document.getElementById("admin-video-wrapper"),
+    adminVideo = document.getElementById("admin-video"),
+    adminScanStatus = document.getElementById("admin-scan-status"),
+    adminManualScanBtn = document.getElementById("admin-manual-scan-btn"),
+    adminBackBtn = document.getElementById("admin-back-btn");
+
+const adminProfileImgHeader = document.getElementById("admin-profile-img-header"),
+    adminProfileSidebar = document.getElementById("admin-profile-compact"),
+    adminProfileImgSidebar = document.getElementById("admin-profile-img-sidebar"),
+    adminNameSidebar = document.getElementById("admin-name-sidebar"),
+    adminRoleSidebar = document.getElementById("admin-role-sidebar");
+
+const sidebarLogo = document.getElementById("sidebar-logo");
+
+const btnThemeToggle = document.getElementById("btn-theme-toggle"),
+    btnLang = document.getElementById("btn-lang"),
+    bgColorPicker = document.getElementById("bg-color-picker"),
+    faceScanToggleRow = document.getElementById("face-scan-toggle-row"),
+    faceScanEnabledCheckbox = document.getElementById("face-scan-enabled");
+
+const logoutBtn = document.getElementById("logout-btn");
+
+// profile page refs
+const profileImgLarge = document.getElementById("profile-img-large"),
+    profileNameLarge = document.getElementById("profile-name-large"),
+    profileRoleLarge = document.getElementById("profile-role-large"),
+    profileTotalAll = document.getElementById("profile-total-all"),
+    profileTotalMy = document.getElementById("profile-total-my"),
+    profileImagesGrid = document.getElementById("profile-images-grid"),
+    profileImageFilter = document.getElementById("profile-image-filter");
+
+// Admin Panel Refs
+const adminManagementList = document.getElementById("admin-management-list");
+const addAdminName = document.getElementById("add-admin-name");
+const addAdminImageUrl = document.getElementById("add-admin-image-url");
+const addAdminEmail = document.getElementById("add-admin-email");
+const addAdminRole = document.getElementById("add-admin-role");
+const addAdminBtn = document.getElementById("add-admin-btn");
+
+// Analytics Refs
+const scansTodayEl = document.getElementById("scans-today");
+const activeUsersEl = document.getElementById("active-users");
+const completionRateEl = document.getElementById("completion-rate");
+const storageUsedEl = document.getElementById("storage-used");
+const weeklyActivityChart = document.getElementById("weekly-activity-chart");
+const classCompletionChart = document.getElementById("class-completion-chart");
+
+// Notification Toast Refs
+const notificationToast = document.getElementById("notification-toast");
+const notificationIcon = document.getElementById("notification-icon");
+const notificationTitle = document.getElementById("notification-title");
+const notificationMessage = document.getElementById("notification-message");
+const notificationClose = document.getElementById("notification-close");
+
+// New Feature Refs
+const voiceSearchBtn = document.getElementById("voice-search-btn");
+const batchScanBtn = document.getElementById("batch-scan-btn");
+const qrScanBtn = document.getElementById("qr-scan-btn");
+const exportListBtn = document.getElementById("export-list-btn");
+const exportRecordsBtn = document.getElementById("export-records-btn");
+
+// Voice Search Indicator
+const voiceSearchIndicator = document.getElementById("voice-search-indicator");
+
+// QR Scanner Modal
+const qrScannerModal = document.getElementById("qr-scanner-modal");
+
+// Batch Scan Modal
+const batchScanModal = document.getElementById("batch-scan-modal");
+
+// state
+const SESSION_KEY = "di_admin_session_v2";
+let studentsData = [],
+    savedRecordsData = [],
+    allStudentsListData = [],
+    adminData = [];
+let currentStream,
+    faceApiInterval,
+    stableFrames = 0,
+    currentFacingMode = "environment",
+    selectedStudent = null,
+    currentCameraMode = "auto";
+let loggedInAdmin = null,
+    adminFaceMatcher = null,
+    adminScanInterval = null,
+    isScanning = false,
+    isUploading = false;
+let settings = { theme: "dark", lang: "KH", bgColor: "#0f172a" };
+let isSidebarCollapsed = false;
+
+// Voice recognition
+let recognition = null;
+let isListening = false;
+
+// QR Scanner
+let qrScanner = null;
+
+// Batch scan data
+let batchScanData = [];
+
+// Analytics data
+let analyticsData = {
+    scansToday: 0,
+    activeUsers: 0,
+    completionRate: 0,
+    storageUsed: 0,
+    weeklyActivity: [],
+    classCompletion: []
+};
+
+/* --------------------------- UTIL (modal) --------------------------- */
+const icons = {
+    success: `<svg class="w-full h-full text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+    error: `<svg class="w-full h-full text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+    loading: `<div class="w-16 h-16 border-4 border-slate-500 border-t-indigo-500 rounded-full animate-spin"></div>`,
+    choice: `<svg class="w-full h-full text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m4 13-4-4M3 10h12M3 15h4M4 19h16a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1z"/></svg>`,
+};
+
+function showModal(type, message, actions = {}) {
+    modalIcon.innerHTML = icons[type] || "";
+    modalMessage.textContent = message;
+    modal.classList.remove("hidden");
+    modalButtons.innerHTML = "";
+    if (type === "loading") return;
+    if (Object.keys(actions).length) {
+        for (const [txt, action] of Object.entries(actions)) {
+            const b = document.createElement("button");
+            b.className = action.className || "w-full bg-slate-600 text-white py-2 rounded-lg font-semibold hover:bg-slate-700 transition";
+            b.textContent = txt;
+            b.onclick = () => {
+                modal.classList.add("hidden");
+                if (action.callback) action.callback();
+            };
+            modalButtons.appendChild(b);
+        }
+    } else {
+        const b = document.createElement("button");
+        b.className = "w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition";
+        b.textContent = settings.lang === "EN" ? "OK" : "យល់ព្រម";
+        b.onclick = () => modal.classList.add("hidden");
+        modalButtons.appendChild(b);
+    }
+}
+
+/* --------------------------- NOTIFICATION TOAST --------------------------- */
+function showNotification(title, message, type = 'info') {
+    notificationTitle.textContent = title;
+    notificationMessage.textContent = message;
+    
+    // Set icon based on type
+    let iconHtml = '';
+    switch(type) {
+        case 'success':
+            iconHtml = '<i class="fas fa-check-circle text-green-400"></i>';
+            break;
+        case 'error':
+            iconHtml = '<i class="fas fa-exclamation-circle text-red-400"></i>';
+            break;
+        case 'warning':
+            iconHtml = '<i class="fas fa-exclamation-triangle text-yellow-400"></i>';
+            break;
+        default:
+            iconHtml = '<i class="fas fa-info-circle text-blue-400"></i>';
+    }
+    notificationIcon.innerHTML = iconHtml;
+    
+    // Show notification
+    notificationToast.classList.add('show');
+    
+    // Auto hide after 5 seconds
+    setTimeout(() => {
+        notificationToast.classList.remove('show');
+    }, 5000);
+}
+
+notificationClose.addEventListener('click', () => {
+    notificationToast.classList.remove('show');
+});
+
+/* --------------------------- FACEAPI MODELS --------------------------- */
+async function loadModels() {
+    const MODEL_URL = "./models";
+    await Promise.all([
+        faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+        faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+        faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+        faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
+    ]);
+}
+
+/* --------------------------- VOICE RECOGNITION --------------------------- */
+function initVoiceRecognition() {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'km-KH'; // Khmer language
+        
+        recognition.onstart = () => {
+            isListening = true;
+            voiceSearchIndicator.classList.add('active');
+            showNotification('Voice Search', 'Listening...', 'info');
+        };
+        
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            studentSearchInput.value = transcript;
+            populateStudentList(transcript);
+            isListening = false;
+            voiceSearchIndicator.classList.remove('active');
+            showNotification('Voice Search', `Search for: ${transcript}`, 'success');
+        };
+        
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            isListening = false;
+            voiceSearchIndicator.classList.remove('active');
+            showNotification('Voice Search Error', 'Please try again', 'error');
+        };
+        
+        recognition.onend = () => {
+            isListening = false;
+            voiceSearchIndicator.classList.remove('active');
+        };
+    } else {
+        voiceSearchBtn.style.display = 'none';
+        console.log('Speech recognition not supported');
+    }
+}
+
+voiceSearchBtn.addEventListener('click', () => {
+    if (recognition && !isListening) {
+        recognition.start();
+    }
+});
+
+/* --------------------------- QR SCANNER --------------------------- */
+function initQRScanner() {
+    qrScanBtn.addEventListener('click', () => {
+        openQRScanner();
+    });
+}
+
+function openQRScanner() {
+    // Create modal if it doesn't exist
+    if (!qrScannerModal) {
+        const modal = document.createElement('div');
+        modal.id = 'qr-scanner-modal';
+        modal.innerHTML = `
+            <button class="close-btn"><i class="fas fa-times"></i></button>
+            <video id="qr-video"></video>
+            <div id="qr-result"></div>
+        `;
+        document.body.appendChild(modal);
+        
+        // Add close button event
+        modal.querySelector('.close-btn').addEventListener('click', closeQRScanner);
+    }
+    
+    qrScannerModal = document.getElementById('qr-scanner-modal');
+    qrScannerModal.style.display = 'flex';
+    
+    const video = document.getElementById('qr-video');
+    
+    // Initialize QR scanner
+    qrScanner = new QrScanner(
+        video,
+        result => {
+            handleQRResult(result);
+            closeQRScanner();
+        },
+        {
+            highlightScanRegion: true,
+            highlightCodeOutline: true,
+        }
+    );
+    
+    qrScanner.start().catch(error => {
+        console.error('Failed to start QR scanner:', error);
+        showNotification('QR Scanner Error', 'Failed to start camera', 'error');
+        closeQRScanner();
+    });
+}
+
+function closeQRScanner() {
+    if (qrScanner) {
+        qrScanner.stop();
+        qrScanner = null;
+    }
+    
+    if (qrScannerModal) {
+        qrScannerModal.style.display = 'none';
+    }
+}
+
+function handleQRResult(result) {
+    // Assuming QR code contains student ID
+    const studentId = result.data;
+    const student = studentsData.find(s => s[0] === studentId);
+    
+    if (student) {
+        selectedStudent = student;
+        showCameraModeSelection();
+    } else {
+        showNotification('QR Scan Result', `Student with ID ${studentId} not found`, 'error');
+    }
+}
+
+/* --------------------------- BATCH SCAN --------------------------- */
+function initBatchScan() {
+    batchScanBtn.addEventListener('click', () => {
+        openBatchScanModal();
+    });
+}
+
+function openBatchScanModal() {
+    // Create modal if it doesn't exist
+    if (!batchScanModal) {
+        const modal = document.createElement('div');
+        modal.id = 'batch-scan-modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-white">Batch Scan</h2>
+                    <button class="close-btn text-white text-xl"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="mb-4">
+                    <p class="text-slate-300 mb-2">Select students to scan in batch:</p>
+                    <div class="batch-list" id="batch-list"></div>
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button id="batch-cancel-btn" class="px-4 py-2 bg-slate-600 text-white rounded-lg">Cancel</button>
+                    <button id="batch-start-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">Start Batch Scan</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        // Add event listeners
+        modal.querySelector('.close-btn').addEventListener('click', closeBatchScanModal);
+        document.getElementById('batch-cancel-btn').addEventListener('click', closeBatchScanModal);
+        document.getElementById('batch-start-btn').addEventListener('click', startBatchScan);
+    }
+    
+    batchScanModal = document.getElementById('batch-scan-modal');
+    batchScanModal.style.display = 'flex';
+    
+    // Populate batch list with students who don't have photos
+    const batchList = document.getElementById('batch-list');
+    batchList.innerHTML = '';
+    
+    const studentsWithoutPhotos = studentsData.filter(s => s[4] === 0);
+    
+    if (studentsWithoutPhotos.length === 0) {
+        batchList.innerHTML = '<p class="text-slate-400">All students have photos!</p>';
+        return;
+    }
+    
+    studentsWithoutPhotos.forEach(student => {
+        const item = document.createElement('div');
+        item.className = 'batch-item';
+        item.innerHTML = `
+            <input type="checkbox" class="batch-checkbox" data-id="${student[0]}" data-name="${student[1]}">
+            <div class="info">
+                <div class="font-semibold">${student[1]}</div>
+                <div class="text-sm text-slate-400">ID: ${student[0]}</div>
+            </div>
+            <div class="status">Pending</div>
+        `;
+        batchList.appendChild(item);
+    });
+}
+
+function closeBatchScanModal() {
+    if (batchScanModal) {
+        batchScanModal.style.display = 'none';
+        batchScanData = [];
+    }
+}
+
+function startBatchScan() {
+    // Get selected students
+    const checkboxes = document.querySelectorAll('.batch-checkbox:checked');
+    
+    if (checkboxes.length === 0) {
+        showNotification('Batch Scan', 'Please select at least one student', 'warning');
+        return;
+    }
+    
+    batchScanData = Array.from(checkboxes).map(cb => ({
+        id: cb.dataset.id,
+        name: cb.dataset.name,
+        status: 'pending',
+        photo: null
+    }));
+    
+    closeBatchScanModal();
+    
+    // Start with first student
+    processBatchStudent(0);
+}
+
+async function processBatchStudent(index) {
+    if (index >= batchScanData.length) {
+        // All students processed
+        showNotification('Batch Scan Complete', `Successfully scanned ${batchScanData.filter(s => s.status === 'completed').length} students`, 'success');
+        return;
+    }
+    
+    const student = batchScanData[index];
+    const studentData = studentsData.find(s => s[0] === student.id);
+    
+    if (!studentData) {
+        student.status = 'error';
+        processBatchStudent(index + 1);
+        return;
+    }
+    
+    selectedStudent = studentData;
+    
+    // Show current student info
+    showNotification('Batch Scan', `Now scanning: ${student.name}`, 'info');
+    
+    // Start camera for this student
+    await startCamera("environment", "manual");
+    
+    // Override upload button to process next student
+    uploadBtn.onclick = async () => {
+        await uploadPhoto();
+        
+        // Mark as completed
+        student.status = 'completed';
+        
+        // Move to next student
+        processBatchStudent(index + 1);
+    };
+}
+
+/* --------------------------- EXPORT FUNCTIONALITY --------------------------- */
+function initExportFunctions() {
+    exportListBtn.addEventListener('click', () => {
+        exportData('list');
+    });
+    
+    exportRecordsBtn.addEventListener('click', () => {
+        exportData('records');
+    });
+}
+
+function exportData(type) {
+    let data, filename;
+    
+    if (type === 'list') {
+        data = allStudentsListData.map(s => ({
+            ID: s[0],
+            Name: s[1],
+            Class: s[2],
+            Group: s[3],
+            PhotoCount: s[4]
+        }));
+        filename = 'student_list.csv';
+    } else if (type === 'records') {
+        data = savedRecordsData.map(r => ({
+            Serial: r[0],
+            Name: r[1],
+            ID: r[2],
+            Class: r[3],
+            Group: r[4],
+            ImageURL: r[5]
+        }));
+        filename = 'saved_records.csv';
+    }
+    
+    // Convert to CSV
+    const csv = convertToCSV(data);
+    
+    // Create download link
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showNotification('Export Success', `Data exported to ${filename}`, 'success');
+}
+
+function convertToCSV(data) {
+    if (!data || data.length === 0) return '';
+    
+    // Get headers
+    const headers = Object.keys(data[0]);
+    
+    // Create CSV content
+    const csvContent = [
+        headers.join(','),
+        ...data.map(row => 
+            headers.map(header => {
+                const value = row[header];
+                // Escape commas and quotes
+                if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+                    return `"${value.replace(/"/g, '""')}"`;
+                }
+                return value;
+            }).join(',')
+        )
+    ].join('\n');
+    
+    return csvContent;
+}
+
+/* --------------------------- ADMIN FETCH & SESSIONS --------------------------- */
+async function fetchAdmins() {
+    try {
+        const res = await fetch(`${SCRIPT_URL}?action=getAdmins`);
+        if (!res.ok) throw new Error(`Server error: ${res.status}`);
+        const data = await res.json();
+        
+        adminData = [];
+        if (Array.isArray(data)) {
+            adminData = data.map(r => ({
+                name: r[0] || '',
+                imageUrl: r[1] || '',
+                role: r[2] || 'admin',
+                faceScan: r[3] === false ? false : true,
+                disabled: r[3] === true || String(r[3]).toLowerCase() === 'true'
+            })).filter(a => a.name && a.imageUrl);
+        }
+        if (!adminData.length) throw new Error("No admin data found.");
+        
+        // Only populate login select if we are on the login screen
+        if (adminSelect) {
+            populateAdminSelect();
+        }
+    } catch (e) {
+        console.error("Failed to fetch admins:", e);
+        if(loginScreen.style.display !== 'none') {
+            showModal('error', `Could not fetch admin list: ${e.message}`);
+            adminListLoader.classList.add('hidden');
+        }
+    }
+}
+
+function populateAdminSelect() {
+    adminSelect.innerHTML = '<option value="">-- សូមជ្រើសរើសឈ្មោះ --</option>';
+    adminData.forEach((a, i) => {
+        const opt = document.createElement("option");
+        opt.value = i;
+        opt.textContent = a.name;
+        adminSelect.appendChild(opt);
+    });
+    adminListLoader.classList.add("hidden");
+    adminSelect.classList.remove("hidden");
+}
+
+function saveAdminSession({ name, imageUrl, role, faceScan }) {
+    try {
+        localStorage.setItem(
+            SESSION_KEY,
+            JSON.stringify({ name, imageUrl, role, faceScan, ts: Date.now() })
+        );
+    } catch (e) {}
+}
+
+function loadAdminSession() {
+    try {
+        const r = localStorage.getItem(SESSION_KEY);
+        return r ? JSON.parse(r) : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function clearAdminSession() {
+    try {
+        localStorage.removeItem(SESSION_KEY);
+    } catch (e) {}
+}
+
+adminSelect.onchange = () => {
+    proceedToScanBtn.classList.toggle("hidden", !adminSelect.value);
+};
+
+proceedToScanBtn.onclick = () => {
+    const idx = adminSelect.value;
+    if (idx === "") return;
+    loggedInAdmin = adminData[idx];
+    
+    // Check if account is disabled
+    if (loggedInAdmin.disabled) {
+        showModal('error', 'Your account is disabled. Please contact a superadmin.');
+        return;
+    }
+
+    adminSelectionArea.classList.add("hidden");
+    adminScanArea.classList.remove("hidden");
+    adminScanStatus.textContent = "Starting camera...";
+    startAdminLoginScan();
+};
+
+async function startAdminLoginScan() {
+    adminScanStatus.textContent = `Loading reference for ${loggedInAdmin.name}...`;
+    adminFaceMatcher = await createFaceMatcher(
+        loggedInAdmin.imageUrl,
+        loggedInAdmin.name
+    );
+    if (!adminFaceMatcher) {
+        adminScanStatus.textContent = "Could not load reference image. Please go back.";
+        adminVideoWrapper.classList.add("fail");
+        return;
+    }
+    try {
+        // Admin login uses front camera by default
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "user", width: 640, height: 480 },
+        });
+        currentStream = stream;
+        adminVideo.srcObject = stream;
+        adminVideo.onloadedmetadata = () => {
+            adminScanStatus.textContent = "Look at the camera. Auto-scanning...";
+            adminVideoWrapper.classList.add("ready");
+            startAdminScanInterval();
+        };
+    } catch (err) {
+        showModal("error", "Please allow camera access.");
+        resetToAdminSelection();
+    }
+}
+
+async function createFaceMatcher(imageUrl, label) {
+    try {
+        const img = await faceapi.fetchImage(imageUrl);
+        const det = await faceapi
+            .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
+            .withFaceLandmarks()
+            .withFaceDescriptor();
+        if (!det) return null;
+        const desc = new faceapi.LabeledFaceDescriptors(label, [
+            det.descriptor,
+        ]);
+        return new faceapi.FaceMatcher(desc, 0.5);
+    } catch (e) {
+        console.error(e);
+        adminScanStatus.innerHTML = "Error loading reference image (check CORS).";
+        return null;
+    }
+}
+
+function startAdminScanInterval() {
+    clearInterval(adminScanInterval);
+    isScanning = true;
+    adminScanInterval = setInterval(async () => {
+        if (!isScanning) return;
+        const ok = await performAdminScan();
+        if (ok) onLoginSuccess();
+    }, 1000);
+}
+
+async function performAdminScan() {
+    if (!adminFaceMatcher) return false;
+    const det = await faceapi
+        .detectSingleFace(
+            adminVideo,
+            new faceapi.TinyFaceDetectorOptions({
+                inputSize: 224,
+                scoreThreshold: 0.5,
+            })
+        )
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+    if (det) {
+        const best = adminFaceMatcher.findBestMatch(det.descriptor);
+        if (best.label !== "unknown" && best.distance < 0.5) {
+            adminScanStatus.textContent = `Welcome, ${best.label}!`;
+            adminVideoWrapper.classList.remove("fail");
+            adminVideoWrapper.classList.add("ready");
+            return true;
+        } else {
+            adminScanStatus.textContent = "Face does not match. Trying...";
+            adminVideoWrapper.classList.add("fail");
+            return false;
+        }
+    } else {
+        adminScanStatus.textContent = "No face detected. Please center your face.";
+        adminVideoWrapper.classList.remove("fail");
+        return false;
+    }
+}
+
+adminManualScanBtn.onclick = async () => {
+    if (isScanning) clearInterval(adminScanInterval);
+    isScanning = false;
+    adminScanStatus.textContent = "Manual scan... processing...";
+    const ok = await performAdminScan();
+    if (ok) onLoginSuccess();
+    else {
+        adminScanStatus.textContent = "Manual scan failed. Resuming auto-scan...";
+        setTimeout(() => {
+            if (!isScanning) startAdminScanInterval();
+        }, 2000);
+    }
+};
+
+function resetToAdminSelection() {
+    stopCamera();
+    adminScanArea.classList.add("hidden");
+    adminSelectionArea.classList.remove("hidden");
+    adminVideoWrapper.classList.remove("ready", "fail");
+    adminSelect.value = "";
+    proceedToScanBtn.classList.add("hidden");
+    loggedInAdmin = null;
+    adminFaceMatcher = null;
+    clearInterval(adminScanInterval);
+}
+
+adminBackBtn.onclick = resetToAdminSelection;
+
+async function onLoginSuccess() {
+    clearInterval(adminScanInterval);
+    stopCamera();
+    
+    // Find the full admin object, in case the one from login was partial
+    const adminObject = adminData.find(a => a.name === loggedInAdmin.name);
+    if (adminObject) {
+        loggedInAdmin = adminObject;
+    }
+
+    // persist session
+    saveAdminSession({
+        name: loggedInAdmin.name,
+        imageUrl: loggedInAdmin.imageUrl,
+        role: loggedInAdmin.role || "admin",
+        faceScan: loggedInAdmin.faceScan,
+    });
+    
+    // set profile UI
+    adminProfileImgHeader.crossOrigin = "anonymous";
+    adminProfileImgSidebar.crossOrigin = "anonymous";
+    adminProfileImgHeader.src = loggedInAdmin.imageUrl;
+    adminProfileImgSidebar.src = loggedInAdmin.imageUrl;
+    adminNameSidebar.textContent = loggedInAdmin.name;
+    adminRoleSidebar.textContent = loggedInAdmin.role || "admin";
+    adminProfileImgHeader.classList.remove("hidden");
+    adminProfileSidebar.classList.remove("hidden");
+    // remove login screen permanently
+    loginScreen.classList.add("hidden");
+    if (loginScreen.parentNode)
+        loginScreen.parentNode.removeChild(loginScreen);
+    mainAppWrapper.classList.remove("hidden");
+    // apply settings UI (face-scan toggle visible only for superadmin)
+    setupSettingsUI();
+    await fetchStudents();
+    await displaySavedRecords();
+    await fetchAllSavedRecordsForStats();
+    updateProfileSummary();
+    fetchAnalyticsData();
+}
+
+// Updated Click Handlers for new sidebar
+logoutBtn.onclick = (e) => {
+    e.preventDefault();
+    clearAdminSession();
+    location.reload();
+};
+
+sidebarLogo.onclick = () => openProfilePage();
+adminProfileImgHeader.onclick = () => openProfilePage();
+adminProfileSidebar.onclick = () => openProfilePage();
+
+navProfile.onclick = (e) => {
+    e.preventDefault();
+    openProfilePage();
+};
+
+navSettingsBtn.onclick = (e) => {
+    e.preventDefault();
+    navLinks.forEach(l => l.classList.remove('active'));
+    pages.forEach(p => p.classList.add('hidden'));
+    navAdmin.classList.add('active');
+    pageAdmin.classList.remove('hidden');
+    stopCamera();
+    closeSidebar();
+    
+    // Load admin list when opening panel
+    populateAdminManagementList();
+};
+
+/* --------------------------- STUDENTS & RECORDS --------------------------- */
+async function fetchStudents() {
+    try {
+        const res = await fetch(`${SCRIPT_URL}?action=getStudents`);
+        if (!res.ok) throw new Error(`Server error: ${res.status}`);
+        const data = await res.json();
+        studentsData = data.slice(1) || [];
+        studentsData = studentsData.filter((s) => {
+            const g = (s[3] || "").toString().trim();
+            return g !== "បុគ្គលិក";
+        });
+        allStudentsListData = studentsData;
+        populateStudentList();
+    } catch (e) {
+        showModal("error", `Could not fetch student data: ${e.message}`);
+    }
+}
+
+function populateStudentList(filter = "") {
+    studentList.innerHTML = "";
+    const f = filter.toLowerCase();
+    const filtered = studentsData.filter(
+        (s) =>
+            (s[0] || "").toString().toLowerCase().includes(f) ||
+            (s[1] || "").toLowerCase().includes(f)
+    );
+    if (!filtered.length) {
+        studentList.innerHTML = `<li class="text-center text-slate-400 p-4">No students found.</li>`;
+        return;
+    }
+    filtered.forEach((s) => {
+        const li = document.createElement("li");
+        li.className = "p-3 rounded-lg cursor-pointer transition flex justify-between items-center";
+        const count = s[4];
+        if (count > 0) li.classList.add("completed");
+        const indicator = count > 0 ? `<i class="fas fa-check-circle ml-2 text-green-400"></i>` : "";
+        if (count > 0) {
+            li.style.pointerEvents = "none";
+            li.style.opacity = ".7";
+            li.style.color = "#4ade80";
+        } else {
+            // permission: viewer cannot capture
+            if (loggedInAdmin && loggedInAdmin.role === "viewer") {
+                li.classList.add("opacity-60");
+                li.title = "View only account";
+            } else {
+                li.onclick = () => {
+                    selectedStudent = s;
+                    showCameraModeSelection();
+                };
+            }
+        }
+        li.innerHTML = `<span>${s[0]} - ${s[1]}</span>${indicator}`;
+        studentList.appendChild(li);
+    });
+}
+
+function showCameraModeSelection() {
+    // if face-scan disabled for this device
+    if (loggedInAdmin && loggedInAdmin.faceScan === false) {
+        showModal("error", "Face-scan is disabled for this account.");
+        return;
+    }
+    showModal(
+        "choice",
+        "សូមជ្រើសរើសប្រតិបត្តិកាមេរ៉ា",
+        {
+            "ថតរូបស្វ័យប្រវត្តិ": {
+                callback: () => startCamera("environment", "auto"),
+                className: "w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition",
+            },
+            "ថតរូបដោយខ្លួនឯង": {
+                callback: () => startCamera("environment", "manual"),
+                className: "w-full bg-slate-600 text-white py-3 rounded-lg font-semibold hover:bg-slate-700 transition",
+            },
+        }
+    );
+}
+
+async function displaySavedRecords() {
+    recordsLoading.style.display = "block";
+    recordsTable.classList.add("hidden");
+    try {
+        const res = await fetch(`${SCRIPT_URL}?action=getSavedData`);
+        if (!res.ok) throw new Error(`Server error: ${res.status}`);
+        const data = await res.json();
+        savedRecordsData = data.slice(1) || [];
+        savedRecordsData = savedRecordsData.filter((r) => {
+            const grp = (r[4] || "").toString().trim();
+            return grp !== "បុគ្គលិក";
+        });
+        populateClassFilter(savedRecordsData, recordsClassFilter);
+        filterRecordsTable();
+        recordsLoading.style.display = "none";
+        recordsTable.classList.remove("hidden");
+    } catch (e) {
+        recordsLoading.innerHTML = `<p class="text-red-400">Error: ${e.message}</p>`;
+    }
+}
+
+function populateClassFilter(records, filterElement) {
+    const classes = [
+        ...new Set(
+            records
+                .filter((r) => (r[4] || "").toString().trim() !== "បុគ្គលិក")
+                .map((r) => r[3])
+                .filter(Boolean)
+        ),
+    ];
+    filterElement.innerHTML = '<option value="all">All Classes</option>';
+    classes
+        .sort()
+        .forEach(
+            (c) => (filterElement.innerHTML += `<option value="${c}">${c}</option>`)
+        );
+}
+
+function filterRecordsTable() {
+    const sel = recordsClassFilter.value,
+        q = recordsSearchInput.value.toLowerCase();
+    const tbody = recordsTable.querySelector("tbody");
+    tbody.innerHTML = "";
+    const rows = savedRecordsData.filter((r) => {
+        const cOk = sel === "all" || r[3] === sel;
+        const sOk =
+            (r[1] || "").toLowerCase().includes(q) ||
+            (r[2] || "").toString().toLowerCase().includes(q);
+        return cOk && sOk;
+    });
+    if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center p-4 text-slate-400">No records found.</td></tr>`;
+        return;
+    }
+    rows.forEach((r) => {
+        const serial = r[0],
+            url = r[5];
+        const tr = document.createElement("tr");
+        tr.className = "border-b border-slate-700";
+        tr.innerHTML = `<td class="p-3">${serial}</td><td class="p-3 whitespace-nowrap">${r[1]}</td><td class="p-3">${r[2]}</td><td class="p-3">${r[3]}</td><td class="p-3">${r[4]}</td><td class="p-3"><a href="${url}" target="_blank" rel="noopener noreferrer" class="relative block w-16 h-16 group rounded-lg overflow-hidden"><img src="${url}" crossorigin="anonymous" class="w-full h-full object-cover" alt="Student photo"></a></td><td class="p-3 text-center">${renderRecordControls(serial, url)}</td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+function renderRecordControls(serial, url) {
+    // permission: only admin and superadmin can delete
+    if (!loggedInAdmin) return "-";
+    const role = loggedInAdmin.role || "viewer";
+    if (role === "superadmin" || role === "admin")
+        return `<button class="text-red-400 hover:text-red-600 transition delete-btn" data-serial="${serial}" data-url="${url}"><i class="fas fa-trash-alt"></i></button>`;
+    if (role === "subadmin")
+        return `<span class="text-slate-400">No delete</span>`;
+    return `<span class="text-slate-400">View only</span>`;
+}
+
+document.addEventListener("click", async (e) => {
+    if (e.target.closest(".delete-btn")) {
+        const b = e.target.closest(".delete-btn");
+        const serial = b.dataset.serial;
+        const url = b.dataset.url;
+        handleDelete(serial, url);
+    }
+});
+
+async function handleDelete(serialNumber, imageUrl) {
+    showModal(
+        "confirm",
+        "តើអ្នកប្រាកដទេថាចង់លុបរូបភាពនេះ?",
+        {
+            "បោះបង់": {
+                callback: null,
+                className: "w-full bg-slate-600 text-white py-2 rounded-lg font-semibold hover:bg-slate-700 transition",
+            },
+            "លុប": {
+                callback: async () => {
+                    showModal("loading", "កំពុងលុប...");
+                    try {
+                        const res = await fetch(SCRIPT_URL, {
+                            method: "POST",
+                            body: JSON.stringify({
+                                action: "delete",
+                                serialNumber,
+                                imageUrl,
+                                adminName: loggedInAdmin ? loggedInAdmin.name : 'Unknown'
+                            }),
+                            redirect: "follow",
+                        });
+                        if (!res.ok) throw new Error(`Server error: ${res.status}`);
+                        const r = await res.json();
+                        if (r.status === "success") {
+                            showModal("success", "រូបភាពត្រូវបានលុប!", {
+                                "OK": {
+                                    callback: async () => {
+                                        await fetchStudents();
+                                        await displaySavedRecords();
+                                        await displayStudentList();
+                                    },
+                                },
+                            });
+                        } else throw new Error(r.message || "Unknown server error.");
+                    } catch (e) {
+                        showModal("error", `Delete failed: ${e.message}`);
+                    }
+                },
+                className: "w-full bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition",
+            },
+        }
+    );
+}
+
+/* --------------------------- STUDENT LIST / STATS --------------------------- */
+function populateListClassFilterV2() {
+    const classes = [
+        ...new Set(
+            allStudentsListData
+                .filter((s) => (s[3] || "").toString().trim() !== "បុគ្គលិក")
+                .map((s) => s[2])
+                .filter(Boolean)
+        ),
+    ];
+    listClassFilter.innerHTML = '<option value="all">All Students</option><option value="with_photos">With Photos</option>';
+    classes
+        .sort()
+        .forEach(
+            (c) =>
+                (listClassFilter.innerHTML += `<option value="${c}">${c}</option>`)
+        );
+}
+
+function filterStudentListTable() {
+    const sel = listClassFilter.value,
+        q = listSearchInput.value.toLowerCase();
+    const tbody = listTable.querySelector("tbody");
+    tbody.innerHTML = "";
+    const imgMap = new Map(savedRecordsData.map((r) => [r[2], r[5]]));
+    let arr =
+        sel === "all"
+            ? allStudentsListData
+            : sel === "with_photos"
+            ? allStudentsListData.filter((s) => s[4] > 0)
+            : allStudentsListData.filter((s) => s[2] === sel);
+    arr = arr.filter(
+        (s) =>
+            (s[0] || "").toString().toLowerCase().includes(q) ||
+            (s[1] || "").toLowerCase().includes(q)
+    );
+    const done = arr.filter((s) => s[4] > 0).length;
+    if (!arr.length) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-slate-400">No students found.</td></tr>`;
+    } else {
+        arr.forEach((s) => {
+            const ok = s[4] > 0;
+            const url = ok ? imgMap.get(String(s[0])) : null;
+            const cell = url
+                ? `<a href="${url}" target="_blank" rel="noopener noreferrer" class="relative block w-12 h-12 group rounded-lg overflow-hidden mx-auto"><img src="${url}" crossorigin="anonymous" class="w-full h-full object-cover" alt="Student photo"></a>`
+                : `<span class="text-slate-500">-</span>`;
+            const icon = ok
+                ? `<i class="fas fa-check-circle text-green-400"></i>`
+                : `<i class="fas fa-times-circle text-red-400"></i>`;
+            const actionButtons = ok
+                ? `<button class="text-blue-400 hover:text-blue-600 transition view-btn" data-id="${s[0]}"><i class="fas fa-eye"></i></button>`
+                : `<button class="text-indigo-400 hover:text-indigo-600 transition scan-btn" data-id="${s[0]}"><i class="fas fa-camera"></i></button>`;
+                
+            tbody.insertAdjacentHTML(
+                "beforeend",
+                `<tr class="border-b border-slate-700"><td class="p-3">${s[0]}</td><td class="p-3 whitespace-nowrap">${s[1]}</td><td class="p-3">${cell}</td><td class="p-3 text-center">${icon}</td><td class="p-3 text-center">${actionButtons}</td></tr>`
+            );
+        });
+    }
+    
+    if(listTotalCount) listTotalCount.textContent = arr.length;
+    if(listCompletedCount) listCompletedCount.textContent = done;
+    if(listPendingCount) listPendingCount.textContent = arr.length - done;
+    
+    // Add event listeners to new buttons
+    document.querySelectorAll('.scan-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const studentId = e.currentTarget.dataset.id;
+            const student = studentsData.find(s => s[0] === studentId);
+            if (student) {
+                selectedStudent = student;
+                showCameraModeSelection();
+            }
+        });
+    });
+    
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const studentId = e.currentTarget.dataset.id;
+            const student = savedRecordsData.find(r => r[2] === studentId);
+            if (student) {
+                window.open(student[5], '_blank');
+            }
+        });
+    });
+}
+
+async function displayStudentList() {
+    listLoading.style.display = "block";
+    listTable.classList.add("hidden");
+    if (savedRecordsData.length === 0) {
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=getSavedData`);
+            if (!res.ok) throw new Error(`Server error: ${res.status}`);
+            const data = await res.json();
+            savedRecordsData = data.slice(1);
+            savedRecordsData = savedRecordsData.filter((r) => {
+                const grp = (r[4] || "").toString().trim();
+                return grp !== "បុគ្គលិក";
+            });
+        } catch (e) {
+            console.error("Could not pre-fetch records for images:", e);
+        }
+    }
+    populateListClassFilterV2();
+    filterStudentListTable();
+    listLoading.style.display = "none";
+    listTable.classList.remove("hidden");
+}
+
+/* --------------------------- CAMERA & UPLOAD --------------------------- */
+async function startCamera(facingMode = "environment", mode = "auto") {
+    currentFacingMode = facingMode;
+    currentCameraMode = mode;
+    stableFrames = 0;
+    subtitle.textContent = `Scanning for: ${selectedStudent ? selectedStudent[1] : ""}`;
+    cameraSection.classList.remove("hidden");
+    selectionArea.classList.add("hidden");
+    switchCameraBtn.classList.remove("hidden");
+    backBtn.classList.remove("hidden");
+    uploadBtn.classList.add("hidden");
+    retakeBtn.classList.add("hidden");
+    photoPreview.classList.add("hidden");
+    videoWrapper.classList.remove("hidden");
+    faceStatus.classList.remove("hidden");
+    isUploading = false;
+    stopCamera();
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode, width: { ideal: 640 }, height: { ideal: 480 } },
+            audio: false,
+        });
+        currentStream = stream;
+        video.srcObject = stream;
+        video.onloadedmetadata = () => {
+            if (mode === "auto") {
+                manualCaptureBtn.classList.add("hidden");
+                detectFace();
+            } else {
+                manualCaptureBtn.classList.remove("hidden");
+                faceStatus.textContent = "ចុចប៊ូតុងកាមេរ៉ាដើម្បីថត";
+                faceStatus.classList.remove("text-green-400");
+                videoWrapper.classList.remove("ready");
+            }
+        };
+    } catch (err) {
+        showModal("error", "Please allow camera access.");
+        resetToSelection();
+    }
+}
+
+function detectFace() {
+    const opts = new faceapi.TinyFaceDetectorOptions({
+        inputSize: 224,
+        scoreThreshold: 0.5,
+    });
+    clearInterval(faceApiInterval);
+    faceApiInterval = setInterval(async () => {
+        const res = await faceapi.detectSingleFace(video, opts);
+        if (res && res.score > 0.7) {
+            stableFrames++;
+            faceStatus.textContent = `Excellent! (${stableFrames}/4)`;
+            faceStatus.classList.add("text-green-400");
+            videoWrapper.classList.add("ready");
+            if (stableFrames >= 4) captureFace();
+        } else {
+            stableFrames = 0;
+            faceStatus.textContent = "Please center your face";
+            faceStatus.classList.remove("text-green-400");
+            videoWrapper.classList.remove("ready");
+        }
+    }, 400);
+}
+
+function captureFace() {
+    clearInterval(faceApiInterval);
+    const ctx = captureCanvas.getContext("2d");
+    const size = 512;
+    captureCanvas.width = size;
+    captureCanvas.height = size;
+    const vRatio = video.videoWidth / video.videoHeight;
+    let sx = 0,
+        sy = 0,
+        sw = video.videoWidth,
+        sh = video.videoHeight;
+    if (vRatio > 1) {
+        sw = sh;
+        sx = (video.videoWidth - sw) / 2;
+    } else {
+        sh = sw;
+        sy = (video.videoHeight - sh) / 2;
+    }
+    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, size, size);
+    photoPreview.src = captureCanvas.toDataURL("image/jpeg", 0.9);
+    stopCamera();
+    switchCameraBtn.classList.add("hidden");
+    videoWrapper.classList.add("hidden");
+    manualCaptureBtn.classList.add("hidden");
+    photoPreview.classList.remove("hidden");
+    uploadBtn.classList.remove("hidden");
+    retakeBtn.classList.remove("hidden");
+    faceStatus.classList.add("hidden");
+    subtitle.textContent = "Confirm your photo";
+}
+
+function stopCamera() {
+    if (currentStream) currentStream.getTracks().forEach((t) => t.stop());
+    clearInterval(faceApiInterval);
+    clearInterval(adminScanInterval);
+}
+
+function resetToSelection() {
+    stopCamera();
+    cameraSection.classList.add("hidden");
+    switchCameraBtn.classList.add("hidden");
+    manualCaptureBtn.classList.add("hidden");
+    backBtn.classList.add("hidden");
+    photoPreview.classList.add("hidden");
+    uploadBtn.classList.add("hidden");
+    retakeBtn.classList.add("hidden");
+    videoWrapper.classList.remove("hidden");
+    selectionArea.classList.remove("hidden");
+    subtitle.textContent = "Select your ID or Name";
+    selectedStudent = null;
+}
+
+manualCaptureBtn.onclick = captureFace;
+
+async function uploadPhoto() {
+    if (isUploading) return;
+    if (!selectedStudent) {
+        showModal("error", "Could not find student data.");
+        return;
+    }
+    const imageData = captureCanvas
+        .toDataURL("image/jpeg", 0.9)
+        .split(",")[1];
+    showModal("loading", "កំពុងបញ្ជូនរូបភាព...");
+    isUploading = true;
+    try {
+        const res = await fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify({
+                id: selectedStudent[0],
+                name: selectedStudent[1],
+                class: selectedStudent[2],
+                group: selectedStudent[3],
+                imageData,
+                adminName: loggedInAdmin ? loggedInAdmin.name : 'Unknown'
+            }),
+            redirect: "follow",
+        });
+        if (!res.ok) throw new Error(`Server error: ${res.status}`);
+        const r = await res.json();
+        if (r.status === "success") {
+            showModal("success", "រូបភាពរក្សាទុកបានជោគជ័យ!", {
+                "OK": {
+                    callback: async () => {
+                        resetToSelection();
+                        await fetchStudents();
+                        await displaySavedRecords();
+                        updateAnalyticsData();
+                    },
+                },
+            });
+        } else throw new Error(r.message || "Unknown server error.");
+    } catch (e) {
+        showModal("error", `Upload failed: ${e.message}`);
+    } finally {
+        isUploading = false;
+    }
+};
+
+uploadBtn.onclick = uploadPhoto;
+
+retakeBtn.onclick = () => {
+    photoPreview.classList.add("hidden");
+    uploadBtn.classList.add("hidden");
+    retakeBtn.classList.add("hidden");
+    videoWrapper.classList.remove("hidden");
+    faceStatus.classList.remove("hidden");
+    stableFrames = 0;
+    startCamera(currentFacingMode, currentCameraMode);
+};
+
+switchCameraBtn.onclick = () =>
+    startCamera(
+        currentFacingMode === "environment" ? "user" : "environment",
+        currentCameraMode
+    );
+
+backBtn.onclick = () => resetToSelection();
+studentSearchInput.oninput = () =>
+    populateStudentList(studentSearchInput.value);
+
+/* --------------------------- PROFILE / STATS --------------------------- */
+async function fetchAllSavedRecordsForStats() {
+    // ensure savedRecordsData is populated
+    if (!savedRecordsData || savedRecordsData.length === 0)
+        await displaySavedRecords();
+    updateProfileSummary();
+}
+
+function updateProfileSummary() {
+    // total counts
+    const totalAll = savedRecordsData.length;
+    const myUploads = savedRecordsData.filter((r) => {
+        // try to infer uploader from r[6] or r[7] if backend stores admin
+        return (
+            r[6] && loggedInAdmin && r[6].toString().includes(loggedInAdmin.name)
+        );
+    }).length;
+    document.getElementById("stat-total").textContent = totalAll;
+    document.getElementById("stat-mycount").textContent = myUploads;
+    document.getElementById("stat-others").textContent =
+        totalAll - myUploads;
+    // profile page values
+    profileTotalAll.textContent = totalAll;
+    profileTotalMy.textContent = myUploads;
+    if (loggedInAdmin) {
+        profileImgLarge.src = loggedInAdmin.imageUrl;
+        profileNameLarge.textContent = loggedInAdmin.name;
+        profileRoleLarge.textContent = loggedInAdmin.role || "admin";
+    }
+}
+
+function openProfilePage() {
+    navLinksDeactivate();
+    hideAllPages();
+    navProfile.classList.add('active');
+    pageProfile.classList.remove("hidden");
+    populateProfileImages();
+}
+
+function populateProfileImages(filter = "") {
+    profileImagesGrid.innerHTML = "";
+    const q = (filter || "").toLowerCase();
+    // show images uploaded by loggedInAdmin first (best-effort by checking uploader name in record row)
+    const mine = savedRecordsData.filter(
+        (r) =>
+            r[6] && loggedInAdmin && r[6].toString().includes(loggedInAdmin.name)
+    );
+    const others = savedRecordsData.filter(
+        (r) =>
+            !(
+                r[6] &&
+                loggedInAdmin &&
+                r[6].toString().includes(loggedInAdmin.name)
+            )
+    );
+    const list = mine
+        .concat(others)
+        .filter(
+            (r) =>
+                (r[1] || "").toLowerCase().includes(q) ||
+                (r[2] || "").toString().toLowerCase().includes(q)
+        );
+    if (!list.length)
+        profileImagesGrid.innerHTML = `<div class="text-slate-400 col-span-4">No images found.</div>`;
+    list.forEach((r) => {
+        const url = r[5];
+        const card = document.createElement("div");
+        card.className = "rounded overflow-hidden bg-slate-800/40 p-2";
+        card.innerHTML = `<a href="${url}" target="_blank" rel="noopener noreferrer"><img src="${url}" class="w-full h-28 object-cover rounded"></a><div class="mt-2 text-sm"><div class="font-semibold">${r[1]}</div><div class="text-xs text-slate-400">ID: ${r[2]}</div></div>`;
+        profileImagesGrid.appendChild(card);
+    });
+}
+
+profileImageFilter.oninput = () =>
+    populateProfileImages(profileImageFilter.value);
+
+/* --------------------------- ADMIN PANEL --------------------------- */
+async function populateAdminManagementList() {
+    adminManagementList.innerHTML = `<div class="text-center text-slate-400 p-4">Loading admin list...</div>`;
+    
+    // Ensure adminData is fresh
+    await fetchAdmins(); 
+    
+    adminManagementList.innerHTML = ""; // Clear loader
+    
+    if (!adminData || !adminData.length) {
+        adminManagementList.innerHTML = `<div class="text-center text-slate-400 p-4">Could not load admin list.</div>`;
+        return;
+    }
+    
+    adminData.forEach(admin => {
+        const isAdminSelf = admin.name === loggedInAdmin.name;
+        const card = document.createElement('div');
+        card.className = 'p-3 bg-slate-800/40 rounded-lg flex items-center gap-3';
+        
+        const roleOptions = ['viewer', 'subadmin', 'admin', 'superadmin']
+            .map(role => `<option value="${role}" ${admin.role === role ? 'selected' : ''}>${role}</option>`)
+            .join('');
+            
+        const isDisabled = admin.disabled;
+        
+        card.innerHTML = `
+            <img src="${admin.imageUrl}" alt="${admin.name}" class="w-12 h-12 rounded-full object-cover flex-shrink-0" crossorigin="anonymous">
+            <div class="flex-1 overflow-hidden">
+                <p class="font-semibold text-white truncate">${admin.name}</p>
+                <p class="text-sm text-slate-400 truncate">${admin.role} ${isDisabled ? '(Disabled)' : ''}</p>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <select id="role-select-${admin.name}" class="admin-filter-select text-sm !py-1 !px-2" ${isAdminSelf ? 'disabled' : ''}>
+                    ${roleOptions}
+                </select>
+                <label class="switch" title="${isDisabled ? 'Unblock' : 'Block'} User">
+                    <input id="disable-check-${admin.name}" type="checkbox" ${isDisabled ? 'checked' : ''} ${isAdminSelf ? 'disabled' : ''}>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        `;
+        
+        adminManagementList.appendChild(card);
+
+        // Add event listeners for the new elements
+        const roleSelect = document.getElementById(`role-select-${admin.name}`);
+        const disableCheck = document.getElementById(`disable-check-${admin.name}`);
+        
+        if (!isAdminSelf) {
+            roleSelect.onchange = (e) => {
+                handleUpdateAdminRole(admin.name, e.target.value);
+            };
+            disableCheck.onchange = (e) => {
+                handleUpdateAdminDisabled(admin.name, e.target.checked);
+            };
+        }
+    });
+}
+
+async function handleUpdateAdminRole(adminName, newRole) {
+    const admin = adminData.find(a => a.name === adminName);
+    if (!admin) return;
+    
+    showModal('loading', `Updating ${adminName} to ${newRole}...`);
+    
+    try {
+        const res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'setAdminRole',
+                requestedBy: loggedInAdmin.name,
+                name: adminName,
+                role: newRole,
+                disabled: admin.disabled // Pass existing disabled status
+            }),
+            redirect: 'follow'
+        });
+        if (!res.ok) throw new Error('Server request failed');
+        const result = await res.json();
+        if (result.status === 'success') {
+            showModal('success', `${adminName} role updated to ${newRole}.`);
+            await populateAdminManagementList(); // Refresh list
+        } else {
+            throw new Error(result.message || 'Unknown error');
+        }
+    } catch (e) {
+        showModal('error', `Failed to update: ${e.message}`);
+        await populateAdminManagementList(); // Refresh to reset UI
+    }
+}
+
+async function handleUpdateAdminDisabled(adminName, isDisabled) {
+    const admin = adminData.find(a => a.name === adminName);
+    if (!admin) return;
+
+    const actionText = isDisabled ? 'Blocking' : 'Unblocking';
+    showModal('loading', `${actionText} ${adminName}...`);
+    
+    try {
+        const res = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'setAdminRole',
+                requestedBy: loggedInAdmin.name,
+                name: adminName,
+                role: admin.role, // Pass existing role
+                disabled: isDisabled 
+            }),
+            redirect: 'follow'
+        });
+        if (!res.ok) throw new Error('Server request failed');
+        const result = await res.json();
+        if (result.status === 'success') {
+            showModal('success', `${adminName} has been ${isDisabled ? 'disabled' : 'enabled'}.`);
+            await populateAdminManagementList(); // Refresh list
+        } else {
+            throw new Error(result.message || 'Unknown error');
+        }
+    } catch (e) {
+        showModal('error', `Failed to update: ${e.message}`);
+        await populateAdminManagementList(); // Refresh to reset UI
+    }
+}
+
+addAdminBtn.onclick = () => {
+    // The backend script setAdminRoleHandler only UPDATES. It does not ADD.
+    // Therefore, we must inform the user to add via the Google Sheet.
+    showModal(
+        'choice', 
+        'Add Admin via Google Sheet', 
+        { 'OK': {} }
+    );
+    modalMessage.innerHTML = 'To add a new admin, please add their details (Name, Image URL, Role, Email) to the <strong>AdminScan</strong> tab in the master Google Sheet.';
+};
+
+/* --------------------------- ANALYTICS --------------------------- */
+async function fetchAnalyticsData() {
+    try {
+        // In a real implementation, this would fetch from a dedicated analytics endpoint
+        // For now, we'll simulate data based on existing data
+        
+        // Calculate today's scans (simplified)
+        const today = new Date().toISOString().split('T')[0];
+        const todayScans = savedRecordsData.filter(r => {
+            // This assumes there's a timestamp field we can check
+            // In a real implementation, we'd have a proper date field
+            return true; // Simplified for demo
+        }).length;
+        
+        // Calculate completion rate
+        const totalStudents = allStudentsListData.length;
+        const studentsWithPhotos = savedRecordsData.length;
+        const completionRate = totalStudents > 0 ? Math.round((studentsWithPhotos / totalStudents) * 100) : 0;
+        
+        // Calculate storage used (simplified estimate)
+        const avgImageSize = 0.5; // MB
+        const storageUsed = (savedRecordsData.length * avgImageSize / 1024).toFixed(2); // GB
+        
+        // Update UI
+        scansTodayEl.textContent = todayScans;
+        activeUsersEl.textContent = adminData.filter(a => !a.disabled).length;
+        completionRateEl.textContent = `${completionRate}%`;
+        storageUsedEl.textContent = `${storageUsed} GB`;
+        
+        // Update charts
+        updateWeeklyActivityChart();
+        updateClassCompletionChart();
+        
+    } catch (error) {
+        console.error('Failed to fetch analytics data:', error);
+    }
+}
+
+function updateWeeklyActivityChart() {
+    const ctx = weeklyActivityChart.getContext('2d');
+    
+    // Generate sample data for the past 7 days
+    const labels = [];
+    const data = [];
+    
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        labels.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
+        
+        // In a real implementation, this would be actual scan data
+        // For now, generate random data
+        data.push(Math.floor(Math.random() * 50) + 10);
+    }
+    
+    // Destroy existing chart if it exists
+    if (window.weeklyActivityChartInstance) {
+        window.weeklyActivityChartInstance.destroy();
+    }
+    
+    window.weeklyActivityChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Scans',
+                data: data,
+                borderColor: '#4f46e5',
+                backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#e2e8f0'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#e2e8f0'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function updateClassCompletionChart() {
+    const ctx = classCompletionChart.getContext('2d');
+    
+    // Get unique classes
+    const classes = [...new Set(allStudentsListData.map(s => s[2]).filter(Boolean))];
+    
+    // Calculate completion rate for each class
+    const completionData = classes.map(className => {
+        const totalStudents = allStudentsListData.filter(s => s[2] === className).length;
+        const studentsWithPhotos = savedRecordsData.filter(r => r[3] === className).length;
+        return totalStudents > 0 ? Math.round((studentsWithPhotos / totalStudents) * 100) : 0;
+    });
+    
+    // Destroy existing chart if it exists
+    if (window.classCompletionChartInstance) {
+        window.classCompletionChartInstance.destroy();
+    }
+    
+    window.classCompletionChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: classes,
+            datasets: [{
+                label: 'Completion Rate (%)',
+                data: completionData,
+                backgroundColor: [
+                    'rgba(79, 70, 229, 0.7)',
+                    'rgba(16, 185, 129, 0.7)',
+                    'rgba(245, 158, 11, 0.7)',
+                    'rgba(239, 68, 68, 0.7)',
+                    'rgba(59, 130, 246, 0.7)'
+                ],
+                borderColor: [
+                    'rgba(79, 70, 229, 1)',
+                    'rgba(16, 185, 129, 1)',
+                    'rgba(245, 158, 11, 1)',
+                    'rgba(239, 68, 68, 1)',
+                    'rgba(59, 130, 246, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#e2e8f0',
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    ticks: {
+                        color: '#e2e8f0'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function updateAnalyticsData() {
+    fetchAnalyticsData();
+}
+
+/* --------------------------- NAV HELPERS --------------------------- */
+const navLinks = [
+    navScan,
+    navList,
+    navRecords,
+    navStorage,
+    navProfile,
+    navAdmin,
+    navAnalytics
+];
+const pages = [
+    pageScan,
+    pageList,
+    pageRecords,
+    pageStorage,
+    pageProfile,
+    pageAdmin,
+    pageAnalytics
+];
+
+function navLinksDeactivate() {
+    navLinks.forEach((l) => l.classList.remove("active"));
+}
+
+function hideAllPages() {
+    pages.forEach((p) => p.classList.add("hidden"));
+}
+
+navLinks.forEach((link, index) => {
+    link.onclick = (e) => {
+        e.preventDefault();
+        navLinksDeactivate();
+        hideAllPages();
+        link.classList.add("active");
+        pages[index].classList.remove("hidden");
+        stopCamera();
+        if (pages[index] === pageRecords) displaySavedRecords();
+        if (pages[index] === pageList) displayStudentList();
+        if (pages[index] === pageStorage) populateStorageLinks();
+        if (pages[index] === pageAdmin) populateAdminManagementList();
+        if (pages[index] === pageAnalytics) fetchAnalyticsData();
+        closeSidebar();
+    };
+});
+
+const closeSidebar = () => {
+    // Only applies to mobile
+    sidebar.classList.remove("is-open");
+    sidebarBackdrop.classList.add("hidden");
+};
+
+menuBtn.onclick = () => { // Mobile menu button
+    sidebar.classList.toggle('is-open'); 
+    sidebarBackdrop.classList.toggle('hidden');
+    // If we open mobile nav, make sure desktop collapsed state is off
+    sidebar.classList.remove('collapsed');
+    contentWrapper.classList.remove('collapsed');
+    isSidebarCollapsed = false;
+};
+
+sidebarToggleBtn.onclick = () => { // Desktop toggle button
+    isSidebarCollapsed = !isSidebarCollapsed;
+    sidebar.classList.toggle('collapsed', isSidebarCollapsed);
+    contentWrapper.classList.toggle('collapsed', isSidebarCollapsed);
+    // Store preference
+    try { localStorage.setItem('sidebar_collapsed', isSidebarCollapsed); } catch(e){}
+};
+
+sidebarBackdrop.onclick = () => closeSidebar();
+
+recordsClassFilter.onchange = () => filterRecordsTable();
+listClassFilter.onchange = () => filterStudentListTable();
+recordsSearchInput.oninput = () => filterRecordsTable();
+listSearchInput.oninput = () => filterStudentListTable();
+
+/* --------------------------- STORAGE LINKS --------------------------- */
+function populateStorageLinks() {
+    const container = document.getElementById("storage-links-container");
+    const links = {
+        Sheets: {
+            "Student List (DIList)": "https://docs.google.com/spreadsheets/d/1eRyPoifzyvB4oBmruNyXcoKMKPRqjk6xDD6-bPNW6pc/edit",
+            "Saved Info & Admins (InfoUsers)": "https://docs.google.com/spreadsheets/d/1dleEg_Q5KV9IRGT4DpfHooZQ_p2bKLk-2yCGYootqPA/edit",
+            "Secondary List (បញ្ជឺឈ្មោះរួម)": "https://docs.google.com/spreadsheets/d/1_Kgl8UQXRsVATt_BOHYQjVWYKkRIBA12R-qnsBoSUzc/edit",
+        },
+        Folders: {
+            "Default Uploads": "https://drive.google.com/drive/folders/10RyejYi9_J0c7gxrL5wgmODy4VfJZ6SA",
+            "AD Class": "https://drive.google.com/drive/folders/140JXHUU9FIKB7VNEXUsv9rPJ4i8S_SMY",
+        },
+    };
+    container.innerHTML = "";
+    for (const [category, items] of Object.entries(links)) {
+        let html = `<div class="mb-6"><h3 class="text-xl font-semibold text-indigo-300 mb-3">${category}</h3><div class="space-y-2">`;
+        for (const [title, url] of Object.entries(items)) {
+            html += `<a href="${url}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between p-4 bg-slate-700/50 rounded-lg hover:bg-slate-600/50 transition"><span class="font-medium">${title}</span><i class="fas fa-external-link-alt text-slate-400"></i></a>`;
+        }
+        html += `</div></div>`;
+        container.innerHTML += html;
+    }
+}
+
+/* --------------------------- SETTINGS UI --------------------------- */
+function setupSettingsUI() {
+    // load saved settings
+    try {
+        const s = JSON.parse(
+            localStorage.getItem("di_settings_v1") || "{}"
+        );
+        if (s.theme) settings.theme = s.theme;
+        if (s.lang) settings.lang = s.lang;
+        if (s.bgColor) settings.bgColor = s.bgColor;
+    } catch (e) {}
+    applySettings(); 
+    
+    // show face-scan toggle only if superadmin
+    if (loggedInAdmin && (loggedInAdmin.role === "superadmin")) {
+        faceScanToggleRow.classList.remove("hidden");
+        navAdmin.classList.remove("hidden"); // Show Admin Panel link
+        navSettingsBtn.classList.remove("hidden"); // Show settings cog
+        
+        faceScanEnabledCheckbox.checked = loggedInAdmin.faceScan !== false;
+        faceScanEnabledCheckbox.onchange = () => {
+            loggedInAdmin.faceScan = faceScanEnabledCheckbox.checked;
+            // TODO: This should be saved to the backend
+            // For now, just update self
+            handleUpdateAdminDisabled(loggedInAdmin.name, !loggedInAdmin.faceScan);
+            showModal("success", "Updated face-scan preference.");
+        };
+    }
+    
+    btnThemeToggle.onclick = () => {
+        settings.theme = settings.theme === "dark" ? "light" : "dark";
+        applySettings();
+        localStorage.setItem("di_settings_v1", JSON.stringify(settings));
+    };
+    btnLang.onclick = () => {
+        settings.lang = settings.lang === "KH" ? "EN" : "KH";
+        applySettings();
+        localStorage.setItem("di_settings_v1", JSON.stringify(settings));
+    };
+    bgColorPicker.onchange = (e) => {
+        settings.bgColor = e.target.value;
+        document.body.style.background = settings.bgColor;
+        localStorage.setItem("di_settings_v1", JSON.stringify(settings));
+    };
+}
+
+function applySettings() {
+    document.body.setAttribute(
+        "data-theme",
+        settings.theme === "dark" ? "dark" : "light"
+    );
+    btnThemeToggle.textContent =
+        settings.theme === "dark" ? "Dark" : "Light";
+    btnLang.textContent = settings.lang;
+    bgColorPicker.value = settings.bgColor || "#0f172a";
+    document.body.style.background = settings.bgColor || "";
+}
+
+/* --------------------------- INITIAL LOAD --------------------------- */
+document.addEventListener("DOMContentLoaded", async () => {
+    // 1. Show loader immediately
+    document.body.insertAdjacentHTML(
+        "afterbegin",
+        `<div id="initial-loading" class="fixed inset-0 flex flex-col items-center justify-center bg-slate-900 z-50"><img src="https://i.postimg.cc/FHBn0Fdf/di3-copy.png" alt="Logo" class="w-24 h-24 rounded-full mb-4 shadow-lg"><p class="text-slate-300 text-lg">កំពុងទាញវិភាគផ្ទៃមុខ...</p></div>`
+    );
+    const loader = document.getElementById("initial-loading");
+
+    // Check for sidebar preference
+    if (localStorage.getItem('sidebar_collapsed') === 'true') {
+        isSidebarCollapsed = true;
+        sidebar.classList.add('collapsed');
+        contentWrapper.classList.add('collapsed');
+    }
+
+    try {
+        // 2. Load models first, this is essential for both paths
+        await loadModels();
+
+        // 3. Initialize new features
+        initVoiceRecognition();
+        initQRScanner();
+        initBatchScan();
+        initExportFunctions();
+
+        // 4. Fetch admin data for both login and session restore
+        await fetchAdmins();
+
+        // 5. Check for an existing session
+        const session = loadAdminSession();
+
+        if (session && session.name && session.imageUrl) {
+            
+            const sessionAdmin = adminData.find(a => a.name === session.name);
+            
+            if (sessionAdmin && sessionAdmin.disabled) {
+                // Admin is disabled, clear session and force login
+                clearAdminSession();
+                loader.style.display = 'none';
+                showModal('error', 'Your account has been disabled. Please contact a superadmin.');
+                return; // Stop execution
+            } else if (sessionAdmin) {
+                 // --- SESSION EXISTS: Go to App ---
+                loggedInAdmin = sessionAdmin; // Use the full, fresh data
+            } else {
+                // No admin found, session is invalid
+                clearAdminSession();
+                loader.style.display = 'none';
+                return; // Stop execution
+            }
+
+            // 4. Update UI immediately
+            adminProfileImgHeader.crossOrigin = "anonymous";
+            adminProfileImgSidebar.crossOrigin = "anonymous";
+            adminProfileImgHeader.src = loggedInAdmin.imageUrl;
+            adminProfileImgSidebar.src = loggedInAdmin.imageUrl;
+            adminNameSidebar.textContent = loggedInAdmin.name;
+            adminRoleSidebar.textContent = loggedInAdmin.role || "admin";
+            adminProfileImgHeader.classList.remove("hidden");
+            adminProfileSidebar.classList.remove("hidden");
+
+            // 5. Show app, hide login
+            loginScreen.classList.add("hidden");
+            if (loginScreen.parentNode)
+                loginScreen.parentNode.removeChild(loginScreen);
+            mainAppWrapper.classList.remove("hidden");
+
+            // 6. Setup settings (e.g., theme)
+            setupSettingsUI();
+
+            // 7. Asynchronously fetch data in the background
+            Promise.all([
+                fetchStudents(),
+                displaySavedRecords(),
+                fetchAllSavedRecordsForStats(),
+            ]).then(updateProfileSummary);
+        }
+        // If no session, do nothing, just let the loader hide
+        
+    } catch (err) {
+        // Handle critical errors (e.g., models failed to load, fetchAdmins failed)
+        console.error("Initialization failed:", err);
+        if (loader) {
+            loader.innerHTML =
+                '<p class="text-red-400 text-lg">Failed to initialize the application.</p><p class="text-slate-400 mt-2">Please try refreshing the page.</p>';
+        } else {
+            showModal("error", "Failed to initialize the application. Please try refreshing the page.");
+        }
+        return; // Stop execution
+    } finally {
+        // 8. Hide loader
+        if (loader) {
+            loader.parentNode.removeChild(loader);
+        }
+    }
+});

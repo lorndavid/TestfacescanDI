@@ -1,2396 +1,506 @@
 <!DOCTYPE html>
 <html lang="km">
-  <head>
+<head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-    />
-    <title>ប្រព័ន្ធស្កេនមុខឌីជីថល — V3</title>
-    <link
-      rel="icon"
-      href="https://img.freepik.com/premium-vector/face-scan-icon_933463-79729.jpg"
-    />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.js"
-      defer
-    ></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>ប្រព័ន្ធស្កេនមុខឌីជីថល — V4</title>
+    <link rel="icon" href="https://img.freepik.com/premium-vector/face-scan-icon_933463-79729.jpg" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      @import url("https://fonts.googleapis.com/css2?family=Moul&display=swap");
-      :root {
-        --bg: #0f172a;
-        --card: rgba(30, 41, 59, 0.7);
-        --muted: #e2e8f0;
-      }
-      [data-theme="light"] {
-        --bg: #f8fafc;
-        --card: rgba(255, 255, 255, 0.8);
-        --muted: #0f172a;
-      }
-      body {
-        font-family: "Kantumruy Pro", sans-serif;
-        background: var(--bg);
-        color: var(--muted);
-        overflow-y: auto;
-        overflow-x: hidden;
-      }
-      .main-content {
-        background: var(--card);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-      }
-      
-      /* --- Sidebar Transitions --- */
-      #sidebar, #content-wrapper {
-        transition: all 0.3s ease-in-out;
-      }
-      /* Text elements to hide */
-      .nav-text, 
-      #sidebar-sub, 
-      #admin-profile-compact .text-sm, 
-      #admin-profile-compact .font-semibold, 
-      #stat-total ~ div, /* text below stats */
-      #logout-btn span, 
-      #nav-settings-btn span {
-        transition: opacity 0.2s ease, width 0.2s ease, transform 0.2s ease;
-        white-space: nowrap;
-      }
-      
-      /* --- Sidebar Desktop Collapsed State --- */
-      @media (min-width: 768px) {
-        #sidebar.collapsed {
-          width: 88px; /* w-22 */
-        }
-        #sidebar.collapsed .nav-text,
-        #sidebar.collapsed #sidebar-sub,
-        #sidebar.collapsed #sidebar-logo-text,
-        #sidebar.collapsed #admin-profile-compact .text-sm,
-        #sidebar.collapsed #admin-profile-compact .font-semibold,
-        #sidebar.collapsed #stat-total ~ div, /* text below stats */
-        #sidebar.collapsed #logout-btn span,
-        #sidebar.collapsed #nav-settings-btn span {
-          opacity: 0;
-          width: 0;
-          transform: translateX(10px);
-          pointer-events: none;
-        }
-        #sidebar.collapsed #sidebar-logo-wrapper {
-          justify-content: center;
-        }
-        #sidebar.collapsed #sidebar-logo {
-           width: 48px; height: 48px; /* w-12 h-12 */
-        }
-        #sidebar.collapsed #admin-profile-img-sidebar {
-           width: 40px; height: 40px; /* w-10 h-10 */
-        }
-        #sidebar.collapsed .nav-link {
-          justify-content: center;
-          padding-left: 0.75rem;
-          padding-right: 0.75rem;
-        }
-         #sidebar.collapsed #admin-profile-compact {
-           justify-content: center;
-         }
-        #sidebar.collapsed #logout-btn,
-        #sidebar.collapsed #nav-settings-btn {
-           justify-content: center;
-        }
-        #sidebar.collapsed #logout-btn i,
-        #sidebar.collapsed #nav-settings-btn i {
-           margin: 0;
-        }
-        #content-wrapper.collapsed {
-          margin-left: 88px;
-        }
-      }
-      /* --- End Sidebar --- */
-      
-      #sidebar.is-open {
-        transform: translateX(0);
-      }
-      .nav-link.active {
-        background: #4f46e5;
-        color: #fff;
-        box-shadow: 0 4px 14px rgba(79, 70, 229, 0.39);
-      }
-      .video-container video {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transform: translate(-50%, -50%);
-      }
-      .video-container {
-        position: relative;
-        border-radius: 50%;
-        overflow: hidden;
-        border: 5px solid transparent;
-        transition: all 0.4s ease;
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
-      }
-      .video-container.ready {
-        border-color: #4ade80;
-        box-shadow: 0 0 25px rgba(74, 222, 128, 0.6);
-      }
-      .video-container.fail {
-        border-color: #f43f5e;
-        box-shadow: 0 0 25px rgba(244, 63, 94, 0.6);
-      }
-      .scanner-line {
-        position: absolute;
-        left: 0;
-        width: 100%;
-        height: 3px;
-        background: linear-gradient(
-          to right,
-          transparent,
-          #4ade80,
-          transparent
-        );
-        box-shadow: 0 0 10px #4ade80;
-        animation: scan 3s linear infinite;
-        opacity: 0;
-        transition: opacity 0.3s;
-      }
-      .video-container.ready .scanner-line {
-        opacity: 1;
-      }
-      @keyframes scan {
-        0% {
-          top: 0%;
-        }
-        50% {
-          top: 100%;
-        }
-        100% {
-          top: 0%;
-        }
-      }
-      .modal {
-        background: rgba(15, 23, 42, 0.8);
-        backdrop-filter: blur(5px);
-      }
-      .modal-content {
-        background: #1e293b;
-        border: 1px solid #475569;
-      }
-      .khmer-title {
-        font-family: "Moul", serif;
-      }
-      .table-container {
-        height: calc(100vh - 280px);
-        overflow-y: auto;
-      }
-      #student-list {
-        max-height: 40vh;
-        overflow-y: auto;
-      }
-      #student-list li:hover {
-        background-color: #334155;
-      }
-      #student-list li.completed {
-        color: #4ade80 !important;
-        font-weight: 600;
-        opacity: 0.7;
-        pointer-events: none;
-      }
-      .filter-select {
-        background-color: #e5e7eb;
-        color: #111827;
-        padding: 0.5rem 2rem 0.5rem 0.75rem;
-        font-size: 0.875rem;
-        border-radius: 0.5rem;
-        border: 1px solid #9ca3af;
-        -webkit-appearance: none;
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-        background-position: right 0.5rem center;
-        background-repeat: no-repeat;
-        background-size: 1.5em 1.5em;
-      }
-      /* Select in admin panel */
-      .admin-filter-select {
-        background-color: #334155;
-        color: #e2e8f0;
-        border: 1px solid #475569;
-        padding: 0.5rem 2rem 0.5rem 0.75rem;
-        font-size: 0.875rem;
-        border-radius: 0.5rem;
-        -webkit-appearance: none;
-        appearance: none;
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-        background-position: right 0.5rem center;
-        background-repeat: no-repeat;
-        background-size: 1.5em 1.5em;
-      }
-      
-      .filter-select option {
-        background: #f3f4f6;
-        color: #000;
-      }
-      @media (min-width: 768px) {
-        .filter-select {
-          padding: 0.6rem 2.5rem 0.6rem 1rem;
-          font-size: 1rem;
-        }
-      }
-      ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #1e293b;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #475569;
-        border-radius: 4px;
-      }
-      #login-screen {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 1rem;
-      }
-      .login-card {
-        width: 100%;
-        max-width: 400px;
-        background: rgba(30, 41, 59, 0.7);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border-radius: 1.5rem;
-        padding: 2rem;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-      }
-      #admin-select {
-        background-color: #334155;
-        color: #e2e8f0;
-        border: 1px solid #475569;
-      }
-      /* profile overlay */
-      .profile-panel {
-        min-width: 260px;
-        max-width: 360px;
-      }
-      .small-badge {
-        font-size: 0.75rem;
-        padding: 0.25rem 0.5rem;
-        border-radius: 999px;
-      }
-      /* mobile responsive tweaks */
-      @media (max-width: 767px) {
-        #sidebar {
-          position: fixed;
-          z-index: 50;
-          transform: translateX(-110%);
-        }
-        #content-wrapper {
-          margin-left: 0;
-        }
-      }
-      
-      /* Admin panel custom switch */
-      .switch { position: relative; display: inline-block; width: 60px; height: 34px; }
-      .switch input { opacity: 0; width: 0; height: 0; }
-      .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #475569; transition: .4s; border-radius: 34px; }
-      .slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
-      input:checked + .slider { background-color: #4f46e5; }
-      input:checked + .slider:before { transform: translateX(26px); }
-
-    </style>
-  </head>
-  <body data-theme="dark" class="bg-slate-900 text-slate-200">
-    <!-- LOGIN (same UX but we keep device session persistence) -->
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body data-theme="dark" class="bg-slate-900 text-slate-200">
+    <!-- LOGIN SCREEN -->
     <div id="login-screen">
-      <div class="login-card text-center">
-        <img
-          src="https://i.postimg.cc/FHBn0Fdf/di3-copy.png"
-          alt="Logo"
-          class="w-24 h-24 rounded-full mx-auto mb-4 shadow-lg"
-        />
-        <h1
-          id="login-title"
-          class="text-2xl font-bold text-white khmer-title mb-2"
-        >
-          ឩស្សាហកម្មឌីជីថល
-        </h1>
-        <p id="login-subtitle" class="text-slate-400 mb-6">
-          សូមជ្រើសរើសឈ្មោះរបស់អ្នក
-        </p>
+        <div class="login-card text-center">
+            <img src="https://i.postimg.cc/FHBn0Fdf/di3-copy.png" alt="Logo" class="w-24 h-24 rounded-full mx-auto mb-4 shadow-lg" />
+            <h1 id="login-title" class="text-2xl font-bold text-white khmer-title mb-2">ឩស្សាហកម្មឌីជីថល</h1>
+            <p id="login-subtitle" class="text-slate-400 mb-6">សូមជ្រើសរើសឈ្មោះរបស់អ្នក</p>
 
-        <div id="admin-selection-area">
-          <div
-            class="w-16 h-16 border-4 border-slate-500 border-t-indigo-500 rounded-full animate-spin mx-auto mb-4"
-            id="admin-list-loader"
-          ></div>
-          <select
-            id="admin-select"
-            class="hidden filter-select w-full text-base mb-4 py-3 px-4"
-            style="background-position: right 1rem center"
-          >
-            <option value="">-- Select Your Name --</option>
-          </select>
-          <button
-            id="proceed-to-scan-btn"
-            class="hidden w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 transition shadow-lg"
-          >
-            បន្តទៅការស្កេន
-          </button>
+            <div id="admin-selection-area">
+                <div class="w-16 h-16 border-4 border-slate-500 border-t-indigo-500 rounded-full animate-spin mx-auto mb-4" id="admin-list-loader"></div>
+                <select id="admin-select" class="hidden filter-select w-full text-base mb-4 py-3 px-4" style="background-position: right 1rem center">
+                    <option value="">-- Select Your Name --</option>
+                </select>
+                <button id="proceed-to-scan-btn" class="hidden w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 transition shadow-lg">បន្តទៅការស្កេន</button>
+            </div>
+
+            <div id="admin-scan-area" class="hidden flex flex-col items-center space-y-4">
+                <div id="admin-video-wrapper" class="video-container w-[90%] mx-auto aspect-square">
+                    <video id="admin-video" autoplay muted playsinline></video>
+                </div>
+                <canvas id="admin-canvas" class="hidden"></canvas>
+                <p id="admin-scan-status" class="text-center text-sm h-10 font-semibold text-slate-400"></p>
+
+                <div class="flex flex-col w-full space-y-3">
+                    <button id="admin-manual-scan-btn" class="w-full bg-slate-600 text-white py-3 rounded-xl font-semibold hover:bg-slate-700 transition">
+                        <i class="fas fa-camera mr-2"></i> ស្កេនដោយខ្លួនឯង
+                    </button>
+                    <button id="admin-back-btn" class="w-full text-slate-400 py-2 rounded-xl font-semibold hover:text-white transition">
+                        <i class="fas fa-arrow-left mr-2"></i> ត្រលប់​ក្រោយ
+                    </button>
+                </div>
+            </div>
         </div>
-
-        <div
-          id="admin-scan-area"
-          class="hidden flex flex-col items-center space-y-4"
-        >
-          <div
-            id="admin-video-wrapper"
-            class="video-container w-[90%] mx-auto aspect-square"
-          >
-            <video id="admin-video" autoplay muted playsinline></video>
-          </div>
-          <canvas id="admin-canvas" class="hidden"></canvas>
-          <p
-            id="admin-scan-status"
-            class="text-center text-sm h-10 font-semibold text-slate-400"
-          ></p>
-
-          <div class="flex flex-col w-full space-y-3">
-            <button
-              id="admin-manual-scan-btn"
-              class="w-full bg-slate-600 text-white py-3 rounded-xl font-semibold hover:bg-slate-700 transition"
-            >
-              <i class="fas fa-camera mr-2"></i> ស្កេនដោយខ្លួនឯង
-            </button>
-            <button
-              id="admin-back-btn"
-              class="w-full text-slate-400 py-2 rounded-xl font-semibold hover:text-white transition"
-            >
-              <i class="fas fa-arrow-left mr-2"></i> ត្រលប់​ក្រោយ
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <!-- APP -->
+    <!-- MAIN APP -->
     <div id="main-app-wrapper" class="hidden">
-      <div class="relative min-h-screen md:flex">
-        <div
-          id="sidebar-backdrop"
-          class="hidden md:hidden fixed inset-0 bg-black/50 z-30"
-        ></div>
+        <div class="relative min-h-screen md:flex">
+            <div id="sidebar-backdrop" class="hidden md:hidden fixed inset-0 bg-black/50 z-30"></div>
 
-        <!-- SIDEBAR -->
-        <aside
-          id="sidebar"
-          class="fixed top-0 left-0 w-72 h-full bg-slate-800/90 backdrop-blur-lg z-40 transform -translate-x-full md:translate-x-0 flex flex-col"
-        >
-          <!-- Logo/Header -->
-          <div class="text-center py-5 mb-2 px-4 border-b border-slate-700/40">
-            <div id="sidebar-logo-wrapper" class="flex items-center gap-3 justify-start px-2">
-              <img
-                id="sidebar-logo"
-                src="https://i.postimg.cc/FHBn0Fdf/di3-copy.png"
-                alt="Logo"
-                class="w-14 h-14 rounded-full shadow-md cursor-pointer transition-all"
-                style="object-fit: cover"
-              />
-              <div class="overflow-hidden">
-                <h2 id="sidebar-logo-text" class="text-lg font-bold text-white khmer-title nav-text">
-                  ឧស្សាហកម្មឌីជីថល
-                </h2>
-                <p id="sidebar-sub" class="text-slate-400 text-sm nav-text">
-                  Face Scan Manager
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Navigation (Takes up all available space) -->
-          <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
-            <ul class="space-y-2">
-              <li>
-                <a
-                  href="#"
-                  id="nav-scan"
-                  class="nav-link active flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"
-                  ><i class="fas fa-camera-retro fa-fw w-5 text-center"></i
-                  ><span class="font-semibold nav-text">ថតរូប</span></a
-                >
-              </li>
-              <li>
-                <a
-                  href="#"
-                  id="nav-list"
-                  class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"
-                  ><i class="fas fa-users fa-fw w-5 text-center"></i
-                  ><span class="font-semibold nav-text">ទិន្នន័យរូបភាពនិស្សិត</span></a
-                >
-              </li>
-              <li>
-                <a
-                  href="#"
-                  id="nav-records"
-                  class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"
-                  ><i class="fas fa-database fa-fw w-5 text-center"></i
-                  ><span class="font-semibold nav-text">រូបភាពបានរក្សាទុក</span></a
-                >
-              </li>
-              <li>
-                <a
-                  href="#"
-                  id="nav-storage"
-                  class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"
-                  ><i class="fas fa-link fa-fw w-5 text-center"></i
-                  ><span class="font-semibold nav-text">Storage Links</span></a
-                >
-              </li>
-              <li>
-                <a
-                  href="#"
-                  id="nav-profile"
-                  class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"
-                  ><i class="fas fa-user-circle fa-fw w-5 text-center"></i
-                  ><span class="font-semibold nav-text">Profile</span></a
-                >
-              </li>
-              <!-- NEW ADMIN LINK (HIDDEN BY DEFAULT) -->
-              <li>
-                <a
-                  href="#"
-                  id="nav-admin"
-                  class="nav-link hidden flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white"
-                  ><i class="fas fa-shield-halved fa-fw w-5 text-center"></i
-                  ><span class="font-semibold nav-text">Admin Panel</span></a
-                >
-              </li>
-            </ul>
-          </nav>
-
-          <!-- Footer (User & Logout) -->
-          <div class="p-4 border-t border-slate-700/40 space-y-4">
-            <!-- Clickable Profile Section -->
-            <div
-              id="admin-profile-compact"
-              class="p-2 rounded-lg hover:bg-slate-700/50 cursor-pointer hidden"
-            >
-              <div class="flex items-center gap-3">
-                <img
-                  id="admin-profile-img-sidebar"
-                  class="w-10 h-10 rounded-full flex-shrink-0 transition-all"
-                  src=""
-                  alt="Admin"
-                  crossorigin="anonymous"
-                />
-                <div class="overflow-hidden">
-                  <p id="admin-name-sidebar" class="font-semibold text-white nav-text">
-                    ឈ្មោះគណនី
-                  </p>
-                  <p id="admin-role-sidebar" class="text-sm text-slate-300 nav-text">
-                    Role
-                  </p>
+            <!-- SIDEBAR -->
+            <aside id="sidebar" class="fixed top-0 left-0 w-72 h-full bg-slate-800/90 backdrop-blur-lg z-40 transform -translate-x-full md:translate-x-0 flex flex-col">
+                <!-- Logo/Header -->
+                <div class="text-center py-5 mb-2 px-4 border-b border-slate-700/40">
+                    <div id="sidebar-logo-wrapper" class="flex items-center gap-3 justify-start px-2">
+                        <img id="sidebar-logo" src="https://i.postimg.cc/FHBn0Fdf/di3-copy.png" alt="Logo" class="w-14 h-14 rounded-full shadow-md cursor-pointer transition-all" style="object-fit: cover" />
+                        <div class="overflow-hidden">
+                            <h2 id="sidebar-logo-text" class="text-lg font-bold text-white khmer-title nav-text">ឧស្សាហកម្មឌីជីថល</h2>
+                            <p id="sidebar-sub" class="text-slate-400 text-sm nav-text">Face Scan Manager</p>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
 
-            <!-- Stats (Moved from profile section for cleaner look) -->
-            <div class="grid grid-cols-3 gap-2 text-center text-sm">
-              <div class="p-2 bg-slate-800/40 rounded">
-                <div id="stat-total" class="font-bold">-</div>
-                <div class="text-xs text-slate-400 nav-text">ទិន្នន័យ</div>
-              </div>
-              <div class="p-2 bg-slate-800/40 rounded">
-                <div id="stat-mycount" class="font-bold">-</div>
-                <div class="text-xs text-slate-400 nav-text">រូបខ្ញុំ</div>
-              </div>
-              <div class="p-2 bg-slate-800/40 rounded">
-                <div id="stat-others" class="font-bold">-</div>
-                <div class="text-xs text-slate-400 nav-text">ផ្សេងៗ</div>
-              </div>
-            </div>
-
-            <!-- Bottom Actions -->
-            <div class="flex items-center justify-between gap-2">
-              <a
-                href="#"
-                id="logout-btn"
-                class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-slate-300 bg-red-600/50 hover:bg-red-600"
-              >
-                <i class="fas fa-sign-out-alt fa-fw"></i>
-                <span class="font-medium text-sm nav-text">Logout</span>
-              </a>
-              <a
-                href="#"
-                id="nav-settings-btn"
-                class="hidden h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-lg text-slate-300 bg-slate-700/50 hover:bg-slate-600"
-                title="Settings"
-              >
-                <i class="fas fa-cog fa-fw"></i>
-              </a>
-            </div>
-          </div>
-        </aside>
-
-        <!-- CONTENT -->
-        <div
-          id="content-wrapper"
-          class="flex flex-col flex-1 md:ml-72"
-        >
-          <header
-            class="w-full h-16 bg-slate-800/50 backdrop-blur-lg flex-shrink-0 flex items-center px-4 sticky top-0 z-20"
-          >
-            <!-- Mobile Menu Button -->
-            <button id="menu-btn" class="text-white mr-4 md:hidden">
-              <i class="fas fa-bars text-xl"></i>
-            </button>
-            <!-- Desktop Sidebar Toggle Button -->
-            <button id="sidebar-toggle-btn" class="text-white mr-4 hidden md:block">
-              <i class="fas fa-bars text-xl"></i>
-            </button>
-            
-            <h1 class="text-xl font-bold text-white khmer-title">
-              គ្រប់គ្រងទិន្នន័យរូបភាព
-            </h1>
-           
-            <!-- This div (logo + admin name) is now removed per request -->
-
-            <div class="ml-auto flex items-center gap-3">
-              <img
-                id="admin-profile-img-header"
-                class="w-10 h-10 rounded-full hidden cursor-pointer"
-                src=""
-                alt="Admin"
-                crossorigin="anonymous"
-              />
-            </div>
-          </header>
-
-          <main class="w-full flex-1 p-4 md:p-8">
-            <!-- PAGE: SCAN (kept) -->
-            <div id="page-scan">
-              <div class="main-content rounded-2xl p-6">
-                <div class="container w-full max-w-md mx-auto relative">
-                  <button
-                    id="back-btn"
-                    class="hidden absolute -top-2 -left-2 w-10 h-10 bg-slate-700/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-slate-600/50 transition z-20"
-                    title="Back to Selection"
-                  >
-                    <i class="fas fa-arrow-left"></i>
-                  </button>
-                  <h1 class="text-center text-2xl mb-2 text-white khmer-title">
-                    ប្រព័ន្ធស្កេនមុខឌីជីថល
-                  </h1>
-                  <p id="subtitle" class="text-center text-slate-400 mb-6">
-                    សូមជ្រើសរើសអត្តលេខរបស់អ្នក
-                  </p>
-
-                  <div id="selection-area" class="mb-5">
-                    <input
-                      type="text"
-                      id="student-search-input"
-                      placeholder="ស្វែងរកអត្តលេខ ឬឈ្មោះ..."
-                      class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-4"
-                    />
-                    <ul id="student-list" class="space-y-1">
-                      <li class="text-center text-slate-400 p-4">
-                        Loading students...
-                      </li>
+                <!-- Navigation -->
+                <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="#" id="nav-scan" class="nav-link active flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white">
+                                <i class="fas fa-camera-retro fa-fw w-5 text-center"></i>
+                                <span class="font-semibold nav-text">ថតរូប</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="nav-list" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white">
+                                <i class="fas fa-users fa-fw w-5 text-center"></i>
+                                <span class="font-semibold nav-text">ទិន្នន័យរូបភាពនិស្សិត</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="nav-records" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white">
+                                <i class="fas fa-database fa-fw w-5 text-center"></i>
+                                <span class="font-semibold nav-text">រូបភាពបានរក្សាទុក</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="nav-storage" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white">
+                                <i class="fas fa-link fa-fw w-5 text-center"></i>
+                                <span class="font-semibold nav-text">Storage Links</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="nav-profile" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white">
+                                <i class="fas fa-user-circle fa-fw w-5 text-center"></i>
+                                <span class="font-semibold nav-text">Profile</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="nav-admin" class="nav-link hidden flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white">
+                                <i class="fas fa-shield-halved fa-fw w-5 text-center"></i>
+                                <span class="font-semibold nav-text">Admin Panel</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" id="nav-analytics" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white">
+                                <i class="fas fa-chart-line fa-fw w-5 text-center"></i>
+                                <span class="font-semibold nav-text">Analytics</span>
+                            </a>
+                        </li>
                     </ul>
-                  </div>
+                </nav>
 
-                  <div
-                    id="camera-section"
-                    class="hidden flex flex-col items-center space-y-4"
-                  >
-                    <div
-                      id="video-wrapper"
-                      class="video-container w-[90%] mx-auto aspect-square"
-                    >
-                      <video id="video" autoplay muted playsinline></video>
-                      <div class="scanner-line"></div>
+                <!-- Footer (User & Logout) -->
+                <div class="p-4 border-t border-slate-700/40 space-y-4">
+                    <!-- Clickable Profile Section -->
+                    <div id="admin-profile-compact" class="p-2 rounded-lg hover:bg-slate-700/50 cursor-pointer hidden">
+                        <div class="flex items-center gap-3">
+                            <img id="admin-profile-img-sidebar" class="w-10 h-10 rounded-full flex-shrink-0 transition-all" src="" alt="Admin" crossorigin="anonymous" />
+                            <div class="overflow-hidden">
+                                <p id="admin-name-sidebar" class="font-semibold text-white nav-text">ឈ្មោះគណនី</p>
+                                <p id="admin-role-sidebar" class="text-sm text-slate-300 nav-text">Role</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex items-center justify-center gap-4">
-                      <button
-                        id="switch-camera-btn"
-                        class="w-14 h-14 bg-slate-700/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-slate-600/50 transition"
-                        title="Switch Camera"
-                      >
-                        <i class="fas fa-sync-alt fa-lg"></i>
-                      </button>
-                      <button
-                        id="manual-capture-btn"
-                        class="w-20 h-20 bg-indigo-600 rounded-full flex items-center justify-center text-white hover:bg-indigo-700 transition shadow-lg"
-                        title="Capture Photo"
-                      >
-                        <i class="fas fa-camera fa-2x"></i>
-                      </button>
+
+                    <!-- Stats -->
+                    <div class="grid grid-cols-3 gap-2 text-center text-sm">
+                        <div class="p-2 bg-slate-800/40 rounded">
+                            <div id="stat-total" class="font-bold">-</div>
+                            <div class="text-xs text-slate-400 nav-text">ទិន្នន័យ</div>
+                        </div>
+                        <div class="p-2 bg-slate-800/40 rounded">
+                            <div id="stat-mycount" class="font-bold">-</div>
+                            <div class="text-xs text-slate-400 nav-text">រូបខ្ញុំ</div>
+                        </div>
+                        <div class="p-2 bg-slate-800/40 rounded">
+                            <div id="stat-others" class="font-bold">-</div>
+                            <div class="text-xs text-slate-400 nav-text">ផ្សេងៗ</div>
+                        </div>
                     </div>
-                    <canvas id="capture-canvas" class="hidden"></canvas>
-                    <img
-                      id="photo-preview"
-                      class="hidden w-[90%] mx-auto aspect-square rounded-full border-4 border-green-400 object-cover shadow-lg"
-                    />
-                    <p
-                      id="face-status"
-                      class="text-center text-sm h-5 font-semibold text-slate-400"
-                    ></p>
-                    <div class="flex flex-col w-full space-y-3">
-                      <button
-                        id="upload-btn"
-                        class="hidden w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:opacity-90 transition shadow-lg"
-                      >
-                        បញ្ជូនរូបភាព
-                      </button>
-                      <button
-                        id="retake-btn"
-                        class="hidden w-full bg-slate-600 text-white py-3 rounded-xl font-semibold hover:bg-slate-700 transition"
-                      >
-                        ថតម្តងទៀត
-                      </button>
+
+                    <!-- Bottom Actions -->
+                    <div class="flex items-center justify-between gap-2">
+                        <a href="#" id="logout-btn" class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-slate-300 bg-red-600/50 hover:bg-red-600">
+                            <i class="fas fa-sign-out-alt fa-fw"></i>
+                            <span class="font-medium text-sm nav-text">Logout</span>
+                        </a>
+                        <a href="#" id="nav-settings-btn" class="hidden h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-lg text-slate-300 bg-slate-700/50 hover:bg-slate-600" title="Settings">
+                            <i class="fas fa-cog fa-fw"></i>
+                        </a>
                     </div>
-                  </div>
                 </div>
-              </div>
-            </div>
+            </aside>
 
-            <!-- PAGE: LIST -->
-            <div
-              id="page-list"
-              class="hidden main-content rounded-2xl p-6 h-full flex flex-col"
-            >
-              <div
-                class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4"
-              >
-                <h1 class="text-2xl text-white khmer-title">
-                  ទិន្នន័យរូបភាពនិស្សិត
-                </h1>
-                <div class="flex gap-4 w-full md:w-auto">
-                  <input
-                    type="text"
-                    id="list-search-input"
-                    placeholder="ស្វែងរកអត្តលេខឬឈ្មោះ..."
-                    class="w-full bg-slate-700 border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                  <select
-                    id="list-class-filter"
-                    class="filter-select w-full md:w-auto"
-                  ></select>
-                </div>
-              </div>
-              <div
-                class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-left"
-              >
-                <div
-                  class="bg-slate-700/50 p-4 rounded-lg flex items-center gap-4"
-                >
-                  <i class="fas fa-users fa-2x text-slate-400"></i>
-                  <div>
-                    <p class="text-slate-400">ចំនួននិស្សិតសរុប</p>
-                    <p
-                      id="list-total-count"
-                      class="text-2xl font-bold text-white"
-                    >
-                      -
-                    </p>
-                  </div>
-                </div>
-                <div
-                  class="bg-green-800/30 p-4 rounded-lg flex items-center gap-4"
-                >
-                  <i class="fas fa-user-check fa-2x text-green-400"></i>
-                  <div>
-                    <p class="text-green-400">និស្សិតមានរូបភាព</p>
-                    <p
-                      id="list-completed-count"
-                      class="text-2xl font-bold text-green-400"
-                    >
-                      -
-                    </p>
-                  </div>
-                </div>
-                <div
-                  class="bg-red-800/30 p-4 rounded-lg flex items-center gap-4"
-                >
-                  <i class="fas fa-user-clock fa-2x text-red-400"></i>
-                  <div>
-                    <p class="text-red-400">និស្សិតគ្មានរូបភាព</p>
-                    <p
-                      id="list-pending-count"
-                      class="text-2xl font-bold text-red-400"
-                    >
-                      -
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div
-                id="list-container"
-                class="table-container flex-1 overflow-x-auto"
-              >
-                <div id="list-loading" class="text-center py-10">
-                  <p class="text-slate-400">
-                    កំពុងទាញទិន្នន័យរូបភាពនិស្សិត...
-                  </p>
-                </div>
-                <table
-                  id="list-table"
-                  class="hidden w-full text-left text-slate-300"
-                >
-                  <thead class="bg-slate-700/50 sticky top-0">
-                    <tr>
-                      <th class="p-3">ID</th>
-                      <th class="p-3">ឈ្មោះ</th>
-                      <th class="p-3">រូបភាព</th>
-                      <th class="p-3 text-center">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- PAGE: RECORDS -->
-            <div
-              id="page-records"
-              class="hidden main-content rounded-2xl p-6 h-full flex flex-col"
-            >
-              <div
-                class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4"
-              >
-                <h1 class="text-2xl text-white khmer-title">
-                  រូបភាពបានរក្សាទុក
-                </h1>
-                <div class="flex gap-4 w-full md:w-auto">
-                  <input
-                    type="text"
-                    id="records-search-input"
-                    placeholder="Search ID or Name..."
-                    class="w-full bg-slate-700 border-slate-600 rounded-lg px-4 py-2"
-                  />
-                  <select
-                    id="records-class-filter"
-                    class="filter-select w-full md:w-auto"
-                  ></select>
-                </div>
-              </div>
-              <div
-                id="records-container"
-                class="table-container flex-1 overflow-x-auto"
-              >
-                <div id="records-loading" class="text-center py-10">
-                  <p class="text-slate-400">កំពុងទាញរូបភាពបានរក្សាទុក...</p>
-                </div>
-                <table
-                  id="records-table"
-                  class="hidden w-full text-left text-slate-300"
-                >
-                  <thead class="bg-slate-700/50 sticky top-0">
-                    <tr>
-                      <th class="p-3">ល.រ</th>
-                      <th class="p-3">ឈ្មោះ</th>
-                      <th class="p-3">ID</th>
-                      <th class="p-3">ថ្នាក់</th>
-                      <th class="p-3">ក្រុម</th>
-                      <th class="p-3">រូបភាព</th>
-                      <th class="p-3 text-center">កែ</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
-              </div>
-            </div>
-
-            <!-- PAGE: STORAGE -->
-            <div
-              id="page-storage"
-              class="hidden main-content rounded-2xl p-6 h-full flex flex-col"
-            >
-              <h1 class="text-2xl text-white khmer-title mb-6">
-                Storage & Links
-              </h1>
-              <p class="text-slate-400 mb-6">
-                This section provides direct links to the Google Sheets and
-                Folders used by the application.
-              </p>
-              <div id="storage-links-container" class="space-y-6"></div>
-            </div>
-
-            <!-- PAGE: PROFILE (new) -->
-            <div
-              id="page-profile"
-              class="hidden main-content rounded-2xl p-6 h-full flex flex-col"
-            >
-              <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-4">
-                  <img
-                    id="profile-img-large"
-                    src=""
-                    class="w-20 h-20 rounded-full object-cover border-2 border-slate-700"
-                    alt="admin"
-                  />
-                  <div>
-                    <h2 id="profile-name-large" class="text-2xl font-bold">
-                      Admin Name
-                    </h2>
-                    <div id="profile-role-large" class="text-sm text-slate-400">
-                      Role
+            <!-- CONTENT -->
+            <div id="content-wrapper" class="flex flex-col flex-1 md:ml-72">
+                <header class="w-full h-16 bg-slate-800/50 backdrop-blur-lg flex-shrink-0 flex items-center px-4 sticky top-0 z-20">
+                    <!-- Mobile Menu Button -->
+                    <button id="menu-btn" class="text-white mr-4 md:hidden">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <!-- Desktop Sidebar Toggle Button -->
+                    <button id="sidebar-toggle-btn" class="text-white mr-4 hidden md:block">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    
+                    <h1 class="text-xl font-bold text-white khmer-title">គ្រប់គ្រងទិន្នន័យរូបភាព</h1>
+                   
+                    <div class="ml-auto flex items-center gap-3">
+                        <div class="hidden md:flex items-center gap-2 bg-slate-700/30 px-3 py-1 rounded-full">
+                            <span class="text-sm text-slate-300">System Status:</span>
+                            <span id="system-status" class="flex items-center gap-1">
+                                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                                <span class="text-sm text-green-400">Online</span>
+                            </span>
+                        </div>
+                        <img id="admin-profile-img-header" class="w-10 h-10 rounded-full hidden cursor-pointer" src="" alt="Admin" crossorigin="anonymous" />
                     </div>
-                  </div>
-                </div>
-                <div class="text-right">
-                  <div class="text-slate-400 text-sm">
-                    Total images (all): <span id="profile-total-all">-</span>
-                  </div>
-                  <div class="text-slate-400 text-sm">
-                    My uploads: <span id="profile-total-my">-</span>
-                  </div>
-                </div>
-              </div>
+                </header>
 
-              <div class="mb-4">
-                <input
-                  id="profile-image-filter"
-                  type="text"
-                  placeholder="Filter images (name / id)"
-                  class="w-full bg-slate-700 border-slate-600 rounded-lg px-4 py-2"
-                />
-              </div>
+                <main class="w-full flex-1 p-4 md:p-8">
+                    <!-- PAGE: SCAN -->
+                    <div id="page-scan">
+                        <div class="main-content rounded-2xl p-6">
+                            <div class="container w-full max-w-md mx-auto relative">
+                                <button id="back-btn" class="hidden absolute -top-2 -left-2 w-10 h-10 bg-slate-700/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-slate-600/50 transition z-20" title="Back to Selection">
+                                    <i class="fas fa-arrow-left"></i>
+                                </button>
+                                <h1 class="text-center text-2xl mb-2 text-white khmer-title">ប្រព័ន្ធស្កេនមុខឌីជីថល</h1>
+                                <p id="subtitle" class="text-center text-slate-400 mb-6">សូមជ្រើសរើសអត្តលេខរបស់អ្នក</p>
 
-              <div
-                id="profile-images-grid"
-                class="grid grid-cols-2 md:grid-cols-4 gap-4"
-              ></div>
-            </div>
-            
-            <!-- PAGE: ADMIN (NEW) -->
-            <div
-              id="page-admin"
-              class="hidden main-content rounded-2xl p-6 h-full flex flex-col"
-            >
-              <h1 class="text-2xl text-white khmer-title mb-6">
-                Admin Panel (Superadmin)
-              </h1>
-              
-              <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Column 1: Settings -->
-                <div class="space-y-4">
-                  <h3 class="text-xl font-semibold text-indigo-300">Appearance</h3>
-                  <div class="flex items-center justify-between p-3 bg-slate-800/40 rounded-lg">
-                    <div class="text-sm">Theme</div>
-                    <div class="flex items-center gap-2">
-                      <button
-                        id="btn-theme-toggle"
-                        class="px-3 py-1 rounded bg-slate-700/40"
-                      >
-                        Dark
-                      </button>
+                                <div id="selection-area" class="mb-5">
+                                    <div class="flex items-center gap-2 mb-4">
+                                        <input type="text" id="student-search-input" placeholder="ស្វែងរកអត្តលេខ ឬឈ្មោះ..." class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                                        <button id="voice-search-btn" class="bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-700 transition">
+                                            <i class="fas fa-microphone"></i>
+                                        </button>
+                                    </div>
+                                    <div id="scan-options" class="flex gap-2 mb-4">
+                                        <button id="batch-scan-btn" class="flex-1 bg-purple-600 text-white py-2 rounded-lg font-semibold hover:bg-purple-700 transition">
+                                            <i class="fas fa-layer-group mr-2"></i> Batch Scan
+                                        </button>
+                                        <button id="qr-scan-btn" class="flex-1 bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition">
+                                            <i class="fas fa-qrcode mr-2"></i> QR Scan
+                                        </button>
+                                    </div>
+                                    <ul id="student-list" class="space-y-1">
+                                        <li class="text-center text-slate-400 p-4">Loading students...</li>
+                                    </ul>
+                                </div>
+
+                                <div id="camera-section" class="hidden flex flex-col items-center space-y-4">
+                                    <div id="video-wrapper" class="video-container w-[90%] mx-auto aspect-square">
+                                        <video id="video" autoplay muted playsinline></video>
+                                        <div class="scanner-line"></div>
+                                    </div>
+                                    <div class="flex items-center justify-center gap-4">
+                                        <button id="switch-camera-btn" class="w-14 h-14 bg-slate-700/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-slate-600/50 transition" title="Switch Camera">
+                                            <i class="fas fa-sync-alt fa-lg"></i>
+                                        </button>
+                                        <button id="manual-capture-btn" class="w-20 h-20 bg-indigo-600 rounded-full flex items-center justify-center text-white hover:bg-indigo-700 transition shadow-lg" title="Capture Photo">
+                                            <i class="fas fa-camera fa-2x"></i>
+                                        </button>
+                                    </div>
+                                    <canvas id="capture-canvas" class="hidden"></canvas>
+                                    <img id="photo-preview" class="hidden w-[90%] mx-auto aspect-square rounded-full border-4 border-green-400 object-cover shadow-lg" />
+                                    <p id="face-status" class="text-center text-sm h-5 font-semibold text-slate-400"></p>
+                                    <div class="flex flex-col w-full space-y-3">
+                                        <button id="upload-btn" class="hidden w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl font-semibold hover:opacity-90 transition shadow-lg">បញ្ជូនរូបភាព</button>
+                                        <button id="retake-btn" class="hidden w-full bg-slate-600 text-white py-3 rounded-xl font-semibold hover:bg-slate-700 transition">ថតម្តងទៀត</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                  </div>
 
-                  <div class="flex items-center justify-between p-3 bg-slate-800/40 rounded-lg">
-                    <div class="text-sm">Language</div>
-                    <div class="flex items-center gap-2">
-                      <button
-                        id="btn-lang"
-                        class="px-3 py-1 rounded bg-slate-700/40"
-                      >
-                        KH
-                      </button>
+                    <!-- PAGE: LIST -->
+                    <div id="page-list" class="hidden main-content rounded-2xl p-6 h-full flex flex-col">
+                        <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+                            <h1 class="text-2xl text-white khmer-title">ទិន្នន័យរូបភាពនិស្សិត</h1>
+                            <div class="flex gap-4 w-full md:w-auto">
+                                <input type="text" id="list-search-input" placeholder="ស្វែងរកអត្តលេខឬឈ្មោះ..." class="w-full bg-slate-700 border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                                <select id="list-class-filter" class="filter-select w-full md:w-auto"></select>
+                                <button id="export-list-btn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                                    <i class="fas fa-download mr-2"></i> Export
+                                </button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-left">
+                            <div class="bg-slate-700/50 p-4 rounded-lg flex items-center gap-4">
+                                <i class="fas fa-users fa-2x text-slate-400"></i>
+                                <div>
+                                    <p class="text-slate-400">ចំនួននិស្សិតសរុប</p>
+                                    <p id="list-total-count" class="text-2xl font-bold text-white">-</p>
+                                </div>
+                            </div>
+                            <div class="bg-green-800/30 p-4 rounded-lg flex items-center gap-4">
+                                <i class="fas fa-user-check fa-2x text-green-400"></i>
+                                <div>
+                                    <p class="text-green-400">និស្សិតមានរូបភាព</p>
+                                    <p id="list-completed-count" class="text-2xl font-bold text-green-400">-</p>
+                                </div>
+                            </div>
+                            <div class="bg-red-800/30 p-4 rounded-lg flex items-center gap-4">
+                                <i class="fas fa-user-clock fa-2x text-red-400"></i>
+                                <div>
+                                    <p class="text-red-400">និស្សិតគ្មានរូបភាព</p>
+                                    <p id="list-pending-count" class="text-2xl font-bold text-red-400">-</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="list-container" class="table-container flex-1 overflow-x-auto">
+                            <div id="list-loading" class="text-center py-10">
+                                <p class="text-slate-400">កំពុងទាញទិន្នន័យរូបភាពនិស្សិត...</p>
+                            </div>
+                            <table id="list-table" class="hidden w-full text-left text-slate-300">
+                                <thead class="bg-slate-700/50 sticky top-0">
+                                    <tr>
+                                        <th class="p-3">ID</th>
+                                        <th class="p-3">ឈ្មោះ</th>
+                                        <th class="p-3">រូបភាព</th>
+                                        <th class="p-3 text-center">Status</th>
+                                        <th class="p-3 text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
                     </div>
-                  </div>
 
-                  <div class="flex items-center justify-between p-3 bg-slate-800/40 rounded-lg">
-                    <div class="text-sm">Background color</div>
-                    <input
-                      id="bg-color-picker"
-                      type="color"
-                      value="#0f172a"
-                      class="w-10 h-8 p-0 border-0 rounded"
-                    />
-                  </div>
+                    <!-- PAGE: RECORDS -->
+                    <div id="page-records" class="hidden main-content rounded-2xl p-6 h-full flex flex-col">
+                        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                            <h1 class="text-2xl text-white khmer-title">រូបភាពបានរក្សាទុក</h1>
+                            <div class="flex gap-4 w-full md:w-auto">
+                                <input type="text" id="records-search-input" placeholder="Search ID or Name..." class="w-full bg-slate-700 border-slate-600 rounded-lg px-4 py-2" />
+                                <select id="records-class-filter" class="filter-select w-full md:w-auto"></select>
+                                <button id="export-records-btn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                                    <i class="fas fa-download mr-2"></i> Export
+                                </button>
+                            </div>
+                        </div>
+                        <div id="records-container" class="table-container flex-1 overflow-x-auto">
+                            <div id="records-loading" class="text-center py-10">
+                                <p class="text-slate-400">កំពុងទាញរូបភាពបានរក្សាទុក...</p>
+                            </div>
+                            <table id="records-table" class="hidden w-full text-left text-slate-300">
+                                <thead class="bg-slate-700/50 sticky top-0">
+                                    <tr>
+                                        <th class="p-3">ល.រ</th>
+                                        <th class="p-3">ឈ្មោះ</th>
+                                        <th class="p-3">ID</th>
+                                        <th class="p-3">ថ្នាក់</th>
+                                        <th class="p-3">ក្រុម</th>
+                                        <th class="p-3">រូបភាព</th>
+                                        <th class="p-3 text-center">កែ</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
 
-                  <h3 class="text-xl font-semibold text-indigo-300 mt-6">My Access</h3>
-                  <div
-                    id="face-scan-toggle-row"
-                    class="hidden flex items-center justify-between p-3 bg-slate-800/40 rounded-lg"
-                  >
-                    <div class="text-sm">Allow face-scan (for my account)</div>
-                    <input type="checkbox" id="face-scan-enabled" class="w-6 h-6" />
-                  </div>
-                  
-                  <h3 class="text-xl font-semibold text-indigo-300 mt-6">Add New Admin</h3>
-                  <div class="p-4 bg-slate-800/40 rounded-lg space-y-3">
-                     <input id="add-admin-name" type="text" placeholder="New Admin Name" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
-                     <input id="add-admin-image-url" type="text" placeholder="Image URL" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
-                     <input id="add-admin-email" type="text" placeholder="Email (Optional)" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
-                     <select id="add-admin-role" class="admin-filter-select w-full">
-                       <option value="viewer">Viewer</option>
-                       <option value="subadmin">Sub-Admin</option>
-                       <option value="admin">Admin</option>
-                       <option value="superadmin">Super-Admin</option>
-                     </select>
-                     <button id="add-admin-btn" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition">Add New Admin</button>
-                  </div>
-                </div>
-                
-                <!-- Column 2: User Management -->
-                <div class="space-y-4">
-                  <h3 class="text-xl font-semibold text-indigo-300">User Management</h3>
-                  <div id="admin-management-list" class="space-y-3">
-                    <!-- Admin list will be populated here by JS -->
-                    <div class="text-center text-slate-400 p-4">Loading admin list...</div>
-                  </div>
-                </div>
-                
-              </div>
-              
+                    <!-- PAGE: STORAGE -->
+                    <div id="page-storage" class="hidden main-content rounded-2xl p-6 h-full flex flex-col">
+                        <h1 class="text-2xl text-white khmer-title mb-6">Storage & Links</h1>
+                        <p class="text-slate-400 mb-6">This section provides direct links to the Google Sheets and Folders used by the application.</p>
+                        <div id="storage-links-container" class="space-y-6"></div>
+                    </div>
+
+                    <!-- PAGE: PROFILE -->
+                    <div id="page-profile" class="hidden main-content rounded-2xl p-6 h-full flex flex-col">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-4">
+                                <img id="profile-img-large" src="" class="w-20 h-20 rounded-full object-cover border-2 border-slate-700" alt="admin" />
+                                <div>
+                                    <h2 id="profile-name-large" class="text-2xl font-bold">Admin Name</h2>
+                                    <div id="profile-role-large" class="text-sm text-slate-400">Role</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-slate-400 text-sm">Total images (all): <span id="profile-total-all">-</span></div>
+                                <div class="text-slate-400 text-sm">My uploads: <span id="profile-total-my">-</span></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <input id="profile-image-filter" type="text" placeholder="Filter images (name / id)" class="w-full bg-slate-700 border-slate-600 rounded-lg px-4 py-2" />
+                        </div>
+
+                        <div id="profile-images-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+                    </div>
+                    
+                    <!-- PAGE: ADMIN -->
+                    <div id="page-admin" class="hidden main-content rounded-2xl p-6 h-full flex flex-col">
+                        <h1 class="text-2xl text-white khmer-title mb-6">Admin Panel (Superadmin)</h1>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <!-- Column 1: Settings -->
+                            <div class="space-y-4">
+                                <h3 class="text-xl font-semibold text-indigo-300">Appearance</h3>
+                                <div class="flex items-center justify-between p-3 bg-slate-800/40 rounded-lg">
+                                    <div class="text-sm">Theme</div>
+                                    <div class="flex items-center gap-2">
+                                        <button id="btn-theme-toggle" class="px-3 py-1 rounded bg-slate-700/40">Dark</button>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-between p-3 bg-slate-800/40 rounded-lg">
+                                    <div class="text-sm">Language</div>
+                                    <div class="flex items-center gap-2">
+                                        <button id="btn-lang" class="px-3 py-1 rounded bg-slate-700/40">KH</button>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-between p-3 bg-slate-800/40 rounded-lg">
+                                    <div class="text-sm">Background color</div>
+                                    <input id="bg-color-picker" type="color" value="#0f172a" class="w-10 h-8 p-0 border-0 rounded" />
+                                </div>
+
+                                <h3 class="text-xl font-semibold text-indigo-300 mt-6">My Access</h3>
+                                <div id="face-scan-toggle-row" class="hidden flex items-center justify-between p-3 bg-slate-800/40 rounded-lg">
+                                    <div class="text-sm">Allow face-scan (for my account)</div>
+                                    <input type="checkbox" id="face-scan-enabled" class="w-6 h-6" />
+                                </div>
+                                
+                                <h3 class="text-xl font-semibold text-indigo-300 mt-6">Add New Admin</h3>
+                                <div class="p-4 bg-slate-800/40 rounded-lg space-y-3">
+                                     <input id="add-admin-name" type="text" placeholder="New Admin Name" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+                                     <input id="add-admin-image-url" type="text" placeholder="Image URL" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+                                     <input id="add-admin-email" type="text" placeholder="Email (Optional)" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+                                     <select id="add-admin-role" class="admin-filter-select w-full">
+                                       <option value="viewer">Viewer</option>
+                                       <option value="subadmin">Sub-Admin</option>
+                                       <option value="admin">Admin</option>
+                                       <option value="superadmin">Super-Admin</option>
+                                     </select>
+                                     <button id="add-admin-btn" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition">Add New Admin</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Column 2: User Management -->
+                            <div class="space-y-4">
+                                <h3 class="text-xl font-semibold text-indigo-300">User Management</h3>
+                                <div id="admin-management-list" class="space-y-3">
+                                    <!-- Admin list will be populated here by JS -->
+                                    <div class="text-center text-slate-400 p-4">Loading admin list...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PAGE: ANALYTICS -->
+                    <div id="page-analytics" class="hidden main-content rounded-2xl p-6 h-full flex flex-col">
+                        <h1 class="text-2xl text-white khmer-title mb-6">Analytics Dashboard</h1>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                            <div class="bg-slate-800/50 p-4 rounded-lg">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-slate-400 text-sm">Total Scans Today</span>
+                                    <i class="fas fa-camera text-indigo-400"></i>
+                                </div>
+                                <div id="scans-today" class="text-2xl font-bold text-white">0</div>
+                                <div class="text-xs text-green-400 mt-1">
+                                    <i class="fas fa-arrow-up"></i> 12% from yesterday
+                                </div>
+                            </div>
+                            <div class="bg-slate-800/50 p-4 rounded-lg">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-slate-400 text-sm">Active Users</span>
+                                    <i class="fas fa-users text-green-400"></i>
+                                </div>
+                                <div id="active-users" class="text-2xl font-bold text-white">0</div>
+                                <div class="text-xs text-green-400 mt-1">
+                                    <i class="fas fa-arrow-up"></i> 5% from last week
+                                </div>
+                            </div>
+                            <div class="bg-slate-800/50 p-4 rounded-lg">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-slate-400 text-sm">Completion Rate</span>
+                                    <i class="fas fa-chart-pie text-purple-400"></i>
+                                </div>
+                                <div id="completion-rate" class="text-2xl font-bold text-white">0%</div>
+                                <div class="text-xs text-red-400 mt-1">
+                                    <i class="fas fa-arrow-down"></i> 3% from last month
+                                </div>
+                            </div>
+                            <div class="bg-slate-800/50 p-4 rounded-lg">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-slate-400 text-sm">Storage Used</span>
+                                    <i class="fas fa-database text-yellow-400"></i>
+                                </div>
+                                <div id="storage-used" class="text-2xl font-bold text-white">0 GB</div>
+                                <div class="text-xs text-slate-400 mt-1">
+                                    60% of total capacity
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="bg-slate-800/50 p-4 rounded-lg">
+                                <h3 class="text-lg font-semibold text-white mb-4">Weekly Scanning Activity</h3>
+                                <canvas id="weekly-activity-chart" class="w-full h-64"></canvas>
+                            </div>
+                            <div class="bg-slate-800/50 p-4 rounded-lg">
+                                <h3 class="text-lg font-semibold text-white mb-4">Class Completion Status</h3>
+                                <canvas id="class-completion-chart" class="w-full h-64"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </main>
             </div>
-            
-          </main>
         </div>
-      </div>
     </div>
 
-    <!-- MODAL (keeps) -->
-    <div
-      id="modal"
-      class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal"
-    >
-      <div
-        class="modal-content w-full max-w-sm p-6 rounded-2xl shadow-2xl text-center"
-      >
-        <div id="modal-icon" class="w-16 h-16 mx-auto mb-4"></div>
-        <p id="modal-message" class="text-lg font-semibold text-white mb-6"></p>
-        <div id="modal-buttons" class="flex flex-col sm:flex-row gap-4"></div>
-      </div>
+    <!-- MODAL -->
+    <div id="modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal">
+        <div class="modal-content w-full max-w-sm p-6 rounded-2xl shadow-2xl text-center">
+            <div id="modal-icon" class="w-16 h-16 mx-auto mb-4"></div>
+            <p id="modal-message" class="text-lg font-semibold text-white mb-6"></p>
+            <div id="modal-buttons" class="flex flex-col sm:flex-row gap-4"></div>
+        </div>
     </div>
 
-    <script>
-      /* --------------------------- CONFIG & DOM --------------------------- */
-      const SCRIPT_URL =
-        "https://script.google.com/macros/s/AKfycbyM-9UZbpL8GW6agRejPVGalKcTQPIdmm5-Xa0BWnpgrJiqahHFIRSE0LKH7n15AjNQ/exec";
-
-      // DOM refs
-      const video = document.getElementById("video"),
-        captureCanvas = document.getElementById("capture-canvas"),
-        photoPreview = document.getElementById("photo-preview");
-      const uploadBtn = document.getElementById("upload-btn"),
-        retakeBtn = document.getElementById("retake-btn"),
-        cameraSection = document.getElementById("camera-section");
-      const videoWrapper = document.getElementById("video-wrapper"),
-        faceStatus = document.getElementById("face-status"),
-        subtitle = document.getElementById("subtitle");
-      const switchCameraBtn = document.getElementById("switch-camera-btn"),
-        backBtn = document.getElementById("back-btn"),
-        manualCaptureBtn = document.getElementById("manual-capture-btn");
-
-      const modal = document.getElementById("modal"),
-        modalIcon = document.getElementById("modal-icon"),
-        modalMessage = document.getElementById("modal-message"),
-        modalButtons = document.getElementById("modal-buttons");
-
-      const pageScan = document.getElementById("page-scan"),
-        pageRecords = document.getElementById("page-records"),
-        pageList = document.getElementById("page-list"),
-        pageStorage = document.getElementById("page-storage"),
-        pageProfile = document.getElementById("page-profile"),
-        pageAdmin = document.getElementById("page-admin"); 
-        
-      const navScan = document.getElementById("nav-scan"),
-        navRecords = document.getElementById("nav-records"),
-        navList = document.getElementById("nav-list"),
-        navStorage = document.getElementById("nav-storage"),
-        navProfile = document.getElementById("nav-profile"),
-        navAdmin = document.getElementById("nav-admin"), 
-        navSettingsBtn = document.getElementById("nav-settings-btn"); 
-
-      const sidebar = document.getElementById("sidebar"),
-        menuBtn = document.getElementById("menu-btn"),
-        sidebarBackdrop = document.getElementById("sidebar-backdrop"),
-        sidebarToggleBtn = document.getElementById("sidebar-toggle-btn"), // Sidebar Toggle
-        contentWrapper = document.getElementById("content-wrapper"); // Content Wrapper
-
-      const selectionArea = document.getElementById("selection-area"),
-        studentSearchInput = document.getElementById("student-search-input"),
-        studentList = document.getElementById("student-list");
-
-      const recordsLoading = document.getElementById("records-loading"),
-        recordsTable = document.getElementById("records-table"),
-        recordsClassFilter = document.getElementById("records-class-filter"),
-        recordsSearchInput = document.getElementById("records-search-input");
-
-      const listLoading = document.getElementById("list-loading"),
-        listTable = document.getElementById("list-table"),
-        listClassFilter = document.getElementById("list-class-filter"),
-        listSearchInput = document.getElementById("list-search-input");
-      
-      const listTotalCount = document.getElementById("list-total-count");
-      const listCompletedCount = document.getElementById("list-completed-count");
-      const listPendingCount = document.getElementById("list-pending-count");
-
-      const loginScreen = document.getElementById("login-screen"),
-        mainAppWrapper = document.getElementById("main-app-wrapper"),
-        adminListLoader = document.getElementById("admin-list-loader"),
-        adminSelect = document.getElementById("admin-select"),
-        proceedToScanBtn = document.getElementById("proceed-to-scan-btn"),
-        adminSelectionArea = document.getElementById("admin-selection-area"),
-        adminScanArea = document.getElementById("admin-scan-area"),
-        adminVideoWrapper = document.getElementById("admin-video-wrapper"),
-        adminVideo = document.getElementById("admin-video"),
-        adminScanStatus = document.getElementById("admin-scan-status"),
-        adminManualScanBtn = document.getElementById("admin-manual-scan-btn"),
-        adminBackBtn = document.getElementById("admin-back-btn");
-
-      const adminProfileImgHeader = document.getElementById(
-          "admin-profile-img-header"
-        ),
-        adminProfileSidebar = document.getElementById("admin-profile-compact"),
-        adminProfileImgSidebar = document.getElementById(
-          "admin-profile-img-sidebar"
-        ),
-        adminNameSidebar = document.getElementById("admin-name-sidebar"),
-        adminRoleSidebar = document.getElementById("admin-role-sidebar");
-
-      const sidebarLogo = document.getElementById("sidebar-logo"),
-        headerLogo = document.getElementById("header-logo");
-        // headerAdminName is removed
-
-      const btnThemeToggle = document.getElementById("btn-theme-toggle"),
-        btnLang = document.getElementById("btn-lang"),
-        bgColorPicker = document.getElementById("bg-color-picker"),
-        faceScanToggleRow = document.getElementById("face-scan-toggle-row"),
-        faceScanEnabledCheckbox = document.getElementById(
-          "face-scan-enabled"
-        );
-
-      const logoutBtn = document.getElementById("logout-btn");
-
-      // profile page refs
-      const profileImgLarge = document.getElementById("profile-img-large"),
-        profileNameLarge = document.getElementById("profile-name-large"),
-        profileRoleLarge = document.getElementById("profile-role-large"),
-        profileTotalAll = document.getElementById("profile-total-all"),
-        profileTotalMy = document.getElementById("profile-total-my"),
-        profileImagesGrid = document.getElementById("profile-images-grid"),
-        profileImageFilter = document.getElementById("profile-image-filter");
-
-      // Admin Panel Refs
-      const adminManagementList = document.getElementById("admin-management-list");
-      const addAdminName = document.getElementById("add-admin-name");
-      const addAdminImageUrl = document.getElementById("add-admin-image-url");
-      const addAdminEmail = document.getElementById("add-admin-email");
-      const addAdminRole = document.getElementById("add-admin-role");
-      const addAdminBtn = document.getElementById("add-admin-btn");
-      
-      // state
-      const SESSION_KEY = "di_admin_session_v2";
-      let studentsData = [],
-        savedRecordsData = [],
-        allStudentsListData = [],
-        adminData = [];
-      let currentStream,
-        faceApiInterval,
-        stableFrames = 0,
-        currentFacingMode = "environment",
-        selectedStudent = null,
-        currentCameraMode = "auto";
-      let loggedInAdmin = null,
-        adminFaceMatcher = null,
-        adminScanInterval = null,
-        isScanning = false,
-        isUploading = false;
-      let settings = { theme: "dark", lang: "KH", bgColor: "#0f172a" };
-      let isSidebarCollapsed = false;
-
-      /* --------------------------- UTIL (modal) --------------------------- */
-      const icons = {
-        success: `<svg class="w-full h-full text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
-        error: `<svg class="w-full h-full text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
-        loading: `<div class="w-16 h-16 border-4 border-slate-500 border-t-indigo-500 rounded-full animate-spin"></div>`,
-        choice: `<svg class="w-full h-full text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m4 13-4-4M3 10h12M3 15h4M4 19h16a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1z"/></svg>`,
-      };
-      function showModal(type, message, actions = {}) {
-        modalIcon.innerHTML = icons[type] || "";
-        modalMessage.textContent = message;
-        modal.classList.remove("hidden");
-        modalButtons.innerHTML = "";
-        if (type === "loading") return;
-        if (Object.keys(actions).length) {
-          for (const [txt, action] of Object.entries(actions)) {
-            const b = document.createElement("button");
-            b.className =
-              action.className ||
-              "w-full bg-slate-600 text-white py-2 rounded-lg font-semibold hover:bg-slate-700 transition";
-            b.textContent = txt;
-            b.onclick = () => {
-              modal.classList.add("hidden");
-              if (action.callback) action.callback();
-            };
-            modalButtons.appendChild(b);
-          }
-        } else {
-          const b = document.createElement("button");
-          b.className =
-            "w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition";
-          b.textContent = settings.lang === "EN" ? "OK" : "យល់ព្រម";
-          b.onclick = () => modal.classList.add("hidden");
-          modalButtons.appendChild(b);
-        }
-      }
-
-      /* --------------------------- FACEAPI MODELS --------------------------- */
-      async function loadModels() {
-        const MODEL_URL = "./models";
-        await Promise.all([
-          faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
-          faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
-          faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
-          faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL),
-        ]);
-      }
-
-      /* --------------------------- ADMIN FETCH & SESSIONS --------------------------- */
-      async function fetchAdmins() {
-        try {
-            const res = await fetch(`${SCRIPT_URL}?action=getAdmins`);
-            if (!res.ok) throw new Error(`Server error: ${res.status}`);
-            const data = await res.json();
-            
-            adminData = [];
-            if (Array.isArray(data)) {
-              adminData = data.map(r => ({
-                  name: r[0] || '',
-                  imageUrl: r[1] || '',
-                  role: r[2] || 'admin',
-                  faceScan: r[3] === false ? false : true, // Handle `faceScan` (col D)
-                  disabled: r[3] === true || String(r[3]).toLowerCase() === 'true' // Also interpret col D as `disabled`
-              })).filter(a => a.name && a.imageUrl);
-            }
-            if (!adminData.length) throw new Error("No admin data found.");
-            
-            // Only populate login select if we are on the login screen
-            if (adminSelect) {
-                populateAdminSelect();
-            }
-        } catch (e) {
-            console.error("Failed to fetch admins:", e);
-            if(loginScreen.style.display !== 'none') {
-                showModal('error', `Could not fetch admin list: ${e.message}`);
-                adminListLoader.classList.add('hidden');
-            }
-        }
-      }
-
-
-      function populateAdminSelect() {
-        adminSelect.innerHTML =
-          '<option value="">-- សូមជ្រើសរើសឈ្មោះ --</option>';
-        adminData.forEach((a, i) => {
-          const opt = document.createElement("option");
-          opt.value = i;
-          opt.textContent = a.name; // CHANGED: Removed role
-          adminSelect.appendChild(opt);
-        });
-        adminListLoader.classList.add("hidden");
-        adminSelect.classList.remove("hidden");
-      }
-
-      function saveAdminSession({ name, imageUrl, role, faceScan }) {
-        try {
-          localStorage.setItem(
-            SESSION_KEY,
-            JSON.stringify({ name, imageUrl, role, faceScan, ts: Date.now() })
-          );
-        } catch (e) {}
-      }
-      function loadAdminSession() {
-        try {
-          const r = localStorage.getItem(SESSION_KEY);
-          return r ? JSON.parse(r) : null;
-        } catch (e) {
-          return null;
-        }
-      }
-      function clearAdminSession() {
-        try {
-          localStorage.removeItem(SESSION_KEY);
-        } catch (e) {}
-      }
-
-      adminSelect.onchange = () => {
-        proceedToScanBtn.classList.toggle("hidden", !adminSelect.value);
-      };
-      proceedToScanBtn.onclick = () => {
-        const idx = adminSelect.value;
-        if (idx === "") return;
-        loggedInAdmin = adminData[idx];
-        
-        // Check if account is disabled
-        if (loggedInAdmin.disabled) {
-            showModal('error', 'Your account is disabled. Please contact a superadmin.');
-            return;
-        }
-
-        adminSelectionArea.classList.add("hidden");
-        adminScanArea.classList.remove("hidden");
-        adminScanStatus.textContent = "Starting camera...";
-        startAdminLoginScan();
-      };
-
-      async function startAdminLoginScan() {
-        adminScanStatus.textContent = `Loading reference for ${loggedInAdmin.name}...`;
-        adminFaceMatcher = await createFaceMatcher(
-          loggedInAdmin.imageUrl,
-          loggedInAdmin.name
-        );
-        if (!adminFaceMatcher) {
-          adminScanStatus.textContent =
-            "Could not load reference image. Please go back.";
-          adminVideoWrapper.classList.add("fail");
-          return;
-        }
-        try {
-          // Admin login uses front camera by default
-          const stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: "user", width: 640, height: 480 },
-          });
-          currentStream = stream;
-          adminVideo.srcObject = stream;
-          adminVideo.onloadedmetadata = () => {
-            adminScanStatus.textContent = "Look at the camera. Auto-scanning...";
-            adminVideoWrapper.classList.add("ready");
-            startAdminScanInterval();
-          };
-        } catch (err) {
-          showModal("error", "Please allow camera access.");
-          resetToAdminSelection();
-        }
-      }
-
-      async function createFaceMatcher(imageUrl, label) {
-        try {
-          const img = await faceapi.fetchImage(imageUrl);
-          const det = await faceapi
-            .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
-            .withFaceLandmarks()
-            .withFaceDescriptor();
-          if (!det) return null;
-          const desc = new faceapi.LabeledFaceDescriptors(label, [
-            det.descriptor,
-          ]);
-          return new faceapi.FaceMatcher(desc, 0.5);
-        } catch (e) {
-          console.error(e);
-          adminScanStatus.innerHTML =
-            "Error loading reference image (check CORS).";
-          return null;
-        }
-      }
-
-      function startAdminScanInterval() {
-        clearInterval(adminScanInterval);
-        isScanning = true;
-        adminScanInterval = setInterval(async () => {
-          if (!isScanning) return;
-          const ok = await performAdminScan();
-          if (ok) onLoginSuccess();
-        }, 1000);
-      }
-
-      async function performAdminScan() {
-        if (!adminFaceMatcher) return false;
-        const det = await faceapi
-          .detectSingleFace(
-            adminVideo,
-            new faceapi.TinyFaceDetectorOptions({
-              inputSize: 224,
-              scoreThreshold: 0.5,
-            })
-          )
-          .withFaceLandmarks()
-          .withFaceDescriptor();
-        if (det) {
-          const best = adminFaceMatcher.findBestMatch(det.descriptor);
-          if (best.label !== "unknown" && best.distance < 0.5) {
-            adminScanStatus.textContent = `Welcome, ${best.label}!`;
-            adminVideoWrapper.classList.remove("fail");
-            adminVideoWrapper.classList.add("ready");
-            return true;
-          } else {
-            adminScanStatus.textContent = "Face does not match. Trying...";
-            adminVideoWrapper.classList.add("fail");
-            return false;
-          }
-        } else {
-          adminScanStatus.textContent =
-            "No face detected. Please center your face.";
-          adminVideoWrapper.classList.remove("fail");
-          return false;
-        }
-      }
-
-      adminManualScanBtn.onclick = async () => {
-        if (isScanning) clearInterval(adminScanInterval);
-        isScanning = false;
-        adminScanStatus.textContent = "Manual scan... processing...";
-        const ok = await performAdminScan();
-        if (ok) onLoginSuccess();
-        else {
-          adminScanStatus.textContent =
-            "Manual scan failed. Resuming auto-scan...";
-          setTimeout(() => {
-            if (!isScanning) startAdminScanInterval();
-          }, 2000);
-        }
-      };
-
-      function resetToAdminSelection() {
-        stopCamera();
-        adminScanArea.classList.add("hidden");
-        adminSelectionArea.classList.remove("hidden");
-        adminVideoWrapper.classList.remove("ready", "fail");
-        adminSelect.value = "";
-        proceedToScanBtn.classList.add("hidden");
-        loggedInAdmin = null;
-        adminFaceMatcher = null;
-        clearInterval(adminScanInterval);
-      }
-      adminBackBtn.onclick = resetToAdminSelection;
-
-      async function onLoginSuccess() {
-        clearInterval(adminScanInterval);
-        stopCamera();
-        
-        // Find the full admin object, in case the one from login was partial
-        const adminObject = adminData.find(a => a.name === loggedInAdmin.name);
-        if (adminObject) {
-            loggedInAdmin = adminObject;
-        }
-
-        // persist session
-        saveAdminSession({
-          name: loggedInAdmin.name,
-          imageUrl: loggedInAdmin.imageUrl,
-          role: loggedInAdmin.role || "admin",
-          faceScan: loggedInAdmin.faceScan, // Use the value from the full object
-        });
-        
-        // set profile UI
-        adminProfileImgHeader.crossOrigin = "anonymous";
-        adminProfileImgSidebar.crossOrigin = "anonymous";
-        adminProfileImgHeader.src = loggedInAdmin.imageUrl;
-        adminProfileImgSidebar.src = loggedInAdmin.imageUrl;
-        adminNameSidebar.textContent = loggedInAdmin.name;
-        adminRoleSidebar.textContent = loggedInAdmin.role || "admin";
-        adminProfileImgHeader.classList.remove("hidden");
-        adminProfileSidebar.classList.remove("hidden");
-        // remove login screen permanently
-        loginScreen.classList.add("hidden");
-        if (loginScreen.parentNode)
-          loginScreen.parentNode.removeChild(loginScreen);
-        mainAppWrapper.classList.remove("hidden");
-        // apply settings UI (face-scan toggle visible only for superadmin)
-        setupSettingsUI();
-        await fetchStudents();
-        await displaySavedRecords();
-        await fetchAllSavedRecordsForStats();
-        updateProfileSummary();
-      }
-
-      // Updated Click Handlers for new sidebar
-      logoutBtn.onclick = (e) => {
-        e.preventDefault();
-        clearAdminSession();
-        location.reload();
-      };
-      
-      // Removed headerLogo.onclick
-      sidebarLogo.onclick = () => openProfilePage();
-      adminProfileImgHeader.onclick = () => openProfilePage();
-      adminProfileSidebar.onclick = () => openProfilePage(); // Make compact profile clickable
-      
-      navProfile.onclick = (e) => {
-        e.preventDefault();
-        openProfilePage();
-      };
-      
-      navSettingsBtn.onclick = (e) => {
-        e.preventDefault();
-        navLinks.forEach(l => l.classList.remove('active'));
-        pages.forEach(p => p.classList.add('hidden'));
-        navAdmin.classList.add('active');
-        pageAdmin.classList.remove('hidden');
-        stopCamera();
-        closeSidebar();
-        
-        // Load admin list when opening panel
-        populateAdminManagementList();
-      };
-
-
-      /* --------------------------- STUDENTS & RECORDS --------------------------- */
-      async function fetchStudents() {
-        try {
-          const res = await fetch(`${SCRIPT_URL}?action=getStudents`);
-          if (!res.ok) throw new Error(`Server error: ${res.status}`);
-          const data = await res.json();
-          studentsData = data.slice(1) || [];
-          studentsData = studentsData.filter((s) => {
-            const g = (s[3] || "").toString().trim();
-            return g !== "បុគ្គលិក";
-          });
-          allStudentsListData = studentsData;
-          populateStudentList();
-        } catch (e) {
-          showModal("error", `Could not fetch student data: ${e.message}`);
-        }
-      }
-
-      function populateStudentList(filter = "") {
-        studentList.innerHTML = "";
-        const f = filter.toLowerCase();
-        const filtered = studentsData.filter(
-          (s) =>
-            (s[0] || "").toString().toLowerCase().includes(f) ||
-            (s[1] || "").toLowerCase().includes(f)
-        );
-        if (!filtered.length) {
-          studentList.innerHTML = `<li class="text-center text-slate-400 p-4">No students found.</li>`;
-          return;
-        }
-        filtered.forEach((s) => {
-          const li = document.createElement("li");
-          li.className =
-            "p-3 rounded-lg cursor-pointer transition flex justify-between items-center";
-          const count = s[4];
-          if (count > 0) li.classList.add("completed");
-          const indicator =
-            count > 0
-              ? `<i class="fas fa-check-circle ml-2 text-green-400"></i>`
-              : "";
-          if (count > 0) {
-            li.style.pointerEvents = "none";
-            li.style.opacity = ".7";
-            li.style.color = "#4ade80";
-          } else {
-            // permission: viewer cannot capture
-            if (loggedInAdmin && loggedInAdmin.role === "viewer") {
-              li.classList.add("opacity-60");
-              li.title = "View only account";
-            } else {
-              li.onclick = () => {
-                selectedStudent = s;
-                showCameraModeSelection();
-              };
-            }
-          }
-          li.innerHTML = `<span>${s[0]} - ${s[1]}</span>${indicator}`;
-          studentList.appendChild(li);
-        });
-      }
-
-      function showCameraModeSelection() {
-        // if face-scan disabled for this device
-        if (loggedInAdmin && loggedInAdmin.faceScan === false) {
-          showModal("error", "Face-scan is disabled for this account.");
-          return;
-        }
-        showModal(
-          "choice",
-          "សូមជ្រើសរើសប្រតិបត្តិកាមេរ៉ា",
-          {
-            "ថតរូបស្វ័យប្រវត្តិ": {
-              callback: () => startCamera("environment", "auto"),
-              className:
-                "w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition",
-            },
-            "ថតរូបដោយខ្លួនឯង": {
-              callback: () => startCamera("environment", "manual"),
-              className:
-                "w-full bg-slate-600 text-white py-3 rounded-lg font-semibold hover:bg-slate-700 transition",
-            },
-          }
-        );
-      }
-
-      async function displaySavedRecords() {
-        recordsLoading.style.display = "block";
-        recordsTable.classList.add("hidden");
-        try {
-          const res = await fetch(`${SCRIPT_URL}?action=getSavedData`);
-          if (!res.ok) throw new Error(`Server error: ${res.status}`);
-          const data = await res.json();
-          savedRecordsData = data.slice(1) || [];
-          savedRecordsData = savedRecordsData.filter((r) => {
-            const grp = (r[4] || "").toString().trim();
-            return grp !== "បុគ្គលិក";
-          });
-          populateClassFilter(savedRecordsData, recordsClassFilter);
-          filterRecordsTable();
-          recordsLoading.style.display = "none";
-          recordsTable.classList.remove("hidden");
-        } catch (e) {
-          recordsLoading.innerHTML = `<p class="text-red-400">Error: ${e.message}</p>`;
-        }
-      }
-
-      function populateClassFilter(records, filterElement) {
-        const classes = [
-          ...new Set(
-            records
-              .filter((r) => (r[4] || "").toString().trim() !== "បុគ្គលិក")
-              .map((r) => r[3])
-              .filter(Boolean)
-          ),
-        ];
-        filterElement.innerHTML = '<option value="all">All Classes</option>';
-        classes
-          .sort()
-          .forEach(
-            (c) => (filterElement.innerHTML += `<option value="${c}">${c}</option>`)
-          );
-      }
-
-      function filterRecordsTable() {
-        const sel = recordsClassFilter.value,
-          q = recordsSearchInput.value.toLowerCase();
-        const tbody = recordsTable.querySelector("tbody");
-        tbody.innerHTML = "";
-        const rows = savedRecordsData.filter((r) => {
-          const cOk = sel === "all" || r[3] === sel;
-          const sOk =
-            (r[1] || "").toLowerCase().includes(q) ||
-            (r[2] || "").toString().toLowerCase().includes(q);
-          return cOk && sOk;
-        });
-        if (!rows.length) {
-          tbody.innerHTML = `<tr><td colspan="7" class="text-center p-4 text-slate-400">No records found.</td></tr>`;
-          return;
-        }
-        rows.forEach((r) => {
-          const serial = r[0],
-            url = r[5];
-          const tr = document.createElement("tr");
-          tr.className = "border-b border-slate-700";
-          tr.innerHTML = `<td class="p-3">${serial}</td><td class="p-3 whitespace-nowrap">${r[1]}</td><td class="p-3">${r[2]}</td><td class="p-3">${r[3]}</td><td class="p-3">${r[4]}</td><td class="p-3"><a href="${url}" target="_blank" rel="noopener noreferrer" class="relative block w-16 h-16 group rounded-lg overflow-hidden"><img src="${url}" crossorigin="anonymous" class="w-full h-full object-cover" alt="Student photo"></a></td><td class="p-3 text-center">${renderRecordControls(
-            serial,
-            url
-          )}</td>`;
-          tbody.appendChild(tr);
-        });
-      }
-
-      function renderRecordControls(serial, url) {
-        // permission: only admin and superadmin can delete
-        if (!loggedInAdmin) return "-";
-        const role = loggedInAdmin.role || "viewer";
-        if (role === "superadmin" || role === "admin")
-          return `<button class="text-red-400 hover:text-red-600 transition delete-btn" data-serial="${serial}" data-url="${url}"><i class="fas fa-trash-alt"></i></button>`;
-        if (role === "subadmin")
-          return `<span class="text-slate-400">No delete</span>`;
-        return `<span class="text-slate-400">View only</span>`;
-      }
-
-      document.addEventListener("click", async (e) => {
-        if (e.target.closest(".delete-btn")) {
-          const b = e.target.closest(".delete-btn");
-          const serial = b.dataset.serial;
-          const url = b.dataset.url;
-          handleDelete(serial, url);
-        }
-      });
-
-      async function handleDelete(serialNumber, imageUrl) {
-        showModal(
-          "confirm",
-          "តើអ្នកប្រាកដទេថាចង់លុបរូបភាពនេះ?",
-          {
-            "បោះបង់": {
-              callback: null,
-              className:
-                "w-full bg-slate-600 text-white py-2 rounded-lg font-semibold hover:bg-slate-700 transition",
-            },
-            "លុប": {
-              callback: async () => {
-                showModal("loading", "កំពុងលុប...");
-                try {
-                  const res = await fetch(SCRIPT_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                      action: "delete",
-                      serialNumber,
-                      imageUrl,
-                      adminName: loggedInAdmin ? loggedInAdmin.name : 'Unknown' // Pass admin name for audit
-                    }),
-                    redirect: "follow",
-                  });
-                  if (!res.ok) throw new Error(`Server error: ${res.status}`);
-                  const r = await res.json();
-                  if (r.status === "success") {
-                    showModal("success", "រូបភាពត្រូវបានលុប!", {
-                      "OK": {
-                        callback: async () => {
-                          await fetchStudents(); // Refresh student list (counts)
-                          await displaySavedRecords(); // Refresh records page
-                          await displayStudentList(); // Refresh list page
-                        },
-                      },
-                    });
-                  } else throw new Error(r.message || "Unknown server error.");
-                } catch (e) {
-                  showModal("error", `Delete failed: ${e.message}`);
-                }
-              },
-              className:
-                "w-full bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition",
-            },
-          }
-        );
-      }
-
-      /* --------------------------- STUDENT LIST / STATS --------------------------- */
-      function populateListClassFilterV2() {
-        const classes = [
-          ...new Set(
-            allStudentsListData
-              .filter((s) => (s[3] || "").toString().trim() !== "បុគ្គលិក")
-              .map((s) => s[2])
-              .filter(Boolean)
-          ),
-        ];
-        listClassFilter.innerHTML =
-          '<option value="all">All Students</option><option value="with_photos">With Photos</option>';
-        classes
-          .sort()
-          .forEach(
-            (c) =>
-              (listClassFilter.innerHTML += `<option value="${c}">${c}</option>`)
-          );
-      }
-
-      function filterStudentListTable() {
-        const sel = listClassFilter.value,
-          q = listSearchInput.value.toLowerCase();
-        const tbody = listTable.querySelector("tbody");
-        tbody.innerHTML = "";
-        const imgMap = new Map(savedRecordsData.map((r) => [r[2], r[5]]));
-        let arr =
-          sel === "all"
-            ? allStudentsListData
-            : sel === "with_photos"
-            ? allStudentsListData.filter((s) => s[4] > 0)
-            : allStudentsListData.filter((s) => s[2] === sel);
-        arr = arr.filter(
-          (s) =>
-            (s[0] || "").toString().toLowerCase().includes(q) ||
-            (s[1] || "").toLowerCase().includes(q)
-        );
-        const done = arr.filter((s) => s[4] > 0).length;
-        if (!arr.length) {
-          tbody.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-slate-400">No students found.</td></tr>`;
-        } else {
-          arr.forEach((s) => {
-            const ok = s[4] > 0;
-            const url = ok ? imgMap.get(String(s[0])) : null;
-            const cell = url
-              ? `<a href="${url}" target="_blank" rel="noopener noreferrer" class="relative block w-12 h-12 group rounded-lg overflow-hidden mx-auto"><img src="${url}" crossorigin="anonymous" class="w-full h-full object-cover" alt="Student photo"></a>`
-              : `<span class="text-slate-500">-</span>`;
-            const icon = ok
-              ? `<i class="fas fa-check-circle text-green-400"></i>`
-              : `<i class="fas fa-times-circle text-red-400"></i>`;
-            tbody.insertAdjacentHTML(
-              "beforeend",
-              `<tr class="border-b border-slate-700"><td class="p-3">${s[0]}</td><td class="p-3 whitespace-nowrap">${s[1]}</td><td class="p-3">${cell}</td><td class="p-3 text-center">${icon}</td></tr>`
-            );
-          });
-        }
-        
-        if(listTotalCount) listTotalCount.textContent = arr.length;
-        if(listCompletedCount) listCompletedCount.textContent = done;
-        if(listPendingCount) listPendingCount.textContent = arr.length - done;
-      }
-
-      async function displayStudentList() {
-        listLoading.style.display = "block";
-        listTable.classList.add("hidden");
-        if (savedRecordsData.length === 0) {
-          try {
-            const res = await fetch(`${SCRIPT_URL}?action=getSavedData`);
-            if (!res.ok) throw new Error(`Server error: ${res.status}`);
-            const data = await res.json();
-            savedRecordsData = data.slice(1);
-            savedRecordsData = savedRecordsData.filter((r) => {
-              const grp = (r[4] || "").toString().trim();
-              return grp !== "បុគ្គលិក";
-            });
-          } catch (e) {
-            console.error("Could not pre-fetch records for images:", e);
-          }
-        }
-        populateListClassFilterV2();
-        filterStudentListTable();
-        listLoading.style.display = "none";
-        listTable.classList.remove("hidden");
-      }
-
-      /* --------------------------- CAMERA & UPLOAD --------------------------- */
-      async function startCamera(facingMode = "environment", mode = "auto") {
-        currentFacingMode = facingMode;
-        currentCameraMode = mode;
-        stableFrames = 0;
-        subtitle.textContent = `Scanning for: ${
-          selectedStudent ? selectedStudent[1] : ""
-        }`;
-        cameraSection.classList.remove("hidden");
-        selectionArea.classList.add("hidden");
-        switchCameraBtn.classList.remove("hidden");
-        backBtn.classList.remove("hidden");
-        uploadBtn.classList.add("hidden");
-        retakeBtn.classList.add("hidden");
-        photoPreview.classList.add("hidden");
-        videoWrapper.classList.remove("hidden");
-        faceStatus.classList.remove("hidden");
-        isUploading = false;
-        stopCamera();
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode, width: { ideal: 640 }, height: { ideal: 480 } },
-            audio: false,
-          });
-          currentStream = stream;
-          video.srcObject = stream;
-          video.onloadedmetadata = () => {
-            if (mode === "auto") {
-              manualCaptureBtn.classList.add("hidden");
-              detectFace();
-            } else {
-              manualCaptureBtn.classList.remove("hidden");
-              faceStatus.textContent = "ចុចប៊ូតុងកាមេរ៉ាដើម្បីថត";
-              faceStatus.classList.remove("text-green-400");
-              videoWrapper.classList.remove("ready");
-            }
-          };
-        } catch (err) {
-          showModal("error", "Please allow camera access.");
-          resetToSelection();
-        }
-      }
-
-      function detectFace() {
-        const opts = new faceapi.TinyFaceDetectorOptions({
-          inputSize: 224,
-          scoreThreshold: 0.5,
-        });
-        clearInterval(faceApiInterval);
-        faceApiInterval = setInterval(async () => {
-          const res = await faceapi.detectSingleFace(video, opts);
-          if (res && res.score > 0.7) {
-            stableFrames++;
-            faceStatus.textContent = `Excellent! (${stableFrames}/4)`;
-            faceStatus.classList.add("text-green-400");
-            videoWrapper.classList.add("ready");
-            if (stableFrames >= 4) captureFace();
-          } else {
-            stableFrames = 0;
-            faceStatus.textContent = "Please center your face";
-            faceStatus.classList.remove("text-green-400");
-            videoWrapper.classList.remove("ready");
-          }
-        }, 400);
-      }
-
-      function captureFace() {
-        clearInterval(faceApiInterval);
-        const ctx = captureCanvas.getContext("2d");
-        const size = 512;
-        captureCanvas.width = size;
-        captureCanvas.height = size;
-        const vRatio = video.videoWidth / video.videoHeight;
-        let sx = 0,
-          sy = 0,
-          sw = video.videoWidth,
-          sh = video.videoHeight;
-        if (vRatio > 1) {
-          sw = sh;
-          sx = (video.videoWidth - sw) / 2;
-        } else {
-          sh = sw;
-          sy = (video.videoHeight - sh) / 2;
-        }
-        ctx.drawImage(video, sx, sy, sw, sh, 0, 0, size, size);
-        photoPreview.src = captureCanvas.toDataURL("image/jpeg", 0.9);
-        stopCamera();
-        switchCameraBtn.classList.add("hidden");
-        videoWrapper.classList.add("hidden");
-        manualCaptureBtn.classList.add("hidden");
-        photoPreview.classList.remove("hidden");
-        uploadBtn.classList.remove("hidden");
-        retakeBtn.classList.remove("hidden");
-        faceStatus.classList.add("hidden");
-        subtitle.textContent = "Confirm your photo";
-      }
-
-      function stopCamera() {
-        if (currentStream) currentStream.getTracks().forEach((t) => t.stop());
-        clearInterval(faceApiInterval);
-        clearInterval(adminScanInterval);
-      }
-      function resetToSelection() {
-        stopCamera();
-        cameraSection.classList.add("hidden");
-        switchCameraBtn.classList.add("hidden");
-        manualCaptureBtn.classList.add("hidden");
-        backBtn.classList.add("hidden");
-        photoPreview.classList.add("hidden");
-        uploadBtn.classList.add("hidden");
-        retakeBtn.classList.add("hidden");
-        videoWrapper.classList.remove("hidden");
-        selectionArea.classList.remove("hidden");
-        subtitle.textContent = "Select your ID or Name";
-        selectedStudent = null;
-      }
-
-      manualCaptureBtn.onclick = captureFace;
-      uploadBtn.onclick = async () => {
-        if (isUploading) return;
-        if (!selectedStudent) {
-          showModal("error", "Could not find student data.");
-          return;
-        }
-        const imageData = captureCanvas
-          .toDataURL("image/jpeg", 0.9)
-          .split(",")[1];
-        showModal("loading", "កំពុងបញ្ជូនរូបភាព...");
-        isUploading = true;
-        try {
-          const res = await fetch(SCRIPT_URL, {
-            method: "POST",
-            body: JSON.stringify({
-              id: selectedStudent[0],
-              name: selectedStudent[1],
-              class: selectedStudent[2],
-              group: selectedStudent[3],
-              imageData,
-              adminName: loggedInAdmin ? loggedInAdmin.name : 'Unknown' // Pass admin name
-            }),
-            redirect: "follow",
-          });
-          if (!res.ok) throw new Error(`Server error: ${res.status}`);
-          const r = await res.json();
-          if (r.status === "success") {
-            showModal("success", "រូបភាពរក្សាទុកបានជោគជ័យ!", {
-              "OK": {
-                callback: async () => {
-                  resetToSelection();
-                  await fetchStudents();
-                  await displaySavedRecords();
-                },
-              },
-            });
-          } else throw new Error(r.message || "Unknown server error.");
-        } catch (e) {
-          showModal("error", `Upload failed: ${e.message}`);
-        } finally {
-          isUploading = false;
-        }
-      };
-
-      retakeBtn.onclick = () => {
-        photoPreview.classList.add("hidden");
-        uploadBtn.classList.add("hidden");
-        retakeBtn.classList.add("hidden");
-        videoWrapper.classList.remove("hidden");
-        faceStatus.classList.remove("hidden");
-        stableFrames = 0;
-        startCamera(currentFacingMode, currentCameraMode);
-      };
-      switchCameraBtn.onclick = () =>
-        startCamera(
-          currentFacingMode === "environment" ? "user" : "environment",
-          currentCameraMode
-        );
-      backBtn.onclick = () => resetToSelection();
-      studentSearchInput.oninput = () =>
-        populateStudentList(studentSearchInput.value);
-
-      /* --------------------------- PROFILE / STATS --------------------------- */
-      async function fetchAllSavedRecordsForStats() {
-        // ensure savedRecordsData is populated
-        if (!savedRecordsData || savedRecordsData.length === 0)
-          await displaySavedRecords();
-        updateProfileSummary();
-      }
-
-      function updateProfileSummary() {
-        // total counts
-        const totalAll = savedRecordsData.length;
-        const myUploads = savedRecordsData.filter((r) => {
-          // try to infer uploader from r[6] or r[7] if backend stores admin
-          return (
-            r[6] && loggedInAdmin && r[6].toString().includes(loggedInAdmin.name)
-          ); // best-effort
-        }).length;
-        document.getElementById("stat-total").textContent = totalAll;
-        document.getElementById("stat-mycount").textContent = myUploads;
-        document.getElementById("stat-others").textContent =
-          totalAll - myUploads;
-        // profile page values
-        profileTotalAll.textContent = totalAll;
-        profileTotalMy.textContent = myUploads;
-        if (loggedInAdmin) {
-          profileImgLarge.src = loggedInAdmin.imageUrl;
-          profileNameLarge.textContent = loggedInAdmin.name;
-          profileRoleLarge.textContent = loggedInAdmin.role || "admin";
-        }
-      }
-
-      function openProfilePage() {
-        navLinksDeactivate();
-        hideAllPages();
-        navProfile.classList.add('active'); // Manually activate profile nav
-        pageProfile.classList.remove("hidden");
-        populateProfileImages();
-      }
-
-      function populateProfileImages(filter = "") {
-        profileImagesGrid.innerHTML = "";
-        const q = (filter || "").toLowerCase();
-        // show images uploaded by loggedInAdmin first (best-effort by checking uploader name in record row)
-        const mine = savedRecordsData.filter(
-          (r) =>
-            r[6] && loggedInAdmin && r[6].toString().includes(loggedInAdmin.name)
-        );
-        const others = savedRecordsData.filter(
-          (r) =>
-            !(
-              r[6] &&
-              loggedInAdmin &&
-              r[6].toString().includes(loggedInAdmin.name)
-            )
-        );
-        const list = mine
-          .concat(others)
-          .filter(
-            (r) =>
-              (r[1] || "").toLowerCase().includes(q) ||
-              (r[2] || "").toString().toLowerCase().includes(q)
-          );
-        if (!list.length)
-          profileImagesGrid.innerHTML = `<div class="text-slate-400 col-span-4">No images found.</div>`;
-        list.forEach((r) => {
-          const url = r[5];
-          const card = document.createElement("div");
-          card.className = "rounded overflow-hidden bg-slate-800/40 p-2";
-          card.innerHTML = `<a href="${url}" target="_blank" rel="noopener noreferrer"><img src="${url}" class="w-full h-28 object-cover rounded"></a><div class="mt-2 text-sm"><div class="font-semibold">${r[1]}</div><div class="text-xs text-slate-400">ID: ${r[2]}</div></div>`;
-          profileImagesGrid.appendChild(card);
-        });
-      }
-
-      profileImageFilter.oninput = () =>
-        populateProfileImages(profileImageFilter.value);
-
-      /* --------------------------- ADMIN PANEL --------------------------- */
-      
-      async function populateAdminManagementList() {
-          adminManagementList.innerHTML = `<div class="text-center text-slate-400 p-4">Loading admin list...</div>`;
-          
-          // Ensure adminData is fresh
-          await fetchAdmins(); 
-          
-          adminManagementList.innerHTML = ""; // Clear loader
-          
-          if (!adminData || !adminData.length) {
-              adminManagementList.innerHTML = `<div class="text-center text-slate-400 p-4">Could not load admin list.</div>`;
-              return;
-          }
-          
-          adminData.forEach(admin => {
-              const isAdminSelf = admin.name === loggedInAdmin.name;
-              const card = document.createElement('div');
-              card.className = 'p-3 bg-slate-800/40 rounded-lg flex items-center gap-3';
-              
-              const roleOptions = ['viewer', 'subadmin', 'admin', 'superadmin']
-                  .map(role => `<option value="${role}" ${admin.role === role ? 'selected' : ''}>${role}</option>`)
-                  .join('');
-                  
-              const isDisabled = admin.disabled;
-              
-              card.innerHTML = `
-                  <img src="${admin.imageUrl}" alt="${admin.name}" class="w-12 h-12 rounded-full object-cover flex-shrink-0" crossorigin="anonymous">
-                  <div class="flex-1 overflow-hidden">
-                      <p class="font-semibold text-white truncate">${admin.name}</p>
-                      <p class="text-sm text-slate-400 truncate">${admin.role} ${isDisabled ? '(Disabled)' : ''}</p>
-                  </div>
-                  <div class="flex items-center gap-2 flex-shrink-0">
-                      <select id="role-select-${admin.name}" class="admin-filter-select text-sm !py-1 !px-2" ${isAdminSelf ? 'disabled' : ''}>
-                          ${roleOptions}
-                      </select>
-                      <label class="switch" title="${isDisabled ? 'Unblock' : 'Block'} User">
-                          <input id="disable-check-${admin.name}" type="checkbox" ${isDisabled ? 'checked' : ''} ${isAdminSelf ? 'disabled' : ''}>
-                          <span class="slider"></span>
-                      </label>
-                  </div>
-              `;
-              
-              adminManagementList.appendChild(card);
-
-              // Add event listeners for the new elements
-              const roleSelect = document.getElementById(`role-select-${admin.name}`);
-              const disableCheck = document.getElementById(`disable-check-${admin.name}`);
-              
-              if (!isAdminSelf) {
-                  roleSelect.onchange = (e) => {
-                      handleUpdateAdminRole(admin.name, e.target.value);
-                  };
-                  disableCheck.onchange = (e) => {
-                      handleUpdateAdminDisabled(admin.name, e.target.checked);
-                  };
-              }
-          });
-      }
-
-      async function handleUpdateAdminRole(adminName, newRole) {
-          const admin = adminData.find(a => a.name === adminName);
-          if (!admin) return;
-          
-          showModal('loading', `Updating ${adminName} to ${newRole}...`);
-          
-          try {
-              const res = await fetch(SCRIPT_URL, {
-                  method: 'POST',
-                  body: JSON.stringify({
-                      action: 'setAdminRole',
-                      requestedBy: loggedInAdmin.name,
-                      name: adminName,
-                      role: newRole,
-                      disabled: admin.disabled // Pass existing disabled status
-                  }),
-                  redirect: 'follow'
-              });
-              if (!res.ok) throw new Error('Server request failed');
-              const result = await res.json();
-              if (result.status === 'success') {
-                  showModal('success', `${adminName} role updated to ${newRole}.`);
-                  await populateAdminManagementList(); // Refresh list
-              } else {
-                  throw new Error(result.message || 'Unknown error');
-              }
-          } catch (e) {
-              showModal('error', `Failed to update: ${e.message}`);
-              await populateAdminManagementList(); // Refresh to reset UI
-          }
-      }
-
-      async function handleUpdateAdminDisabled(adminName, isDisabled) {
-          const admin = adminData.find(a => a.name === adminName);
-          if (!admin) return;
-
-          const actionText = isDisabled ? 'Blocking' : 'Unblocking';
-          showModal('loading', `${actionText} ${adminName}...`);
-          
-          try {
-              const res = await fetch(SCRIPT_URL, {
-                  method: 'POST',
-                  body: JSON.stringify({
-                      action: 'setAdminRole',
-                      requestedBy: loggedInAdmin.name,
-                      name: adminName,
-                      role: admin.role, // Pass existing role
-                      disabled: isDisabled 
-                  }),
-                  redirect: 'follow'
-              });
-              if (!res.ok) throw new Error('Server request failed');
-              const result = await res.json();
-              if (result.status === 'success') {
-                  showModal('success', `${adminName} has been ${isDisabled ? 'disabled' : 'enabled'}.`);
-                  await populateAdminManagementList(); // Refresh list
-              } else {
-                  throw new Error(result.message || 'Unknown error');
-              }
-          } catch (e) {
-              showModal('error', `Failed to update: ${e.message}`);
-              await populateAdminManagementList(); // Refresh to reset UI
-          }
-      }
-      
-      addAdminBtn.onclick = () => {
-          // The backend script (code.gs) setAdminRoleHandler only UPDATES. It does not ADD.
-          // Therefore, we must inform the user to add via the Google Sheet.
-          showModal(
-              'choice', 
-              'Add Admin via Google Sheet', 
-              { 'OK': {} }
-          );
-          modalMessage.innerHTML = 'To add a new admin, please add their details (Name, Image URL, Role, Email) to the <strong>AdminScan</strong> tab in the master Google Sheet.';
-      };
-
-      /* --------------------------- NAV HELPERS --------------------------- */
-      const navLinks = [
-        navScan,
-        navList,
-        navRecords,
-        navStorage,
-        navProfile,
-        navAdmin
-      ];
-      const pages = [
-        pageScan,
-        pageList,
-        pageRecords,
-        pageStorage,
-        pageProfile,
-        pageAdmin
-      ];
-      function navLinksDeactivate() {
-        navLinks.forEach((l) => l.classList.remove("active"));
-      }
-      function hideAllPages() {
-        pages.forEach((p) => p.classList.add("hidden"));
-      }
-
-      navLinks.forEach((link, index) => {
-        link.onclick = (e) => {
-          e.preventDefault();
-          navLinksDeactivate();
-          hideAllPages();
-          link.classList.add("active");
-          pages[index].classList.remove("hidden");
-          stopCamera();
-          if (pages[index] === pageRecords) displaySavedRecords();
-          if (pages[index] === pageList) displayStudentList();
-          if (pages[index] === pageStorage) populateStorageLinks();
-          if (pages[index] === pageAdmin) populateAdminManagementList(); // Load data on page open
-          closeSidebar();
-        };
-      });
-
-      const closeSidebar = () => {
-        // Only applies to mobile
-        sidebar.classList.remove("is-open");
-        sidebarBackdrop.classList.add("hidden");
-      };
-      
-      menuBtn.onclick = () => { // Mobile menu button
-        sidebar.classList.toggle('is-open'); 
-        sidebarBackdrop.classList.toggle('hidden');
-        // If we open mobile nav, make sure desktop collapsed state is off
-        sidebar.classList.remove('collapsed');
-        contentWrapper.classList.remove('collapsed');
-        isSidebarCollapsed = false;
-      };
-      
-      sidebarToggleBtn.onclick = () => { // Desktop toggle button
-        isSidebarCollapsed = !isSidebarCollapsed;
-        sidebar.classList.toggle('collapsed', isSidebarCollapsed);
-        contentWrapper.classList.toggle('collapsed', isSidebarCollapsed);
-        // Store preference
-        try { localStorage.setItem('sidebar_collapsed', isSidebarCollapsed); } catch(e){}
-      };
-      
-      sidebarBackdrop.onclick = () => closeSidebar();
-
-      recordsClassFilter.onchange = () => filterRecordsTable();
-      listClassFilter.onchange = () => filterStudentListTable();
-      recordsSearchInput.oninput = () => filterRecordsTable();
-      listSearchInput.oninput = () => filterStudentListTable();
-
-      /* --------------------------- STORAGE LINKS --------------------------- */
-      function populateStorageLinks() {
-        const container = document.getElementById("storage-links-container");
-        const links = {
-          Sheets: {
-            "Student List (DIList)":
-              "https://docs.google.com/spreadsheets/d/1eRyPoifzyvB4oBmruNyXcoKMKPRqjk6xDD6-bPNW6pc/edit",
-            "Saved Info & Admins (InfoUsers)":
-              "https://docs.google.com/spreadsheets/d/1dleEg_Q5KV9IRGT4DpfHooZQ_p2bKLk-2yCGYootqPA/edit",
-            "Secondary List (បញ្ជឺឈ្មោះរួម)":
-              "https://docs.google.com/spreadsheets/d/1_Kgl8UQXRsVATt_BOHYQjVWYKkRIBA12R-qnsBoSUzc/edit",
-          },
-          Folders: {
-            "Default Uploads":
-              "https://drive.google.com/drive/folders/10RyejYi9_J0c7gxrL5wgmODy4VfJZ6SA",
-            "AD Class":
-              "https://drive.google.com/drive/folders/140JXHUU9FIKB7VNEXUsv9rPJ4i8S_SMY",
-          },
-        };
-        container.innerHTML = "";
-        for (const [category, items] of Object.entries(links)) {
-          let html = `<div class="mb-6"><h3 class="text-xl font-semibold text-indigo-300 mb-3">${category}</h3><div class="space-y-2">`;
-          for (const [title, url] of Object.entries(items)) {
-            html += `<a href="${url}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between p-4 bg-slate-700/50 rounded-lg hover:bg-slate-600/50 transition"><span class="font-medium">${title}</span><i class="fas fa-external-link-alt text-slate-400"></i></a>`;
-          }
-          html += `</div></div>`;
-          container.innerHTML += html;
-        }
-      }
-
-      /* --------------------------- SETTINGS UI --------------------------- */
-      function setupSettingsUI() {
-        // load saved settings
-        try {
-          const s = JSON.parse(
-            localStorage.getItem("di_settings_v1") || "{}"
-          );
-          if (s.theme) settings.theme = s.theme;
-          if (s.lang) settings.lang = s.lang;
-          if (s.bgColor) settings.bgColor = s.bgColor;
-        } catch (e) {}
-        applySettings(); 
-        
-        // show face-scan toggle only if superadmin
-        if (loggedInAdmin && (loggedInAdmin.role === "superadmin")) {
-          faceScanToggleRow.classList.remove("hidden");
-          navAdmin.classList.remove("hidden"); // Show Admin Panel link
-          navSettingsBtn.classList.remove("hidden"); // Show settings cog
-          
-          faceScanEnabledCheckbox.checked = loggedInAdmin.faceScan !== false;
-          faceScanEnabledCheckbox.onchange = () => {
-            loggedInAdmin.faceScan = faceScanEnabledCheckbox.checked;
-            // TODO: This should be saved to the backend
-            // For now, just update self
-            handleUpdateAdminDisabled(loggedInAdmin.name, !loggedInAdmin.faceScan); // This is a bit of a guess, `faceScan` and `disabled` might be different
-            showModal("success", "Updated face-scan preference.");
-          };
-        }
-        
-        btnThemeToggle.onclick = () => {
-          settings.theme = settings.theme === "dark" ? "light" : "dark";
-          applySettings();
-          localStorage.setItem("di_settings_v1", JSON.stringify(settings));
-        };
-        btnLang.onclick = () => {
-          settings.lang = settings.lang === "KH" ? "EN" : "KH";
-          applySettings();
-          localStorage.setItem("di_settings_v1", JSON.stringify(settings));
-        };
-        bgColorPicker.onchange = (e) => {
-          settings.bgColor = e.target.value;
-          document.body.style.background = settings.bgColor;
-          localStorage.setItem("di_settings_v1", JSON.stringify(settings));
-        };
-      }
-
-      function applySettings() {
-        document.body.setAttribute(
-          "data-theme",
-          settings.theme === "dark" ? "dark" : "light"
-        );
-        btnThemeToggle.textContent =
-          settings.theme === "dark" ? "Dark" : "Light";
-        btnLang.textContent = settings.lang;
-        bgColorPicker.value = settings.bgColor || "#0f172a";
-        document.body.style.background = settings.bgColor || "";
-      }
-
-      /* --------------------------- INITIAL LOAD --------------------------- */
-      document.addEventListener("DOMContentLoaded", async () => {
-        // 1. Show loader immediately
-        document.body.insertAdjacentHTML(
-          "afterbegin",
-          `<div id="initial-loading" class="fixed inset-0 flex flex-col items-center justify-center bg-slate-900 z-50"><img src="https://i.postimg.cc/FHBn0Fdf/di3-copy.png" alt="Logo" class="w-24 h-24 rounded-full mb-4 shadow-lg"><p class="text-slate-300 text-lg">កំពុងទាញវិភាគផ្ទៃមុខ...</p></div>`
-        );
-        const loader = document.getElementById("initial-loading");
-
-        // Check for sidebar preference
-        if (localStorage.getItem('sidebar_collapsed') === 'true') {
-          isSidebarCollapsed = true;
-          sidebar.classList.add('collapsed');
-          contentWrapper.classList.add('collapsed');
-        }
-
-        try {
-          // 2. Load models first, this is essential for both paths
-          await loadModels();
-
-          // 3. Fetch admin data for both login and session restore
-          await fetchAdmins();
-
-          // 4. Check for an existing session
-          const session = loadAdminSession();
-
-          if (session && session.name && session.imageUrl) {
-            
-            const sessionAdmin = adminData.find(a => a.name === session.name);
-            
-            if (sessionAdmin && sessionAdmin.disabled) {
-                // Admin is disabled, clear session and force login
-                clearAdminSession();
-                loader.style.display = 'none';
-                showModal('error', 'Your account has been disabled. Please contact a superadmin.');
-                return; // Stop execution
-            } else if (sessionAdmin) {
-                 // --- SESSION EXISTS: Go to App ---
-                loggedInAdmin = sessionAdmin; // Use the full, fresh data
-            } else {
-                // No admin found, session is invalid
-                clearAdminSession();
-                loader.style.display = 'none';
-                return; // Stop execution
-            }
-
-            // 4. Update UI immediately
-            adminProfileImgHeader.crossOrigin = "anonymous";
-            adminProfileImgSidebar.crossOrigin = "anonymous";
-            adminProfileImgHeader.src = loggedInAdmin.imageUrl;
-            adminProfileImgSidebar.src = loggedInAdmin.imageUrl;
-            adminNameSidebar.textContent = loggedInAdmin.name;
-            adminRoleSidebar.textContent = loggedInAdmin.role || "admin";
-            adminProfileImgHeader.classList.remove("hidden");
-            adminProfileSidebar.classList.remove("hidden");
-
-            // 5. Show app, hide login
-            loginScreen.classList.add("hidden");
-            if (loginScreen.parentNode)
-              loginScreen.parentNode.removeChild(loginScreen);
-            mainAppWrapper.classList.remove("hidden");
-
-            // 6. Setup settings (e.g., theme)
-            setupSettingsUI();
-
-            // 7. Asynchronously fetch data in the background
-            Promise.all([
-              fetchStudents(),
-              displaySavedRecords(),
-              fetchAllSavedRecordsForStats(),
-            ]).then(updateProfileSummary);
-          }
-          // If no session, do nothing, just let the loader hide
-          
-        } catch (err) {
-          // Handle critical errors (e.g., models failed to load, fetchAdmins failed)
-          console.error("Initialization failed:", err);
-          if (loader) {
-            loader.innerHTML =
-                '<p class="text-red-400 text-lg">Failed to initialize the application.</p><p class="text-slate-400 mt-2">Please try refreshing the page.</p>';
-          } else {
-            showModal("error", "Failed to initialize the application. Please try refreshing the page.");
-          }
-          return; // Stop execution
-        } finally {
-          // 8. Hide loader
-          if (loader) {
-            loader.parentNode.removeChild(loader);
-          }
-        }
-      });
-    </script>
-  </body>
+    <!-- NOTIFICATION TOAST -->
+    <div id="notification-toast" class="fixed bottom-4 right-4 transform translate-x-full transition-transform duration-300 z-50">
+        <div class="bg-slate-800 text-white p-4 rounded-lg shadow-lg flex items-center gap-3 min-w-[300px]">
+            <div id="notification-icon" class="flex-shrink-0"></div>
+            <div>
+                <p id="notification-title" class="font-semibold"></p>
+                <p id="notification-message" class="text-sm text-slate-300"></p>
+            </div>
+            <button id="notification-close" class="ml-auto text-slate-400 hover:text-white">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
 </html>
