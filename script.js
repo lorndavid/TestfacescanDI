@@ -1234,7 +1234,34 @@ async function onLoginSuccess() {
     ]).then(updateProfileSummary);
 }
 
+// Updated Click Handlers for new sidebar
+logoutBtn.onclick = (e) => {
+    e.preventDefault();
+    clearAdminSession();
+    location.reload();
+};
 
+sidebarLogo.onclick = () => openProfilePage();
+adminProfileImgHeader.onclick = () => openProfilePage();
+adminProfileSidebar.onclick = () => openProfilePage();
+
+navProfile.onclick = (e) => {
+    e.preventDefault();
+    openProfilePage();
+};
+
+navSettingsBtn.onclick = (e) => {
+    e.preventDefault();
+    navLinks.forEach(l => l.classList.remove('active'));
+    pages.forEach(p => p.classList.add('hidden'));
+    navAdmin.classList.add('active');
+    pageAdmin.classList.remove('hidden');
+    stopCamera();
+    closeSidebar();
+    
+    // Load admin list when opening panel
+    populateAdminManagementList();
+};
 
 /* --------------------------- STUDENTS & RECORDS --------------------------- */
 async function fetchStudents() {
@@ -1560,7 +1587,9 @@ async function startCamera(facingMode = "environment", mode = "auto") {
     currentFacingMode = facingMode;
     currentCameraMode = mode;
     stableFrames = 0;
-    subtitle.textContent = `Scanning for: ${selectedStudent ? selectedStudent[1] : ""}`;
+    subtitle.textContent = settings.lang === "KH" 
+        ? `កំពុងស្កេនសម្រាប់: ${selectedStudent ? selectedStudent[1] : ""}` 
+        : `Scanning for: ${selectedStudent ? selectedStudent[1] : ""}`;
     cameraSection.classList.remove("hidden");
     selectionArea.classList.add("hidden");
     switchCameraBtn.classList.remove("hidden");
@@ -1580,18 +1609,20 @@ async function startCamera(facingMode = "environment", mode = "auto") {
         currentStream = stream;
         video.srcObject = stream;
         video.onloadedmetadata = () => {
-            if (mode === "auto") {
+                        if (mode === "auto") {
                 manualCaptureBtn.classList.add("hidden");
                 detectFace();
             } else {
                 manualCaptureBtn.classList.remove("hidden");
-                faceStatus.textContent = "ចុចប៊ូតុងកាមេរ៉ាដើម្បីថត";
+                faceStatus.textContent = settings.lang === "KH" 
+                    ? "ចុចប៊ូតុងកាមេរ៉ាដើម្បីថត" 
+                    : "Click camera button to capture";
                 faceStatus.classList.remove("text-green-400");
                 videoWrapper.classList.remove("ready");
             }
         };
     } catch (err) {
-        showModal("error", "Please allow camera access.");
+        showModal("error", settings.lang === "KH" ? "សូមអនុញ្ញាតឱ្យចូលដំណើរការកាមេរ៉ា។" : "Please allow camera access.");
         resetToSelection();
     }
 }
@@ -1606,13 +1637,17 @@ function detectFace() {
         const res = await faceapi.detectSingleFace(video, opts);
         if (res && res.score > 0.7) {
             stableFrames++;
-            faceStatus.textContent = `Excellent! (${stableFrames}/4)`;
+            faceStatus.textContent = settings.lang === "KH" 
+                ? `ល្អ! (${stableFrames}/4)` 
+                : `Excellent! (${stableFrames}/4)`;
             faceStatus.classList.add("text-green-400");
             videoWrapper.classList.add("ready");
             if (stableFrames >= 4) captureFace();
         } else {
             stableFrames = 0;
-            faceStatus.textContent = "Please center your face";
+            faceStatus.textContent = settings.lang === "KH" 
+                ? "សូមដាក់មុខអ្នកនៅកណ្តាល" 
+                : "Please center your face";
             faceStatus.classList.remove("text-green-400");
             videoWrapper.classList.remove("ready");
         }
@@ -1647,7 +1682,7 @@ function captureFace() {
     uploadBtn.classList.remove("hidden");
     retakeBtn.classList.remove("hidden");
     faceStatus.classList.add("hidden");
-    subtitle.textContent = "Confirm your photo";
+    subtitle.textContent = settings.lang === "KH" ? "បញ្ជាក់រូបភាពរបស់អ្នក" : "Confirm your photo";
 }
 
 function stopCamera() {
@@ -1667,7 +1702,7 @@ function resetToSelection() {
     retakeBtn.classList.add("hidden");
     videoWrapper.classList.remove("hidden");
     selectionArea.classList.remove("hidden");
-    subtitle.textContent = "Select your ID or Name";
+    subtitle.textContent = settings.lang === "KH" ? "ជ្រើសរើស ID ឬឈ្មោះរបស់អ្នក" : "Select your ID or Name";
     selectedStudent = null;
 }
 
@@ -1676,13 +1711,13 @@ manualCaptureBtn.onclick = captureFace;
 async function uploadPhoto() {
     if (isUploading) return;
     if (!selectedStudent) {
-        showModal("error", "Could not find student data.");
+        showModal("error", settings.lang === "KH" ? "មិនអាចរកឃើញទិន្នន័យនិស្សិត" : "Could not find student data.");
         return;
     }
     const imageData = captureCanvas
         .toDataURL("image/jpeg", 0.9)
         .split(",")[1];
-    showModal("loading", "កំពុងបញ្ជូនរូបភាព...");
+    showModal("loading", settings.lang === "KH" ? "កំពុងបញ្ជូនរូបភាព..." : "Uploading image...");
     isUploading = true;
     try {
         const res = await fetch(SCRIPT_URL, {
@@ -1700,7 +1735,7 @@ async function uploadPhoto() {
         if (!res.ok) throw new Error(`Server error: ${res.status}`);
         const r = await res.json();
         if (r.status === "success") {
-            showModal("success", "រូបភាពរក្សាទុកបានជោគជ័យ!", {
+            showModal("success", settings.lang === "KH" ? "រូបភាពរក្សាទុកបានជោគជ័យ!" : "Image saved successfully!", {
                 "OK": {
                     callback: async () => {
                         resetToSelection();
@@ -1712,7 +1747,7 @@ async function uploadPhoto() {
             });
         } else throw new Error(r.message || "Unknown server error.");
     } catch (e) {
-        showModal("error", `Upload failed: ${e.message}`);
+        showModal("error", settings.lang === "KH" ? `ការបញ្ជូនបរាជ័យ: ${e.message}` : `Upload failed: ${e.message}`);
     } finally {
         isUploading = false;
     }
@@ -1803,7 +1838,7 @@ function populateProfileImages(filter = "") {
                 (r[2] || "").toString().toLowerCase().includes(q)
         );
     if (!list.length)
-        profileImagesGrid.innerHTML = `<div class="text-slate-400 col-span-4">No images found.</div>`;
+        profileImagesGrid.innerHTML = `<div class="text-slate-400 col-span-4">${settings.lang === "KH" ? "រកមិនឃើញរូបភាព" : "No images found"}.</div>`;
     list.forEach((r) => {
         const url = r[5];
         const card = document.createElement("div");
@@ -1818,7 +1853,7 @@ profileImageFilter.oninput = () =>
 
 /* --------------------------- ADMIN PANEL --------------------------- */
 async function populateAdminManagementList() {
-    adminManagementList.innerHTML = `<div class="text-center text-slate-400 p-4">Loading admin list...</div>`;
+    adminManagementList.innerHTML = `<div class="text-center text-slate-400 p-4">${settings.lang === "KH" ? "កំពុងផ្ទុកបញ្ជីអ្នកគ្រប់គ្រង..." : "Loading admin list..."}</div>`;
     
     // Ensure adminData is fresh
     await fetchAdmins(); 
@@ -1826,7 +1861,7 @@ async function populateAdminManagementList() {
     adminManagementList.innerHTML = ""; // Clear loader
     
     if (!adminData || !adminData.length) {
-        adminManagementList.innerHTML = `<div class="text-center text-slate-400 p-4">Could not load admin list.</div>`;
+        adminManagementList.innerHTML = `<div class="text-center text-slate-400 p-4">${settings.lang === "KH" ? "មិនអាចផ្ទុកបញ្ជីអ្នកគ្រប់គ្រង" : "Could not load admin list"}.</div>`;
         return;
     }
     
@@ -1845,13 +1880,13 @@ async function populateAdminManagementList() {
             <img src="${admin.imageUrl}" alt="${admin.name}" class="w-12 h-12 rounded-full object-cover flex-shrink-0" crossorigin="anonymous">
             <div class="flex-1 overflow-hidden">
                 <p class="font-semibold text-white truncate">${admin.name}</p>
-                <p class="text-sm text-slate-400 truncate">${admin.role} ${isDisabled ? '(Disabled)' : ''}</p>
+                <p class="text-sm text-slate-400 truncate">${admin.role} ${isDisabled ? '(${settings.lang === "KH" ? "ត្រូវបានទប់ស្កាត់" : "Disabled"})' : ''}</p>
             </div>
             <div class="flex items-center gap-2 flex-shrink-0">
                 <select id="role-select-${admin.name}" class="admin-filter-select text-sm !py-1 !px-2" ${isAdminSelf ? 'disabled' : ''}>
                     ${roleOptions}
                 </select>
-                <label class="switch" title="${isDisabled ? 'Unblock' : 'Block'} User">
+                <label class="switch" title="${isDisabled ? (settings.lang === "KH" ? "លើកស្រាង" : "Unblock") : (settings.lang === "KH" ? "ទប់ស្កាត់" : "Block")} User">
                     <input id="disable-check-${admin.name}" type="checkbox" ${isDisabled ? 'checked' : ''} ${isAdminSelf ? 'disabled' : ''}>
                     <span class="slider"></span>
                 </label>
@@ -1879,7 +1914,7 @@ async function handleUpdateAdminRole(adminName, newRole) {
     const admin = adminData.find(a => a.name === adminName);
     if (!admin) return;
     
-    showModal('loading', `Updating ${adminName} to ${newRole}...`);
+    showModal('loading', settings.lang === "KH" ? `កំពុងធ្វើបច្ចុប្បន្នភាព ${adminName} ទៅ ${newRole}...` : `Updating ${adminName} to ${newRole}...`);
     
     try {
         const res = await fetch(SCRIPT_URL, {
@@ -1896,13 +1931,13 @@ async function handleUpdateAdminRole(adminName, newRole) {
         if (!res.ok) throw new Error('Server request failed');
         const result = await res.json();
         if (result.status === 'success') {
-            showModal('success', `${adminName} role updated to ${newRole}.`);
+            showModal('success', settings.lang === "KH" ? `${adminName} តួនាទីត្រូវបានធ្វើបច្ចុប្បន្នភាពទៅ ${newRole}` : `${adminName} role updated to ${newRole}.`);
             await populateAdminManagementList(); // Refresh list
         } else {
             throw new Error(result.message || 'Unknown error');
         }
     } catch (e) {
-        showModal('error', `Failed to update: ${e.message}`);
+        showModal('error', settings.lang === "KH" ? `ធ្វើបច្ចុប្បន្នភាពបរាជ័យ: ${e.message}` : `Failed to update: ${e.message}`);
         await populateAdminManagementList(); // Refresh to reset UI
     }
 }
@@ -1911,7 +1946,7 @@ async function handleUpdateAdminDisabled(adminName, isDisabled) {
     const admin = adminData.find(a => a.name === adminName);
     if (!admin) return;
 
-    const actionText = isDisabled ? 'Blocking' : 'Unblocking';
+    const actionText = isDisabled ? (settings.lang === "KH" ? 'កំពុងទប់ស្កាត់' : 'Blocking') : (settings.lang === "KH" ? 'កំពុងលើកស្រាង' : 'Unblocking');
     showModal('loading', `${actionText} ${adminName}...`);
     
     try {
@@ -1929,13 +1964,13 @@ async function handleUpdateAdminDisabled(adminName, isDisabled) {
         if (!res.ok) throw new Error('Server request failed');
         const result = await res.json();
         if (result.status === 'success') {
-            showModal('success', `${adminName} has been ${isDisabled ? 'disabled' : 'enabled'}.`);
+            showModal('success', settings.lang === "KH" ? `${adminName} ត្រូវបាន${isDisabled ? 'ទប់ស្កាត់' : 'លើកស្រាង'}` : `${adminName} has been ${isDisabled ? 'disabled' : 'enabled'}.`);
             await populateAdminManagementList(); // Refresh list
         } else {
             throw new Error(result.message || 'Unknown error');
         }
     } catch (e) {
-        showModal('error', `Failed to update: ${e.message}`);
+        showModal('error', settings.lang === "KH" ? `ធ្វើបច្ចុប្បន្នភាពបរាជ័យ: ${e.message}` : `Failed to update: ${e.message}`);
         await populateAdminManagementList(); // Refresh to reset UI
     }
 }
@@ -1945,10 +1980,12 @@ addAdminBtn.onclick = () => {
     // Therefore, we must inform the user to add via the Google Sheet.
     showModal(
         'choice', 
-        'Add Admin via Google Sheet', 
+        settings.lang === "KH" ? 'បន្ថែមអ្នកគ្រប់គ្រងតាមរយៈ Google Sheet' : 'Add Admin via Google Sheet', 
         { 'OK': {} }
     );
-    modalMessage.innerHTML = 'To add a new admin, please add their details (Name, Image URL, Role, Email) to the <strong>AdminScan</strong> tab in the master Google Sheet.';
+    modalMessage.innerHTML = settings.lang === "KH" 
+        ? 'ដើម្បីបន្ថែមអ្នកគ្រប់គ្រងថ្មី សូមបញ្ចូលព័ត៌មានរបស់ពួកគេ (ឈ្មោះ, URL រូបភាព, តួនាទី, អ៊ីមែល) ទៅក្នុងផ្ទាំង <strong>AdminScan</strong> នៅក្នុង Google Sheet មេ។' 
+        : 'To add a new admin, please add their details (Name, Image URL, Role, Email) to the <strong>AdminScan</strong> tab in the master Google Sheet.';
 };
 
 /* --------------------------- ANALYTICS --------------------------- */
@@ -1999,7 +2036,7 @@ function updateWeeklyActivityChart() {
     for (let i = 6; i >= 0; i--) {
         const date = new Date();
         date.setDate(date.getDate() - i);
-        labels.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
+        labels.push(settings.lang === "KH" ? date.toLocaleDateString('km-KH', { weekday: 'short' }) : date.toLocaleDateString('en-US', { weekday: 'short' }));
         
         // In a real implementation, this would be actual scan data
         // For now, generate random data
@@ -2016,7 +2053,7 @@ function updateWeeklyActivityChart() {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Scans',
+                label: settings.lang === "KH" ? "ការស្កេន" : "Scans",
                 data: data,
                 borderColor: '#4f46e5',
                 backgroundColor: 'rgba(79, 70, 229, 0.1)',
@@ -2078,7 +2115,7 @@ function updateClassCompletionChart() {
         data: {
             labels: classes,
             datasets: [{
-                label: 'Completion Rate (%)',
+                label: settings.lang === "KH" ? "អត្រាបញ្ចប់ (%)" : "Completion Rate (%)",
                 data: completionData,
                 backgroundColor: [
                     'rgba(79, 70, 229, 0.7)',
@@ -2215,14 +2252,14 @@ listSearchInput.oninput = () => filterStudentListTable();
 function populateStorageLinks() {
     const container = document.getElementById("storage-links-container");
     const links = {
-        Sheets: {
-            "Student List (DIList)": "https://docs.google.com/spreadsheets/d/1eRyPoifzyvB4oBmruNyXcoKMKPRqjk6xDD6-bPNW6pc/edit",
-            "Saved Info & Admins (InfoUsers)": "https://docs.google.com/spreadsheets/d/1dleEg_Q5KV9IRGT4DpfHooZQ_p2bKLk-2yCGYootqPA/edit",
-            "Secondary List (បញ្ជឺឈ្មោះរួម)": "https://docs.google.com/spreadsheets/d/1_Kgl8UQXRsVATt_BOHYQjVWYKkRIBA12R-qnsBoSUzc/edit",
+        [settings.lang === "KH" ? "សៀវភៅ" : "Sheets"]: {
+            [settings.lang === "KH" ? "បញ្ជីនិស្សិត (DIList)" : "Student List (DIList)"]: "https://docs.google.com/spreadsheets/d/1eRyPoifzyvB4oBmruNyXcoKMKPRqjk6xDD6-bPNW6pc/edit",
+            [settings.lang === "KH" ? "ព័ត៌មានដែលបានរក្សាទុក & អ្នកគ្រប់គ្រង (InfoUsers)" : "Saved Info & Admins (InfoUsers)"]: "https://docs.google.com/spreadsheets/d/1dleEg_Q5KV9IRGT4DpfHooZQ_p2bKLk-2yCGYootqPA/edit",
+            [settings.lang === "KH" ? "បញ្ជីមួយទៀត (បញ្ជីឈ្មោះរួម)" : "Secondary List (បញ្ជឺឈ្មោះរួម)"]: "https://docs.google.com/spreadsheets/d/1_Kgl8UQXRsVATt_BOHYQjVWYKkRIBA12R-qnsBoSUzc/edit",
         },
-        Folders: {
-            "Default Uploads": "https://drive.google.com/drive/folders/10RyejYi9_J0c7gxrL5wgmODy4VfJZ6SA",
-            "AD Class": "https://drive.google.com/drive/folders/140JXHUU9FIKB7VNEXUsv9rPJ4i8S_SMY",
+        [settings.lang === "KH" ? "ថត" : "Folders"]: {
+            [settings.lang === "KH" ? "ឯកសារដែលបានបញ្ចូលលើកដំបូង" : "Default Uploads"]: "https://drive.google.com/drive/folders/10RyejYi9_J0c7gxrL5wgmODy4VfJZ6SA",
+            [settings.lang === "KH" ? "ថ្នាក់ AD" : "AD Class"]: "https://drive.google.com/drive/folders/140JXHUU9FIKB7VNEXUsv9rPJ4i8S_SMY",
         },
     };
     container.innerHTML = "";
@@ -2261,7 +2298,7 @@ function setupSettingsUI() {
             // TODO: This should be saved to the backend
             // For now, just update self
             handleUpdateAdminDisabled(loggedInAdmin.name, !loggedInAdmin.faceScan);
-            showModal("success", "Updated face-scan preference.");
+            showModal("success", settings.lang === "KH" ? "បានធ្វើបច្ចុប្បន្នភាពចំណង់ចំណូលចិត្តការស្កេនមុខ" : "Updated face-scan preference.");
         };
     }
     
@@ -2288,7 +2325,7 @@ function applySettings() {
         settings.theme === "dark" ? "dark" : "light"
     );
     btnThemeToggle.textContent =
-        settings.theme === "dark" ? "Dark" : "Light";
+        settings.theme === "dark" ? (settings.lang === "KH" ? "ងងឹត" : "Dark") : (settings.lang === "KH" ? "ពន្លឺ" : "Light");
     btnLang.textContent = settings.lang;
     bgColorPicker.value = settings.bgColor || "#0f172a";
     document.body.style.background = settings.bgColor || "";
@@ -2299,7 +2336,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 1. Show loader immediately
     document.body.insertAdjacentHTML(
         "afterbegin",
-        `<div id="initial-loading" class="fixed inset-0 flex flex-col items-center justify-center bg-slate-900 z-50"><img src="https://i.postimg.cc/FHBn0Fdf/di3-copy.png" alt="Logo" class="w-24 h-24 rounded-full mb-4 shadow-lg"><p class="text-slate-300 text-lg">កំពុងទាញវិភាគផ្ទៃមុខ...</p></div>`
+        `<div id="initial-loading" class="fixed inset-0 flex flex-col items-center justify-center bg-slate-900 z-50"><img src="https://i.postimg.cc/FHBn0Fdf/di3-copy.png" alt="Logo" class="w-24 h-24 rounded-full mb-4 shadow-lg"><p class="text-slate-300 text-lg">${settings.lang === "KH" ? "កំពុងទាញយកម៉ូដែល..." : "Loading face models..."}</p></div>`
     );
     const loader = document.getElementById("initial-loading");
 
@@ -2319,6 +2356,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         initQRScanner();
         initBatchScan();
         initExportFunctions();
+        initTourGuide();
 
         // 4. Fetch admin data for both login and session restore
         await fetchAdmins();
@@ -2334,7 +2372,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 // Admin is disabled, clear session and force login
                 clearAdminSession();
                 loader.style.display = 'none';
-                showModal('error', 'Your account has been disabled. Please contact a superadmin.');
+                showModal('error', settings.lang === "KH" ? 'គណនីរបស់អ្នកត្រូវបានទប់ស្កាត់។ សូមទាក់ទង superadmin។' : 'Your account has been disabled. Please contact a superadmin.');
                 return; // Stop execution
             } else if (sessionAdmin) {
                  // --- SESSION EXISTS: Go to App ---
@@ -2379,9 +2417,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error("Initialization failed:", err);
         if (loader) {
             loader.innerHTML =
-                '<p class="text-red-400 text-lg">Failed to initialize the application.</p><p class="text-slate-400 mt-2">Please try refreshing the page.</p>';
+                `<p class="text-red-400 text-lg">${settings.lang === "KH" ? "បរាជ័យក្នុងការចាប់ផ្តើមកម្មវិធី" : "Failed to initialize the application"}.</p><p class="text-slate-400 mt-2">${settings.lang === "KH" ? "សូមព្យាយាមផ្ទុកទំព័រឡើងវិញ" : "Please try refreshing the page"}.</p>`;
         } else {
-            showModal("error", "Failed to initialize the application. Please try refreshing the page.");
+            showModal("error", settings.lang === "KH" ? "បរាជ័យក្នុងការចាប់ផ្តើមកម្មវិធី។ សូមព្យាយាមផ្ទុកទំព័រឡើងវិញ" : "Failed to initialize the application. Please try refreshing the page.");
         }
         return; // Stop execution
     } finally {
@@ -2391,60 +2429,3 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 });
-/* --------------------------- SETTINGS UI --------------------------- */
-function setupSettingsUI() {
-    // load saved settings
-    try {
-        const s = JSON.parse(
-            localStorage.getItem("di_settings_v1") || "{}"
-        );
-        if (s.theme) settings.theme = s.theme;
-        if (s.lang) settings.lang = s.lang;
-        if (s.bgColor) settings.bgColor = s.bgColor;
-    } catch (e) {}
-    applySettings(); 
-    
-    // show face-scan toggle only if superadmin
-    if (loggedInAdmin && (loggedInAdmin.role === "superadmin")) {
-        faceScanToggleRow.classList.remove("hidden");
-        navAdmin.classList.remove("hidden"); // Show Admin Panel link
-        navSettingsBtn.classList.remove("hidden"); // Show settings cog
-        
-        faceScanEnabledCheckbox.checked = loggedInAdmin.faceScan !== false;
-        faceScanEnabledCheckbox.onchange = () => {
-            loggedInAdmin.faceScan = faceScanEnabledCheckbox.checked;
-            // TODO: This should be saved to the backend
-            // For now, just update self
-            handleUpdateAdminDisabled(loggedInAdmin.name, !loggedInAdmin.faceScan);
-            showModal("success", "Updated face-scan preference.");
-        };
-    }
-    
-    btnThemeToggle.onclick = () => {
-        settings.theme = settings.theme === "dark" ? "light" : "dark";
-        applySettings();
-        localStorage.setItem("di_settings_v1", JSON.stringify(settings));
-    };
-    btnLang.onclick = () => {
-        settings.lang = settings.lang === "KH" ? "EN" : "KH";
-        applySettings();
-        localStorage.setItem("di_settings_v1", JSON.stringify(settings));
-    };
-    bgColorPicker.onchange = (e) => {
-        settings.bgColor = e.target.value;
-        document.body.style.background = settings.bgColor;
-        localStorage.setItem("di_settings_v1", JSON.stringify(settings));
-    };
-}
-
-function applySettings() {
-    document.body.setAttribute(
-        "data-theme",
-        settings.theme === "dark" ? "dark" : "light"
-    );
-    btnThemeToggle.textContent =
-        settings.theme === "dark" ? "Dark" : "Light";
-    btnLang.textContent = settings.lang;
-    bgColorPicker.value = settings.bgColor || "#0f172a";
-    document.body.style.background = settings.bgColor || "";
-}
