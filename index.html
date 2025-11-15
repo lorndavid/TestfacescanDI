@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/qr-scanner@1.4.2/qr-scanner.umd.min.js"></script>
 </head>
 <body data-theme="dark" class="bg-slate-900 text-slate-200">
     <!-- LOGIN SCREEN -->
@@ -115,9 +116,10 @@
                 <!-- Footer (Updated) -->
                 <div class="p-4 border-t border-slate-700/40 space-y-4">
                     <!-- Profile Button -->
-                    <div class="sidebar-profile-btn" onclick="openProfilePage()">
-                        <img id="sidebar-profile-img" src="" alt="Profile" class="rounded-full">
-                        <div class="name">Admin Name</div>
+                    <div id="admin-profile-compact" class="sidebar-profile-btn" onclick="openProfilePage()">
+                        <img id="admin-profile-img-sidebar" src="" alt="Profile" class="rounded-full">
+                        <div id="admin-name-sidebar" class="name">Admin Name</div>
+                        <div id="admin-role-sidebar" class="role">Admin Role</div>
                     </div>
                     
                     <!-- Stats Section -->
@@ -141,6 +143,12 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Settings Button -->
+                    <button id="nav-settings-btn" class="w-full flex items-center justify-center gap-2 bg-slate-700/30 py-2 rounded-lg hover:bg-slate-600/30 transition">
+                        <i class="fas fa-cog"></i>
+                        <span class="font-medium">Settings</span>
+                    </button>
                     
                     <!-- Logout Button -->
                     <button id="logout-btn" class="w-full flex items-center justify-center gap-2">
@@ -198,6 +206,9 @@
                                         <button id="voice-search-btn" class="bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-700 transition">
                                             <i class="fas fa-microphone"></i>
                                         </button>
+                                        <div id="voice-search-indicator" class="hidden ml-2 w-6 h-6 bg-red-500 rounded-full animate-pulse flex items-center justify-center">
+                                            <i class="fas fa-microphone text-white text-xs"></i>
+                                        </div>
                                     </div>
                                     <div id="scan-options" class="flex gap-2 mb-4">
                                         <button id="batch-scan-btn" class="flex-1 bg-purple-600 text-white py-2 rounded-lg font-semibold hover:bg-purple-700 transition">
@@ -624,24 +635,26 @@
     </div>
 
     <!-- QR Scanner Modal -->
-    <div id="qr-scanner-modal">
-        <div class="modal-header">
-            <h3 class="modal-title">QR Code Scanner</h3>
-            <button class="close-btn" id="close-qr-scanner">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="scan-region">
-            <video id="qr-video"></video>
-        </div>
-        <div class="instructions">
-            <p>Position QR code within frame to scan</p>
-            <p>The scanner will automatically detect and process QR code</p>
+    <div id="qr-scanner-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">QR Code Scanner</h3>
+                <button class="close-btn" id="close-qr-scanner">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="scan-region">
+                <video id="qr-video"></video>
+            </div>
+            <div class="instructions">
+                <p>Position QR code within frame to scan</p>
+                <p>The scanner will automatically detect and process QR code</p>
+            </div>
         </div>
     </div>
 
     <!-- Batch Scan Modal -->
-    <div id="batch-scan-modal">
+    <div id="batch-scan-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">Batch Scanning</h3>
@@ -663,30 +676,6 @@
                     <button class="btn btn-cancel" id="cancel-batch-scan">Cancel</button>
                     <button class="btn btn-start" id="start-batch-scan" disabled>Start Batch Scan</button>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Logout Confirmation Modal -->
-    <div id="logout-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
-        <div class="logout-modal fade-in-up">
-            <div class="logout-header">
-                <img src="https://i.postimg.cc/FHBn0Fdf/di3-copy.png" alt="Logo" class="logout-logo">
-                <h2 class="logout-title">Confirm Logout</h2>
-                <p class="logout-subtitle">Are you sure you want to logout?</p>
-            </div>
-            <div class="logout-body">
-                <p class="logout-message">Thank you for using our system. Your session will be terminated and you'll need to login again to access the system.</p>
-            </div>
-            <div class="logout-footer">
-                <button id="logout-cancel-btn" class="logout-btn logout-btn-cancel">
-                    <i class="fas fa-times"></i>
-                    Cancel
-                </button>
-                <button id="logout-confirm-btn" class="logout-btn logout-btn-confirm">
-                    <i class="fas fa-sign-out-alt"></i>
-                    Confirm Logout
-                </button>
             </div>
         </div>
     </div>
@@ -713,14 +702,6 @@
             <button id="notification-close" class="ml-auto text-slate-400 hover:text-white">
                 <i class="fas fa-times"></i>
             </button>
-        </div>
-    </div>
-
-    <!-- LOADING OVERLAY -->
-    <div id="loading-overlay" class="hidden fixed inset-0 z-9999">
-        <div class="loading-content">
-            <div class="loading-spinner"></div>
-            <div class="loading-text">Loading...</div>
         </div>
     </div>
 

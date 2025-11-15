@@ -7,171 +7,176 @@ let tourSteps = [];
 let currentTourStep = 0;
 let isTourActive = false;
 
-// DOM refs
-const video = document.getElementById("video"),
-    captureCanvas = document.getElementById("capture-canvas"),
-    photoPreview = document.getElementById("photo-preview");
-const uploadBtn = document.getElementById("upload-btn"),
-    retakeBtn = document.getElementById("retake-btn"),
-    cameraSection = document.getElementById("camera-section");
-const videoWrapper = document.getElementById("video-wrapper"),
-    faceStatus = document.getElementById("face-status"),
-    subtitle = document.getElementById("subtitle");
-const switchCameraBtn = document.getElementById("switch-camera-btn"),
-    backBtn = document.getElementById("back-btn"),
-    manualCaptureBtn = document.getElementById("manual-capture-btn");
+// Safe DOM element getter function
+function getEl(id) {
+    return document.getElementById(id);
+}
 
-const modal = document.getElementById("modal"),
-    modalIcon = document.getElementById("modal-icon"),
-    modalMessage = document.getElementById("modal-message"),
-    modalButtons = document.getElementById("modal-buttons");
+// DOM refs with null checks
+const video = getEl("video"),
+    captureCanvas = getEl("capture-canvas"),
+    photoPreview = getEl("photo-preview");
+const uploadBtn = getEl("upload-btn"),
+    retakeBtn = getEl("retake-btn"),
+    cameraSection = getEl("camera-section");
+const videoWrapper = getEl("video-wrapper"),
+    faceStatus = getEl("face-status"),
+    subtitle = getEl("subtitle");
+const switchCameraBtn = getEl("switch-camera-btn"),
+    backBtn = getEl("back-btn"),
+    manualCaptureBtn = getEl("manual-capture-btn");
 
-const pageScan = document.getElementById("page-scan"),
-    pageRecords = document.getElementById("page-records"),
-    pageList = document.getElementById("page-list"),
-    pageStorage = document.getElementById("page-storage"),
-    pageProfile = document.getElementById("page-profile"),
-    pageAdmin = document.getElementById("page-admin"),
-    pageAnalytics = document.getElementById("page-analytics");
+const modal = getEl("modal"),
+    modalIcon = getEl("modal-icon"),
+    modalMessage = getEl("modal-message"),
+    modalButtons = getEl("modal-buttons");
 
-const navScan = document.getElementById("nav-scan"),
-    navRecords = document.getElementById("nav-records"),
-    navList = document.getElementById("nav-list"),
-    navStorage = document.getElementById("nav-storage"),
-    navProfile = document.getElementById("nav-profile"),
-    navAdmin = document.getElementById("nav-admin"),
-    navAnalytics = document.getElementById("nav-analytics"),
-    navSettingsBtn = document.getElementById("nav-settings-btn");
+const pageScan = getEl("page-scan"),
+    pageRecords = getEl("page-records"),
+    pageList = getEl("page-list"),
+    pageStorage = getEl("page-storage"),
+    pageProfile = getEl("page-profile"),
+    pageAdmin = getEl("page-admin"),
+    pageAnalytics = getEl("page-analytics");
 
-const sidebar = document.getElementById("sidebar"),
-    menuBtn = document.getElementById("menu-btn"),
-    sidebarBackdrop = document.getElementById("sidebar-backdrop"),
-    sidebarToggleBtn = document.getElementById("sidebar-toggle-btn"),
-    contentWrapper = document.getElementById("content-wrapper");
+const navScan = getEl("nav-scan"),
+    navRecords = getEl("nav-records"),
+    navList = getEl("nav-list"),
+    navStorage = getEl("nav-storage"),
+    navProfile = getEl("nav-profile"),
+    navAdmin = getEl("nav-admin"),
+    navAnalytics = getEl("nav-analytics"),
+    navSettingsBtn = getEl("nav-settings-btn");
 
-const selectionArea = document.getElementById("selection-area"),
-    studentSearchInput = document.getElementById("student-search-input"),
-    studentList = document.getElementById("student-list");
+const sidebar = getEl("sidebar"),
+    menuBtn = getEl("menu-btn"),
+    sidebarBackdrop = getEl("sidebar-backdrop"),
+    sidebarToggleBtn = getEl("sidebar-toggle-btn"),
+    contentWrapper = getEl("content-wrapper");
 
-const recordsLoading = document.getElementById("records-loading"),
-    recordsTable = document.getElementById("records-table"),
-    recordsClassFilter = document.getElementById("records-class-filter"),
-    recordsSearchInput = document.getElementById("records-search-input");
+const selectionArea = getEl("selection-area"),
+    studentSearchInput = getEl("student-search-input"),
+    studentList = getEl("student-list");
 
-const listLoading = document.getElementById("list-loading"),
-    listTable = document.getElementById("list-table"),
-    listClassFilter = document.getElementById("list-class-filter"),
-    listSearchInput = document.getElementById("list-search-input");
+const recordsLoading = getEl("records-loading"),
+    recordsTable = getEl("records-table"),
+    recordsClassFilter = getEl("records-class-filter"),
+    recordsSearchInput = getEl("records-search-input");
 
-const listTotalCount = document.getElementById("list-total-count");
-const listCompletedCount = document.getElementById("list-completed-count");
-const listPendingCount = document.getElementById("list-pending-count");
+const listLoading = getEl("list-loading"),
+    listTable = getEl("list-table"),
+    listClassFilter = getEl("list-class-filter"),
+    listSearchInput = getEl("list-search-input");
 
-const loginScreen = document.getElementById("login-screen"),
-    mainAppWrapper = document.getElementById("main-app-wrapper"),
-    adminListLoader = document.getElementById("admin-list-loader"),
-    adminSelect = document.getElementById("admin-select"),
-    proceedToScanBtn = document.getElementById("proceed-to-scan-btn"),
-    adminSelectionArea = document.getElementById("admin-selection-area"),
-    adminScanArea = document.getElementById("admin-scan-area"),
-    adminVideoWrapper = document.getElementById("admin-video-wrapper"),
-    adminVideo = document.getElementById("admin-video"),
-    adminScanStatus = document.getElementById("admin-scan-status"),
-    adminManualScanBtn = document.getElementById("admin-manual-scan-btn"),
-    adminBackBtn = document.getElementById("admin-back-btn");
+const listTotalCount = getEl("list-total-count");
+const listCompletedCount = getEl("list-completed-count");
+const listPendingCount = getEl("list-pending-count");
 
-const adminProfileImgHeader = document.getElementById("admin-profile-img-header"),
-    adminProfileSidebar = document.getElementById("admin-profile-compact"),
-    adminProfileImgSidebar = document.getElementById("admin-profile-img-sidebar"),
-    adminNameSidebar = document.getElementById("admin-name-sidebar"),
-    adminRoleSidebar = document.getElementById("admin-role-sidebar");
+const loginScreen = getEl("login-screen"),
+    mainAppWrapper = getEl("main-app-wrapper"),
+    adminListLoader = getEl("admin-list-loader"),
+    adminSelect = getEl("admin-select"),
+    proceedToScanBtn = getEl("proceed-to-scan-btn"),
+    adminSelectionArea = getEl("admin-selection-area"),
+    adminScanArea = getEl("admin-scan-area"),
+    adminVideoWrapper = getEl("admin-video-wrapper"),
+    adminVideo = getEl("admin-video"),
+    adminScanStatus = getEl("admin-scan-status"),
+    adminManualScanBtn = getEl("admin-manual-scan-btn"),
+    adminBackBtn = getEl("admin-back-btn");
 
-const sidebarLogo = document.getElementById("sidebar-logo");
+const adminProfileImgHeader = getEl("admin-profile-img-header"),
+    adminProfileSidebar = getEl("admin-profile-compact"),
+    adminProfileImgSidebar = getEl("admin-profile-img-sidebar"),
+    adminNameSidebar = getEl("admin-name-sidebar"),
+    adminRoleSidebar = getEl("admin-role-sidebar");
 
-const btnThemeToggle = document.getElementById("btn-theme-toggle"),
-    btnLang = document.getElementById("btn-lang"),
-    bgColorPicker = document.getElementById("bg-color-picker"),
-    faceScanToggleRow = document.getElementById("face-scan-toggle-row"),
-    faceScanEnabledCheckbox = document.getElementById("face-scan-enabled");
+const sidebarLogo = getEl("sidebar-logo");
 
-const logoutBtn = document.getElementById("logout-btn");
+const btnThemeToggle = getEl("btn-theme-toggle"),
+    btnLang = getEl("btn-lang"),
+    bgColorPicker = getEl("bg-color-picker"),
+    faceScanToggleRow = getEl("face-scan-toggle-row"),
+    faceScanEnabledCheckbox = getEl("face-scan-enabled");
+
+const logoutBtn = getEl("logout-btn");
 
 // profile page refs
-const profileImgLarge = document.getElementById("profile-img-large"),
-    profileNameLarge = document.getElementById("profile-name-large"),
-    profileRoleLarge = document.getElementById("profile-role-large"),
-    profileTotalAll = document.getElementById("profile-total-all"),
-    profileTotalMy = document.getElementById("profile-total-my"),
-    profileImagesGrid = document.getElementById("profile-images-grid"),
-    profileImageFilter = document.getElementById("profile-image-filter");
+const profileImgLarge = getEl("profile-img-large"),
+    profileNameLarge = getEl("profile-name-large"),
+    profileRoleLarge = getEl("profile-role-large"),
+    profileTotalAll = getEl("profile-total-all"),
+    profileTotalMy = getEl("profile-total-my"),
+    profileImagesGrid = getEl("profile-images-grid"),
+    profileImageFilter = getEl("profile-image-filter");
 
 // Admin Panel Refs
-const adminManagementList = document.getElementById("admin-management-list");
-const addAdminName = document.getElementById("add-admin-name");
-const addAdminImageUrl = document.getElementById("add-admin-image-url");
-const addAdminEmail = document.getElementById("add-admin-email");
-const addAdminRole = document.getElementById("add-admin-role");
-const addAdminBtn = document.getElementById("add-admin-btn");
+const adminManagementList = getEl("admin-management-list");
+const addAdminName = getEl("add-admin-name");
+const addAdminImageUrl = getEl("add-admin-image-url");
+const addAdminEmail = getEl("add-admin-email");
+const addAdminRole = getEl("add-admin-role");
+const addAdminBtn = getEl("add-admin-btn");
 
 // Analytics Refs
-const scansTodayEl = document.getElementById("scans-today");
-const activeUsersEl = document.getElementById("active-users");
-const completionRateEl = document.getElementById("completion-rate");
-const storageUsedEl = document.getElementById("storage-used");
-const weeklyActivityChart = document.getElementById("weekly-activity-chart");
-const classCompletionChart = document.getElementById("class-completion-chart");
+const scansTodayEl = getEl("scans-today");
+const activeUsersEl = getEl("active-users");
+const completionRateEl = getEl("completion-rate");
+const storageUsedEl = getEl("storage-used");
+const weeklyActivityChart = getEl("weekly-activity-chart");
+const classCompletionChart = getEl("class-completion-chart");
 
 // Notification Toast Refs
-const notificationToast = document.getElementById("notification-toast");
-const notificationIcon = document.getElementById("notification-icon");
-const notificationTitle = document.getElementById("notification-title");
-const notificationMessage = document.getElementById("notification-message");
-const notificationClose = document.getElementById("notification-close");
+const notificationToast = getEl("notification-toast");
+const notificationIcon = getEl("notification-icon");
+const notificationTitle = getEl("notification-title");
+const notificationMessage = getEl("notification-message");
+const notificationClose = getEl("notification-close");
 
 // New Feature Refs
-const voiceSearchBtn = document.getElementById("voice-search-btn");
-const batchScanBtn = document.getElementById("batch-scan-btn");
-const qrScanBtn = document.getElementById("qr-scan-btn");
-const exportListBtn = document.getElementById("export-list-btn");
-const exportRecordsBtn = document.getElementById("export-records-btn");
+const voiceSearchBtn = getEl("voice-search-btn");
+const batchScanBtn = getEl("batch-scan-btn");
+const qrScanBtn = getEl("qr-scan-btn");
+const exportListBtn = getEl("export-list-btn");
+const exportRecordsBtn = getEl("export-records-btn");
 
 // Voice Search Indicator
-const voiceSearchIndicator = document.getElementById("voice-search-indicator");
+const voiceSearchIndicator = getEl("voice-search-indicator");
 
 // Modal refs for new features
-const welcomeModal = document.getElementById("welcome-modal");
-const welcomeAvatar = document.getElementById("welcome-avatar");
-const welcomeTitle = document.getElementById("welcome-title");
-const welcomeSubtitle = document.getElementById("welcome-subtitle");
-const welcomeName = document.getElementById("welcome-name");
-const welcomeRole = document.getElementById("welcome-role");
-const startTourBtn = document.getElementById("start-tour-btn");
-const skipTourBtn = document.getElementById("skip-tour-btn");
+const welcomeModal = getEl("welcome-modal");
+const welcomeAvatar = getEl("welcome-avatar");
+const welcomeTitle = getEl("welcome-title");
+const welcomeSubtitle = getEl("welcome-subtitle");
+const welcomeName = getEl("welcome-name");
+const welcomeRole = getEl("welcome-role");
+const startTourBtn = getEl("start-tour-btn");
+const skipTourBtn = getEl("skip-tour-btn");
 
-const roleInfoModal = document.getElementById("role-info-modal");
-const roleBadgeText = document.getElementById("role-badge-text");
-const roleTitle = document.getElementById("role-title");
-const roleDescription = document.getElementById("role-description");
-const permissionList = document.getElementById("permission-list");
-const viewDashboardBtn = document.getElementById("view-dashboard-btn");
-const closeRoleBtn = document.getElementById("close-role-btn");
+const roleInfoModal = getEl("role-info-modal");
+const roleBadgeText = getEl("role-badge-text");
+const roleTitle = getEl("role-title");
+const roleDescription = getEl("role-description");
+const permissionList = getEl("permission-list");
+const viewDashboardBtn = getEl("view-dashboard-btn");
+const closeRoleBtn = getEl("close-role-btn");
 
-const qrScannerModal = document.getElementById("qr-scanner-modal");
-const closeQrScannerBtn = document.getElementById("close-qr-scanner");
-const qrVideo = document.getElementById("qr-video");
+const qrScannerModal = getEl("qr-scanner-modal");
+const closeQrScannerBtn = getEl("close-qr-scanner");
+const qrVideo = getEl("qr-video");
 
-const batchScanModal = document.getElementById("batch-scan-modal");
-const closeBatchScanBtn = document.getElementById("close-batch-scan");
-const batchList = document.getElementById("batch-list");
-const selectedCountEl = document.getElementById("selected-count");
-const cancelBatchScanBtn = document.getElementById("cancel-batch-scan");
-const startBatchScanBtn = document.getElementById("start-batch-scan");
+const batchScanModal = getEl("batch-scan-modal");
+const closeBatchScanBtn = getEl("close-batch-scan");
+const batchList = getEl("batch-list");
+const selectedCountEl = getEl("selected-count");
+const cancelBatchScanBtn = getEl("cancel-batch-scan");
+const startBatchScanBtn = getEl("start-batch-scan");
 
-const tourGuide = document.getElementById("tour-guide");
-const tourTitle = document.getElementById("tour-title");
-const tourContent = document.getElementById("tour-content");
-const tourSkip = document.getElementById("tour-skip");
-const tourNext = document.getElementById("tour-next");
+const tourGuide = getEl("tour-guide");
+const tourTitle = getEl("tour-title");
+const tourContent = getEl("tour-content");
+const tourSkip = getEl("tour-skip");
+const tourNext = getEl("tour-next");
 
 // state
 const SESSION_KEY = "di_admin_session_v2";
@@ -222,6 +227,8 @@ const icons = {
 };
 
 function showModal(type, message, actions = {}) {
+    if (!modal || !modalIcon || !modalMessage || !modalButtons) return;
+    
     modalIcon.innerHTML = icons[type] || "";
     modalMessage.textContent = message;
     modal.classList.remove("hidden");
@@ -249,6 +256,8 @@ function showModal(type, message, actions = {}) {
 
 /* --------------------------- NOTIFICATION TOAST --------------------------- */
 function showNotification(title, message, type = 'info') {
+    if (!notificationToast || !notificationIcon || !notificationTitle || !notificationMessage) return;
+    
     notificationTitle.textContent = title;
     notificationMessage.textContent = message;
     
@@ -274,13 +283,19 @@ function showNotification(title, message, type = 'info') {
     
     // Auto hide after 5 seconds
     setTimeout(() => {
-        notificationToast.classList.remove('show');
+        if (notificationToast) {
+            notificationToast.classList.remove('show');
+        }
     }, 5000);
 }
 
-notificationClose.addEventListener('click', () => {
-    notificationToast.classList.remove('show');
-});
+if (notificationClose) {
+    notificationClose.addEventListener('click', () => {
+        if (notificationToast) {
+            notificationToast.classList.remove('show');
+        }
+    });
+}
 
 /* --------------------------- FACEAPI MODELS --------------------------- */
 async function loadModels() {
@@ -295,6 +310,8 @@ async function loadModels() {
 
 /* --------------------------- VOICE RECOGNITION --------------------------- */
 function initVoiceRecognition() {
+    if (!voiceSearchBtn || !voiceSearchIndicator) return;
+    
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         recognition = new SpeechRecognition();
@@ -310,8 +327,10 @@ function initVoiceRecognition() {
         
         recognition.onresult = (event) => {
             const transcript = event.results[0][0].transcript;
-            studentSearchInput.value = transcript;
-            populateStudentList(transcript);
+            if (studentSearchInput) {
+                studentSearchInput.value = transcript;
+                populateStudentList(transcript);
+            }
             isListening = false;
             voiceSearchIndicator.classList.remove('active');
             showNotification('Voice Search', settings.lang === "KH" ? `ស្វែងរក: ${transcript}` : `Search for: ${transcript}`, 'success');
@@ -328,20 +347,22 @@ function initVoiceRecognition() {
             isListening = false;
             voiceSearchIndicator.classList.remove('active');
         };
+        
+        voiceSearchBtn.addEventListener('click', () => {
+            if (recognition && !isListening) {
+                recognition.start();
+            }
+        });
     } else {
         voiceSearchBtn.style.display = 'none';
         console.log('Speech recognition not supported');
     }
 }
 
-voiceSearchBtn.addEventListener('click', () => {
-    if (recognition && !isListening) {
-        recognition.start();
-    }
-});
-
 /* --------------------------- QR SCANNER --------------------------- */
 function initQRScanner() {
+    if (!qrScanBtn || !qrScannerModal || !qrVideo || !closeQrScannerBtn) return;
+    
     qrScanBtn.addEventListener('click', () => {
         openQRScanner();
     });
@@ -352,6 +373,8 @@ function initQRScanner() {
 }
 
 function openQRScanner() {
+    if (!qrScannerModal || !qrVideo) return;
+    
     qrScannerModal.classList.add('active');
     
     // Initialize QR scanner
@@ -377,6 +400,8 @@ function openQRScanner() {
 }
 
 function closeQRScanner() {
+    if (!qrScannerModal) return;
+    
     qrScannerModal.classList.remove('active');
     
     if (qrScanner) {
@@ -403,6 +428,9 @@ function handleQRResult(result) {
 
 /* --------------------------- BATCH SCAN --------------------------- */
 function initBatchScan() {
+    if (!batchScanBtn || !batchScanModal || !closeBatchScanBtn || 
+        !batchList || !selectedCountEl || !cancelBatchScanBtn || !startBatchScanBtn) return;
+    
     batchScanBtn.addEventListener('click', () => {
         openBatchScanModal();
     });
@@ -421,16 +449,22 @@ function initBatchScan() {
 }
 
 function openBatchScanModal() {
+    if (!batchScanModal || !batchList || !selectedCountEl || !startBatchScanBtn) return;
+    
     batchScanModal.classList.add('active');
     populateBatchList();
 }
 
 function closeBatchScanModal() {
+    if (!batchScanModal) return;
+    
     batchScanModal.classList.remove('active');
     batchScanData = [];
 }
 
 function populateBatchList() {
+    if (!batchList || !selectedCountEl || !startBatchScanBtn) return;
+    
     batchList.innerHTML = '';
     
     const studentsWithoutPhotos = studentsData.filter(s => s[4] === 0);
@@ -468,6 +502,8 @@ function populateBatchList() {
 }
 
 function updateSelectedCount() {
+    if (!selectedCountEl || !startBatchScanBtn) return;
+    
     const checkboxes = document.querySelectorAll('.batch-checkbox:checked');
     selectedCountEl.textContent = checkboxes.length;
     startBatchScanBtn.disabled = checkboxes.length === 0;
@@ -530,19 +566,23 @@ async function processBatchStudent(index) {
     await startCamera("environment", "manual");
     
     // Override upload button to process next student
-    uploadBtn.onclick = async () => {
-        await uploadPhoto();
-        
-        // Mark as completed
-        student.status = 'completed';
-        
-        // Move to next student
-        processBatchStudent(index + 1);
-    };
+    if (uploadBtn) {
+        uploadBtn.onclick = async () => {
+            await uploadPhoto();
+            
+            // Mark as completed
+            student.status = 'completed';
+            
+            // Move to next student
+            processBatchStudent(index + 1);
+        };
+    }
 }
 
 /* --------------------------- EXPORT FUNCTIONALITY --------------------------- */
 function initExportFunctions() {
+    if (!exportListBtn || !exportRecordsBtn) return;
+    
     exportListBtn.addEventListener('click', () => {
         exportData('list');
     });
@@ -619,6 +659,8 @@ function convertToCSV(data) {
 
 /* --------------------------- TOUR GUIDE --------------------------- */
 function initTourGuide() {
+    if (!startTourBtn || !skipTourBtn || !tourSkip || !tourNext || !tourGuide || !tourTitle || !tourContent) return;
+    
     // Define tour steps
     tourSteps = [
         {
@@ -682,7 +724,9 @@ function initTourGuide() {
     // Add event listeners
     startTourBtn.addEventListener('click', startTour);
     skipTourBtn.addEventListener('click', () => {
-        welcomeModal.classList.add("hidden");
+        if (welcomeModal) {
+            welcomeModal.classList.add("hidden");
+        }
         showRoleInfoModal();
     });
     
@@ -691,6 +735,8 @@ function initTourGuide() {
 }
 
 function startTour() {
+    if (!welcomeModal || !tourGuide) return;
+    
     welcomeModal.classList.add("hidden");
     isTourActive = true;
     currentTourStep = 0;
@@ -698,6 +744,8 @@ function startTour() {
 }
 
 function showTourStep() {
+    if (!tourGuide || !tourTitle || !tourContent) return;
+    
     if (currentTourStep >= tourSteps.length) {
         endTour();
         return;
@@ -756,7 +804,10 @@ function showTourStep() {
     tourContent.textContent = step.content;
     
     // Update arrow
-    tourGuide.querySelector('.tour-guide-arrow').className = `tour-guide-arrow ${arrowClass}`;
+    const arrowElement = tourGuide.querySelector('.tour-guide-arrow');
+    if (arrowElement) {
+        arrowElement.className = `tour-guide-arrow ${arrowClass}`;
+    }
     
     // Position and show tour guide
     tourGuide.style.top = `${top}px`;
@@ -767,10 +818,12 @@ function showTourStep() {
     element.classList.add('feature-highlight');
     
     // Update button text
-    if (currentTourStep === tourSteps.length - 1) {
-        tourNext.textContent = settings.lang === "KH" ? "បញ្ចប់" : "Finish";
-    } else {
-        tourNext.textContent = settings.lang === "KH" ? "បន្ទាប់" : "Next";
+    if (tourNext) {
+        if (currentTourStep === tourSteps.length - 1) {
+            tourNext.textContent = settings.lang === "KH" ? "បញ្ចប់" : "Finish";
+        } else {
+            tourNext.textContent = settings.lang === "KH" ? "បន្ទាប់" : "Next";
+        }
     }
 }
 
@@ -787,6 +840,8 @@ function nextTourStep() {
 }
 
 function endTour() {
+    if (!tourGuide) return;
+    
     isTourActive = false;
     tourGuide.classList.add('hidden');
     
@@ -804,6 +859,8 @@ function endTour() {
 
 /* --------------------------- WELCOME & ROLE MODALS --------------------------- */
 function showWelcomeModal() {
+    if (!welcomeModal || !welcomeAvatar || !welcomeName || !welcomeRole || !welcomeTitle || !welcomeSubtitle) return;
+    
     // Set welcome modal content
     welcomeAvatar.src = loggedInAdmin.imageUrl;
     welcomeName.textContent = loggedInAdmin.name;
@@ -843,21 +900,23 @@ function showWelcomeModal() {
         if (stepDescriptions[2]) stepDescriptions[2].textContent = "បញ្ជាក់ និងបញ្ជូនរូបភាពទៅក្នុងប្រព័ន្ធ";
         
         // Update buttons in Khmer
-        startTourBtn.innerHTML = '<i class="fas fa-play"></i> ចាប់ផ្តើមការណែនាំអន្តរកម្ម';
-        skipTourBtn.innerHTML = '<i class="fas fa-forward"></i> លំងាប់ការណែនាំ';
+        if (startTourBtn) startTourBtn.innerHTML = '<i class="fas fa-play"></i> ចាប់ផ្តើមការណែនាំអន្តរកម្ម';
+        if (skipTourBtn) skipTourBtn.innerHTML = '<i class="fas fa-forward"></i> លំងាប់ការណែនាំ';
     } else {
         welcomeTitle.textContent = "Welcome to the Face Scan System";
         welcomeSubtitle.textContent = "Would you like a quick tour?";
         
         // Update buttons in English
-        startTourBtn.innerHTML = '<i class="fas fa-play"></i> Start Interactive Tour';
-        skipTourBtn.innerHTML = '<i class="fas fa-forward"></i> Skip Tour';
+        if (startTourBtn) startTourBtn.innerHTML = '<i class="fas fa-play"></i> Start Interactive Tour';
+        if (skipTourBtn) skipTourBtn.innerHTML = '<i class="fas fa-forward"></i> Skip Tour';
     }
     
     welcomeModal.classList.remove("hidden");
 }
 
 function showRoleInfoModal() {
+    if (!roleInfoModal || !roleBadgeText || !roleTitle || !roleDescription || !permissionList) return;
+    
     // Set role info modal content
     roleBadgeText.textContent = loggedInAdmin.role || "admin";
     roleTitle.textContent = `${loggedInAdmin.name} - ${loggedInAdmin.role || "admin"}`;
@@ -867,14 +926,14 @@ function showRoleInfoModal() {
         roleDescription.textContent = "នេះជាអ្វីដែលអ្នកអាចធ្វើបាននៅក្នុងប្រព័ន្ធ";
         
         // Update button text in Khmer
-        viewDashboardBtn.innerHTML = '<i class="fas fa-tachometer-alt"></i> ទៅកាន់ផ្ទាំងគ្រប់គ្រង';
-        closeRoleBtn.innerHTML = '<i class="fas fa-times"></i> បិទ';
+        if (viewDashboardBtn) viewDashboardBtn.innerHTML = '<i class="fas fa-tachometer-alt"></i> ទៅកាន់ផ្ទាំងគ្រប់គ្រង';
+        if (closeRoleBtn) closeRoleBtn.innerHTML = '<i class="fas fa-times"></i> បិទ';
     } else {
         roleDescription.textContent = "Here's what you can do in the system";
         
         // Update button text in English
-        viewDashboardBtn.innerHTML = '<i class="fas fa-tachometer-alt"></i> Go to Dashboard';
-        closeRoleBtn.innerHTML = '<i class="fas fa-times"></i> Close';
+        if (viewDashboardBtn) viewDashboardBtn.innerHTML = '<i class="fas fa-tachometer-alt"></i> Go to Dashboard';
+        if (closeRoleBtn) closeRoleBtn.innerHTML = '<i class="fas fa-times"></i> Close';
     }
     
     // Set permissions based on role
@@ -936,23 +995,27 @@ function getRolePermissions(role) {
 }
 
 // Update the event listeners for the modal buttons
-viewDashboardBtn.addEventListener('click', () => {
-    roleInfoModal.classList.add("hidden");
-    // Default to scan page
-    navLinksDeactivate();
-    hideAllPages();
-    navScan.classList.add('active');
-    pageScan.classList.remove('hidden');
-});
+if (viewDashboardBtn) {
+    viewDashboardBtn.addEventListener('click', () => {
+        if (roleInfoModal) roleInfoModal.classList.add("hidden");
+        // Default to scan page
+        navLinksDeactivate();
+        hideAllPages();
+        if (navScan) navScan.classList.add('active');
+        if (pageScan) pageScan.classList.remove('hidden');
+    });
+}
 
-closeRoleBtn.addEventListener('click', () => {
-    roleInfoModal.classList.add("hidden");
-    // Default to scan page
-    navLinksDeactivate();
-    hideAllPages();
-    navScan.classList.add('active');
-    pageScan.classList.remove('hidden');
-});
+if (closeRoleBtn) {
+    closeRoleBtn.addEventListener('click', () => {
+        if (roleInfoModal) roleInfoModal.classList.add("hidden");
+        // Default to scan page
+        navLinksDeactivate();
+        hideAllPages();
+        if (navScan) navScan.classList.add('active');
+        if (pageScan) pageScan.classList.remove('hidden');
+    });
+}
 
 /* --------------------------- ADMIN FETCH & SESSIONS --------------------------- */
 async function fetchAdmins() {
@@ -979,14 +1042,16 @@ async function fetchAdmins() {
         }
     } catch (e) {
         console.error("Failed to fetch admins:", e);
-        if(loginScreen.style.display !== 'none') {
+        if(loginScreen && loginScreen.style.display !== 'none') {
             showModal('error', `Could not fetch admin list: ${e.message}`);
-            adminListLoader.classList.add('hidden');
+            if (adminListLoader) adminListLoader.classList.add('hidden');
         }
     }
 }
 
 function populateAdminSelect() {
+    if (!adminSelect) return;
+    
     adminSelect.innerHTML = '<option value="">-- សូមជ្រើសរើសឈ្មោះ --</option>';
     adminData.forEach((a, i) => {
         const opt = document.createElement("option");
@@ -994,7 +1059,7 @@ function populateAdminSelect() {
         opt.textContent = a.name;
         adminSelect.appendChild(opt);
     });
-    adminListLoader.classList.add("hidden");
+    if (adminListLoader) adminListLoader.classList.add("hidden");
     adminSelect.classList.remove("hidden");
 }
 
@@ -1022,28 +1087,36 @@ function clearAdminSession() {
     } catch (e) {}
 }
 
-adminSelect.onchange = () => {
-    proceedToScanBtn.classList.toggle("hidden", !adminSelect.value);
-};
+if (adminSelect) {
+    adminSelect.onchange = () => {
+        if (proceedToScanBtn) {
+            proceedToScanBtn.classList.toggle("hidden", !adminSelect.value);
+        }
+    };
+}
 
-proceedToScanBtn.onclick = () => {
-    const idx = adminSelect.value;
-    if (idx === "") return;
-    loggedInAdmin = adminData[idx];
-    
-    // Check if account is disabled
-    if (loggedInAdmin.disabled) {
-        showModal('error', settings.lang === "KH" ? 'គណនីរបស់អ្នកត្រូវបានទប់ស្កាត់។ សូមទាក់ទង superadmin។' : 'Your account is disabled. Please contact a superadmin.');
-        return;
-    }
+if (proceedToScanBtn) {
+    proceedToScanBtn.onclick = () => {
+        const idx = adminSelect.value;
+        if (idx === "") return;
+        loggedInAdmin = adminData[idx];
+        
+        // Check if account is disabled
+        if (loggedInAdmin.disabled) {
+            showModal('error', settings.lang === "KH" ? 'គណនីរបស់អ្នកត្រូវបានទប់ស្កាត់។ សូមទាក់ទង superadmin។' : 'Your account is disabled. Please contact a superadmin.');
+            return;
+        }
 
-    adminSelectionArea.classList.add("hidden");
-    adminScanArea.classList.remove("hidden");
-    adminScanStatus.textContent = settings.lang === "KH" ? "កំពុងចាប់ផ្តើមកាមេរ៉ា..." : "Starting camera...";
-    startAdminLoginScan();
-};
+        if (adminSelectionArea) adminSelectionArea.classList.add("hidden");
+        if (adminScanArea) adminScanArea.classList.remove("hidden");
+        if (adminScanStatus) adminScanStatus.textContent = settings.lang === "KH" ? "កំពុងចាប់ផ្តើមកាមេរ៉ា..." : "Starting camera...";
+        startAdminLoginScan();
+    };
+}
 
 async function startAdminLoginScan() {
+    if (!adminScanStatus || !adminVideoWrapper) return;
+    
     adminScanStatus.textContent = settings.lang === "KH" 
         ? `កំពុងផ្ទុកឯកសារយោងសម្រាប់ ${loggedInAdmin.name}...` 
         : `Loading reference for ${loggedInAdmin.name}...`;
@@ -1064,14 +1137,16 @@ async function startAdminLoginScan() {
             video: { facingMode: "user", width: 640, height: 480 },
         });
         currentStream = stream;
-        adminVideo.srcObject = stream;
-        adminVideo.onloadedmetadata = () => {
-            adminScanStatus.textContent = settings.lang === "KH" 
-                ? "សូមមើលកាមេរ៉ា។ កំពុងស្កេនដោយស្វ័យប្រវត្តិ..." 
-                : "Look at the camera. Auto-scanning...";
-            adminVideoWrapper.classList.add("ready");
-            startAdminScanInterval();
-        };
+        if (adminVideo) {
+            adminVideo.srcObject = stream;
+            adminVideo.onloadedmetadata = () => {
+                adminScanStatus.textContent = settings.lang === "KH" 
+                    ? "សូមមើលកាមេរ៉ា។ កំពុងស្កេនដោយស្វ័យប្រវត្តិ..." 
+                    : "Look at the camera. Auto-scanning...";
+                adminVideoWrapper.classList.add("ready");
+                startAdminScanInterval();
+            };
+        }
     } catch (err) {
         showModal("error", settings.lang === "KH" ? "សូមអនុញ្ញាតឱ្យចូលដំណើរការកាមេរ៉ា។" : "Please allow camera access.");
         resetToAdminSelection();
@@ -1092,9 +1167,11 @@ async function createFaceMatcher(imageUrl, label) {
         return new faceapi.FaceMatcher(desc, 0.5);
     } catch (e) {
         console.error(e);
-        adminScanStatus.innerHTML = settings.lang === "KH" 
-            ? "កំហុសក្នុងការផ្ទុករូបភាពយោង (ពិនិត្យ CORS)។" 
-            : "Error loading reference image (check CORS).";
+        if (adminScanStatus) {
+            adminScanStatus.innerHTML = settings.lang === "KH" 
+                ? "កំហុសក្នុងការផ្ទុករូបភាពយោង (ពិនិត្យ CORS)។" 
+                : "Error loading reference image (check CORS).";
+        }
         return null;
     }
 }
@@ -1110,7 +1187,7 @@ function startAdminScanInterval() {
 }
 
 async function performAdminScan() {
-    if (!adminFaceMatcher) return false;
+    if (!adminFaceMatcher || !adminVideo) return false;
     const det = await faceapi
         .detectSingleFace(
             adminVideo,
@@ -1124,64 +1201,84 @@ async function performAdminScan() {
     if (det) {
         const best = adminFaceMatcher.findBestMatch(det.descriptor);
         if (best.label !== "unknown" && best.distance < 0.5) {
-            adminScanStatus.textContent = settings.lang === "KH" 
-                ? `សូមស្វាគមន៍, ${best.label}!` 
-                : `Welcome, ${best.label}!`;
-            adminVideoWrapper.classList.remove("fail");
-            adminVideoWrapper.classList.add("ready");
+            if (adminScanStatus) {
+                adminScanStatus.textContent = settings.lang === "KH" 
+                    ? `សូមស្វាគមន៍, ${best.label}!` 
+                    : `Welcome, ${best.label}!`;
+            }
+            if (adminVideoWrapper) {
+                adminVideoWrapper.classList.remove("fail");
+                adminVideoWrapper.classList.add("ready");
+            }
             return true;
         } else {
-            adminScanStatus.textContent = settings.lang === "KH" 
-                ? "មុខមិនត្រូវគ្នា។ កំពុងព្យាយាម..." 
-                : "Face does not match. Trying...";
-            adminVideoWrapper.classList.add("fail");
+            if (adminScanStatus) {
+                adminScanStatus.textContent = settings.lang === "KH" 
+                    ? "មុខមិនត្រូវគ្នា។ កំពុងព្យាយាម..." 
+                    : "Face does not match. Trying...";
+            }
+            if (adminVideoWrapper) {
+                adminVideoWrapper.classList.add("fail");
+            }
             return false;
         }
     } else {
-        adminScanStatus.textContent = settings.lang === "KH" 
-            ? "រកមិនឃើញមុខ។ សូមដាក់មុខអ្នកនៅកណ្តាល។" 
-            : "No face detected. Please center your face.";
-        adminVideoWrapper.classList.remove("fail");
+        if (adminScanStatus) {
+            adminScanStatus.textContent = settings.lang === "KH" 
+                ? "រកមិនឃើញមុខ។ សូមដាក់មុខអ្នកនៅកណ្តាល។" 
+                : "No face detected. Please center your face.";
+        }
+        if (adminVideoWrapper) {
+            adminVideoWrapper.classList.remove("fail");
+        }
         return false;
     }
 }
 
-adminManualScanBtn.onclick = async () => {
-    if (isScanning) clearInterval(adminScanInterval);
-    isScanning = false;
-    adminScanStatus.textContent = settings.lang === "KH" ? "កំពុងស្កេនដោយដៃ..." : "Manual scan... processing...";
-    const ok = await performAdminScan();
-    if (ok) onLoginSuccess();
-    else {
-        adminScanStatus.textContent = settings.lang === "KH" 
-            ? "ការស្កេនដោយដៃបរាជ័យ។ កំពុងបន្តការស្កេនដោយស្វ័យប្រវត្តិ..." 
-            : "Manual scan failed. Resuming auto-scan...";
-        setTimeout(() => {
-            if (!isScanning) startAdminScanInterval();
-        }, 2000);
-    }
-};
+if (adminManualScanBtn) {
+    adminManualScanBtn.onclick = async () => {
+        if (isScanning) clearInterval(adminScanInterval);
+        isScanning = false;
+        if (adminScanStatus) {
+            adminScanStatus.textContent = settings.lang === "KH" ? "កំពុងស្កេនដោយដៃ..." : "Manual scan... processing...";
+        }
+        const ok = await performAdminScan();
+        if (ok) onLoginSuccess();
+        else {
+            if (adminScanStatus) {
+                adminScanStatus.textContent = settings.lang === "KH" 
+                    ? "ការស្កេនដោយដៃបរាជ័យ។ កំពុងបន្តការស្កេនដោយស្វ័យប្រវត្តិ..." 
+                    : "Manual scan failed. Resuming auto-scan...";
+            }
+            setTimeout(() => {
+                if (!isScanning) startAdminScanInterval();
+            }, 2000);
+        }
+    };
+}
 
 function resetToAdminSelection() {
     stopCamera();
-    adminScanArea.classList.add("hidden");
-    adminSelectionArea.classList.remove("hidden");
-    adminVideoWrapper.classList.remove("ready", "fail");
-    adminSelect.value = "";
-    proceedToScanBtn.classList.add("hidden");
+    if (adminScanArea) adminScanArea.classList.add("hidden");
+    if (adminSelectionArea) adminSelectionArea.classList.remove("hidden");
+    if (adminVideoWrapper) adminVideoWrapper.classList.remove("ready", "fail");
+    if (adminSelect) adminSelect.value = "";
+    if (proceedToScanBtn) proceedToScanBtn.classList.add("hidden");
     loggedInAdmin = null;
     adminFaceMatcher = null;
     clearInterval(adminScanInterval);
 }
 
-adminBackBtn.onclick = resetToAdminSelection;
+if (adminBackBtn) {
+    adminBackBtn.onclick = resetToAdminSelection;
+}
 
 // Update the onLoginSuccess function to handle first-time login
 async function onLoginSuccess() {
     clearInterval(adminScanInterval);
     stopCamera();
     
-    // Find the full admin object, in case the one from login was partial
+    // Find the full admin object, in case one from login was partial
     const adminObject = adminData.find(a => a.name === loggedInAdmin.name);
     if (adminObject) {
         loggedInAdmin = adminObject;
@@ -1201,20 +1298,26 @@ async function onLoginSuccess() {
     });
     
     // set profile UI
-    adminProfileImgHeader.crossOrigin = "anonymous";
-    adminProfileImgSidebar.crossOrigin = "anonymous";
-    adminProfileImgHeader.src = loggedInAdmin.imageUrl;
-    adminProfileImgSidebar.src = loggedInAdmin.imageUrl;
-    adminNameSidebar.textContent = loggedInAdmin.name;
-    adminRoleSidebar.textContent = loggedInAdmin.role || "admin";
-    adminProfileImgHeader.classList.remove("hidden");
-    adminProfileSidebar.classList.remove("hidden");
+    if (adminProfileImgHeader) {
+        adminProfileImgHeader.crossOrigin = "anonymous";
+        adminProfileImgHeader.src = loggedInAdmin.imageUrl;
+        adminProfileImgHeader.classList.remove("hidden");
+    }
+    if (adminProfileSidebar) {
+        adminProfileSidebar.crossOrigin = "anonymous";
+        adminProfileSidebar.src = loggedInAdmin.imageUrl;
+        adminProfileSidebar.classList.remove("hidden");
+    }
+    if (adminNameSidebar) adminNameSidebar.textContent = loggedInAdmin.name;
+    if (adminRoleSidebar) adminRoleSidebar.textContent = loggedInAdmin.role || "admin";
     
     // remove login screen permanently
-    loginScreen.classList.add("hidden");
-    if (loginScreen.parentNode)
-        loginScreen.parentNode.removeChild(loginScreen);
-    mainAppWrapper.classList.remove("hidden");
+    if (loginScreen) {
+        loginScreen.classList.add("hidden");
+        if (loginScreen.parentNode)
+            loginScreen.parentNode.removeChild(loginScreen);
+    }
+    if (mainAppWrapper) mainAppWrapper.classList.remove("hidden");
     
     // Show appropriate modal based on first-time login
     if (isFirstLogin) {
@@ -1235,33 +1338,45 @@ async function onLoginSuccess() {
 }
 
 // Updated Click Handlers for new sidebar
-logoutBtn.onclick = (e) => {
-    e.preventDefault();
-    clearAdminSession();
-    location.reload();
-};
+if (logoutBtn) {
+    logoutBtn.onclick = (e) => {
+        e.preventDefault();
+        clearAdminSession();
+        location.reload();
+    };
+}
 
-sidebarLogo.onclick = () => openProfilePage();
-adminProfileImgHeader.onclick = () => openProfilePage();
-adminProfileSidebar.onclick = () => openProfilePage();
+if (sidebarLogo) {
+    sidebarLogo.onclick = () => openProfilePage();
+}
+if (adminProfileImgHeader) {
+    adminProfileImgHeader.onclick = () => openProfilePage();
+}
+if (adminProfileSidebar) {
+    adminProfileSidebar.onclick = () => openProfilePage();
+}
 
-navProfile.onclick = (e) => {
-    e.preventDefault();
-    openProfilePage();
-};
+if (navProfile) {
+    navProfile.onclick = (e) => {
+        e.preventDefault();
+        openProfilePage();
+    };
+}
 
-navSettingsBtn.onclick = (e) => {
-    e.preventDefault();
-    navLinks.forEach(l => l.classList.remove('active'));
-    pages.forEach(p => p.classList.add('hidden'));
-    navAdmin.classList.add('active');
-    pageAdmin.classList.remove('hidden');
-    stopCamera();
-    closeSidebar();
-    
-    // Load admin list when opening panel
-    populateAdminManagementList();
-};
+if (navSettingsBtn) {
+    navSettingsBtn.onclick = (e) => {
+        e.preventDefault();
+        navLinksDeactivate();
+        hideAllPages();
+        if (navAdmin) navAdmin.classList.add('active');
+        if (pageAdmin) pageAdmin.classList.remove('hidden');
+        stopCamera();
+        closeSidebar();
+        
+        // Load admin list when opening panel
+        populateAdminManagementList();
+    };
+}
 
 /* --------------------------- STUDENTS & RECORDS --------------------------- */
 async function fetchStudents() {
@@ -1282,6 +1397,8 @@ async function fetchStudents() {
 }
 
 function populateStudentList(filter = "") {
+    if (!studentList) return;
+    
     studentList.innerHTML = "";
     const f = filter.toLowerCase();
     const filtered = studentsData.filter(
@@ -1343,6 +1460,8 @@ function showCameraModeSelection() {
 }
 
 async function displaySavedRecords() {
+    if (!recordsLoading || !recordsTable) return;
+    
     recordsLoading.style.display = "block";
     recordsTable.classList.add("hidden");
     try {
@@ -1364,6 +1483,8 @@ async function displaySavedRecords() {
 }
 
 function populateClassFilter(records, filterElement) {
+    if (!filterElement) return;
+    
     const classes = [
         ...new Set(
             records
@@ -1381,9 +1502,13 @@ function populateClassFilter(records, filterElement) {
 }
 
 function filterRecordsTable() {
-    const sel = recordsClassFilter.value,
-        q = recordsSearchInput.value.toLowerCase();
+    if (!recordsTable) return;
+    
+    const sel = recordsClassFilter ? recordsClassFilter.value : "all";
+    const q = recordsSearchInput ? recordsSearchInput.value.toLowerCase() : "";
     const tbody = recordsTable.querySelector("tbody");
+    if (!tbody) return;
+    
     tbody.innerHTML = "";
     const rows = savedRecordsData.filter((r) => {
         const cOk = sel === "all" || r[3] === sel;
@@ -1474,6 +1599,8 @@ async function handleDelete(serialNumber, imageUrl) {
 
 /* --------------------------- STUDENT LIST / STATS --------------------------- */
 function populateListClassFilterV2() {
+    if (!listClassFilter) return;
+    
     const classes = [
         ...new Set(
             allStudentsListData
@@ -1492,9 +1619,13 @@ function populateListClassFilterV2() {
 }
 
 function filterStudentListTable() {
-    const sel = listClassFilter.value,
-        q = listSearchInput.value.toLowerCase();
+    if (!listTable) return;
+    
+    const sel = listClassFilter ? listClassFilter.value : "all";
+    const q = listSearchInput ? listSearchInput.value.toLowerCase() : "";
     const tbody = listTable.querySelector("tbody");
+    if (!tbody) return;
+    
     tbody.innerHTML = "";
     const imgMap = new Map(savedRecordsData.map((r) => [r[2], r[5]]));
     let arr =
@@ -1560,6 +1691,8 @@ function filterStudentListTable() {
 }
 
 async function displayStudentList() {
+    if (!listLoading || !listTable) return;
+    
     listLoading.style.display = "block";
     listTable.classList.add("hidden");
     if (savedRecordsData.length === 0) {
@@ -1578,12 +1711,14 @@ async function displayStudentList() {
     }
     populateListClassFilterV2();
     filterStudentListTable();
-    listLoading.style.display = "none";
+    listLoading.style.display ="none";
     listTable.classList.remove("hidden");
 }
 
 /* --------------------------- CAMERA & UPLOAD --------------------------- */
 async function startCamera(facingMode = "environment", mode = "auto") {
+    if (!video || !videoWrapper || !faceStatus || !subtitle || !switchCameraBtn || !backBtn || !uploadBtn || !retakeBtn || !photoPreview || !manualCaptureBtn || !cameraSection || !selectionArea) return;
+    
     currentFacingMode = facingMode;
     currentCameraMode = mode;
     stableFrames = 0;
@@ -1609,7 +1744,7 @@ async function startCamera(facingMode = "environment", mode = "auto") {
         currentStream = stream;
         video.srcObject = stream;
         video.onloadedmetadata = () => {
-                        if (mode === "auto") {
+            if (mode === "auto") {
                 manualCaptureBtn.classList.add("hidden");
                 detectFace();
             } else {
@@ -1628,6 +1763,8 @@ async function startCamera(facingMode = "environment", mode = "auto") {
 }
 
 function detectFace() {
+    if (!video || !faceStatus || !videoWrapper || !captureCanvas) return;
+    
     const opts = new faceapi.TinyFaceDetectorOptions({
         inputSize: 224,
         scoreThreshold: 0.5,
@@ -1655,6 +1792,8 @@ function detectFace() {
 }
 
 function captureFace() {
+    if (!captureCanvas || !video || !photoPreview || !switchCameraBtn || !videoWrapper || !manualCaptureBtn || !uploadBtn || !retakeBtn || !faceStatus || !subtitle) return;
+    
     clearInterval(faceApiInterval);
     const ctx = captureCanvas.getContext("2d");
     const size = 512;
@@ -1692,10 +1831,11 @@ function stopCamera() {
 }
 
 function resetToSelection() {
+    if (!cameraSection || !switchCameraBtn || !backBtn || !photoPreview || !uploadBtn || !retakeBtn || !videoWrapper || !selectionArea || !subtitle) return;
+    
     stopCamera();
     cameraSection.classList.add("hidden");
     switchCameraBtn.classList.add("hidden");
-    manualCaptureBtn.classList.add("hidden");
     backBtn.classList.add("hidden");
     photoPreview.classList.add("hidden");
     uploadBtn.classList.add("hidden");
@@ -1706,9 +1846,13 @@ function resetToSelection() {
     selectedStudent = null;
 }
 
-manualCaptureBtn.onclick = captureFace;
+if (manualCaptureBtn) {
+    manualCaptureBtn.onclick = captureFace;
+}
 
 async function uploadPhoto() {
+    if (!uploadBtn || !captureCanvas || !selectedStudent) return;
+    
     if (isUploading) return;
     if (!selectedStudent) {
         showModal("error", settings.lang === "KH" ? "មិនអាចរកឃើញទិន្នន័យនិស្សិត" : "Could not find student data.");
@@ -1753,27 +1897,40 @@ async function uploadPhoto() {
     }
 };
 
-uploadBtn.onclick = uploadPhoto;
+if (uploadBtn) {
+    uploadBtn.onclick = uploadPhoto;
+}
 
-retakeBtn.onclick = () => {
-    photoPreview.classList.add("hidden");
-    uploadBtn.classList.add("hidden");
-    retakeBtn.classList.add("hidden");
-    videoWrapper.classList.remove("hidden");
-    faceStatus.classList.remove("hidden");
-    stableFrames = 0;
-    startCamera(currentFacingMode, currentCameraMode);
-};
+if (retakeBtn) {
+    retakeBtn.onclick = () => {
+        if (!photoPreview || !uploadBtn || !retakeBtn || !videoWrapper || !faceStatus) return;
+        
+        photoPreview.classList.add("hidden");
+        uploadBtn.classList.add("hidden");
+        retakeBtn.classList.add("hidden");
+        videoWrapper.classList.remove("hidden");
+        faceStatus.classList.remove("hidden");
+        stableFrames = 0;
+        startCamera(currentFacingMode, currentCameraMode);
+    };
+}
 
-switchCameraBtn.onclick = () =>
-    startCamera(
-        currentFacingMode === "environment" ? "user" : "environment",
-        currentCameraMode
-    );
+if (switchCameraBtn) {
+    switchCameraBtn.onclick = () =>
+        startCamera(
+            currentFacingMode === "environment" ? "user" : "environment",
+            currentCameraMode
+        );
+}
 
-backBtn.onclick = () => resetToSelection();
-studentSearchInput.oninput = () =>
-    populateStudentList(studentSearchInput.value);
+if (backBtn) {
+    backBtn.onclick = () => resetToSelection();
+}
+
+if (studentSearchInput) {
+    studentSearchInput.oninput = () =>
+        populateStudentList(studentSearchInput.value);
+}
 
 /* --------------------------- PROFILE / STATS --------------------------- */
 async function fetchAllSavedRecordsForStats() {
@@ -1792,29 +1949,36 @@ function updateProfileSummary() {
             r[6] && loggedInAdmin && r[6].toString().includes(loggedInAdmin.name)
         );
     }).length;
-    document.getElementById("stat-total").textContent = totalAll;
-    document.getElementById("stat-mycount").textContent = myUploads;
-    document.getElementById("stat-others").textContent =
-        totalAll - myUploads;
+    
+    const statTotal = document.getElementById("stat-total");
+    const statMycount = document.getElementById("stat-mycount");
+    const statOthers = document.getElementById("stat-others");
+    
+    if (statTotal) statTotal.textContent = totalAll;
+    if (statMycount) statMycount.textContent = myUploads;
+    if (statOthers) statOthers.textContent = totalAll - myUploads;
+    
     // profile page values
-    profileTotalAll.textContent = totalAll;
-    profileTotalMy.textContent = myUploads;
+    if (profileTotalAll) profileTotalAll.textContent = totalAll;
+    if (profileTotalMy) profileTotalMy.textContent = myUploads;
     if (loggedInAdmin) {
-        profileImgLarge.src = loggedInAdmin.imageUrl;
-        profileNameLarge.textContent = loggedInAdmin.name;
-        profileRoleLarge.textContent = loggedInAdmin.role || "admin";
+        if (profileImgLarge) profileImgLarge.src = loggedInAdmin.imageUrl;
+        if (profileNameLarge) profileNameLarge.textContent = loggedInAdmin.name;
+        if (profileRoleLarge) profileRoleLarge.textContent = loggedInAdmin.role || "admin";
     }
 }
 
 function openProfilePage() {
     navLinksDeactivate();
     hideAllPages();
-    navProfile.classList.add('active');
-    pageProfile.classList.remove("hidden");
+    if (navProfile) navProfile.classList.add('active');
+    if (pageProfile) pageProfile.classList.remove("hidden");
     populateProfileImages();
 }
 
 function populateProfileImages(filter = "") {
+    if (!profileImagesGrid) return;
+    
     profileImagesGrid.innerHTML = "";
     const q = (filter || "").toLowerCase();
     // show images uploaded by loggedInAdmin first (best-effort by checking uploader name in record row)
@@ -1848,11 +2012,15 @@ function populateProfileImages(filter = "") {
     });
 }
 
-profileImageFilter.oninput = () =>
-    populateProfileImages(profileImageFilter.value);
+if (profileImageFilter) {
+    profileImageFilter.oninput = () =>
+        populateProfileImages(profileImageFilter.value);
+}
 
 /* --------------------------- ADMIN PANEL --------------------------- */
 async function populateAdminManagementList() {
+    if (!adminManagementList) return;
+    
     adminManagementList.innerHTML = `<div class="text-center text-slate-400 p-4">${settings.lang === "KH" ? "កំពុងផ្ទុកបញ្ជីអ្នកគ្រប់គ្រង..." : "Loading admin list..."}</div>`;
     
     // Ensure adminData is fresh
@@ -1895,14 +2063,16 @@ async function populateAdminManagementList() {
         
         adminManagementList.appendChild(card);
 
-        // Add event listeners for the new elements
+        // Add event listeners for new elements
         const roleSelect = document.getElementById(`role-select-${admin.name}`);
         const disableCheck = document.getElementById(`disable-check-${admin.name}`);
         
-        if (!isAdminSelf) {
+        if (!isAdminSelf && roleSelect) {
             roleSelect.onchange = (e) => {
                 handleUpdateAdminRole(admin.name, e.target.value);
             };
+        }
+        if (!isAdminSelf && disableCheck) {
             disableCheck.onchange = (e) => {
                 handleUpdateAdminDisabled(admin.name, e.target.checked);
             };
@@ -1975,21 +2145,27 @@ async function handleUpdateAdminDisabled(adminName, isDisabled) {
     }
 }
 
-addAdminBtn.onclick = () => {
-    // The backend script setAdminRoleHandler only UPDATES. It does not ADD.
-    // Therefore, we must inform the user to add via the Google Sheet.
-    showModal(
-        'choice', 
-        settings.lang === "KH" ? 'បន្ថែមអ្នកគ្រប់គ្រងតាមរយៈ Google Sheet' : 'Add Admin via Google Sheet', 
-        { 'OK': {} }
-    );
-    modalMessage.innerHTML = settings.lang === "KH" 
-        ? 'ដើម្បីបន្ថែមអ្នកគ្រប់គ្រងថ្មី សូមបញ្ចូលព័ត៌មានរបស់ពួកគេ (ឈ្មោះ, URL រូបភាព, តួនាទី, អ៊ីមែល) ទៅក្នុងផ្ទាំង <strong>AdminScan</strong> នៅក្នុង Google Sheet មេ។' 
-        : 'To add a new admin, please add their details (Name, Image URL, Role, Email) to the <strong>AdminScan</strong> tab in the master Google Sheet.';
-};
+if (addAdminBtn) {
+    addAdminBtn.onclick = () => {
+        // The backend script setAdminRoleHandler only UPDATES. It does not ADD.
+        // Therefore, we must inform user to add via Google Sheet.
+        showModal(
+            'choice', 
+            settings.lang === "KH" ? 'បន្ថែមអ្នកគ្រប់គ្រងតាមរយៈ Google Sheet' : 'Add Admin via Google Sheet', 
+            { 'OK': {} }
+        );
+        if (modalMessage) {
+            modalMessage.innerHTML = settings.lang === "KH" 
+                ? 'ដើម្បីបន្ថែមអ្នកគ្រប់គ្រងថ្មី សូមបញ្ចូលព័ត៌មានរបស់ពួកគេ (ឈ្មោះ, URL រូបភាព, តួនាទី, អ៊ីមែល) ទៅក្នុងផ្ទាំង <strong>AdminScan</strong> នៅក្នុង Google Sheet មេ។' 
+                : 'To add a new admin, please add their details (Name, Image URL, Role, Email) to <strong>AdminScan</strong> tab in master Google Sheet.';
+        }
+    };
+}
 
 /* --------------------------- ANALYTICS --------------------------- */
 async function fetchAnalyticsData() {
+    if (!scansTodayEl || !activeUsersEl || !completionRateEl || !storageUsedEl) return;
+    
     try {
         // In a real implementation, this would fetch from a dedicated analytics endpoint
         // For now, we'll simulate data based on existing data
@@ -2027,9 +2203,11 @@ async function fetchAnalyticsData() {
 }
 
 function updateWeeklyActivityChart() {
+    if (!weeklyActivityChart) return;
+    
     const ctx = weeklyActivityChart.getContext('2d');
     
-    // Generate sample data for the past 7 days
+    // Generate sample data for past 7 days
     const labels = [];
     const data = [];
     
@@ -2093,6 +2271,8 @@ function updateWeeklyActivityChart() {
 }
 
 function updateClassCompletionChart() {
+    if (!classCompletionChart) return;
+    
     const ctx = classCompletionChart.getContext('2d');
     
     // Get unique classes
@@ -2194,14 +2374,20 @@ const pages = [
 ];
 
 function navLinksDeactivate() {
-    navLinks.forEach((l) => l.classList.remove("active"));
+    navLinks.forEach((l) => {
+        if (l) l.classList.remove("active");
+    });
 }
 
 function hideAllPages() {
-    pages.forEach((p) => p.classList.add("hidden"));
+    pages.forEach((p) => {
+        if (p) p.classList.add("hidden");
+    });
 }
 
 navLinks.forEach((link, index) => {
+    if (!link || !pages[index]) return;
+    
     link.onclick = (e) => {
         e.preventDefault();
         navLinksDeactivate();
@@ -2220,42 +2406,58 @@ navLinks.forEach((link, index) => {
 
 const closeSidebar = () => {
     // Only applies to mobile
-    sidebar.classList.remove("is-open");
-    sidebarBackdrop.classList.add("hidden");
+    if (sidebar) sidebar.classList.remove("is-open");
+    if (sidebarBackdrop) sidebarBackdrop.classList.add("hidden");
 };
 
-menuBtn.onclick = () => { // Mobile menu button
-    sidebar.classList.toggle('is-open'); 
-    sidebarBackdrop.classList.toggle('hidden');
-    // If we open mobile nav, make sure desktop collapsed state is off
-    sidebar.classList.remove('collapsed');
-    contentWrapper.classList.remove('collapsed');
-    isSidebarCollapsed = false;
-};
+if (menuBtn) {
+    menuBtn.onclick = () => { // Mobile menu button
+        if (sidebar) sidebar.classList.toggle('is-open'); 
+        if (sidebarBackdrop) sidebarBackdrop.classList.toggle('hidden');
+        // If we open mobile nav, make sure desktop collapsed state is off
+        if (sidebar) sidebar.classList.remove('collapsed');
+        if (contentWrapper) contentWrapper.classList.remove('collapsed');
+        isSidebarCollapsed = false;
+    };
+}
 
-sidebarToggleBtn.onclick = () => { // Desktop toggle button
-    isSidebarCollapsed = !isSidebarCollapsed;
-    sidebar.classList.toggle('collapsed', isSidebarCollapsed);
-    contentWrapper.classList.toggle('collapsed', isSidebarCollapsed);
-    // Store preference
-    try { localStorage.setItem('sidebar_collapsed', isSidebarCollapsed); } catch(e){}
-};
+if (sidebarToggleBtn) {
+    sidebarToggleBtn.onclick = () => { // Desktop toggle button
+        isSidebarCollapsed = !isSidebarCollapsed;
+        if (sidebar) sidebar.classList.toggle('collapsed', isSidebarCollapsed);
+        if (contentWrapper) contentWrapper.classList.toggle('collapsed', isSidebarCollapsed);
+        // Store preference
+        try { localStorage.setItem('sidebar_collapsed', isSidebarCollapsed); } catch(e){}
+    };
+}
 
-sidebarBackdrop.onclick = () => closeSidebar();
+if (sidebarBackdrop) {
+    sidebarBackdrop.onclick = () => closeSidebar();
+}
 
-recordsClassFilter.onchange = () => filterRecordsTable();
-listClassFilter.onchange = () => filterStudentListTable();
-recordsSearchInput.oninput = () => filterRecordsTable();
-listSearchInput.oninput = () => filterStudentListTable();
+if (recordsClassFilter) {
+    recordsClassFilter.onchange = () => filterRecordsTable();
+}
+if (listClassFilter) {
+    listClassFilter.onchange = () => filterStudentListTable();
+}
+if (recordsSearchInput) {
+    recordsSearchInput.oninput = () => filterRecordsTable();
+}
+if (listSearchInput) {
+    listSearchInput.oninput = () => filterStudentListTable();
+}
 
 /* --------------------------- STORAGE LINKS --------------------------- */
 function populateStorageLinks() {
     const container = document.getElementById("storage-links-container");
+    if (!container) return;
+    
     const links = {
         [settings.lang === "KH" ? "សៀវភៅ" : "Sheets"]: {
             [settings.lang === "KH" ? "បញ្ជីនិស្សិត (DIList)" : "Student List (DIList)"]: "https://docs.google.com/spreadsheets/d/1eRyPoifzyvB4oBmruNyXcoKMKPRqjk6xDD6-bPNW6pc/edit",
             [settings.lang === "KH" ? "ព័ត៌មានដែលបានរក្សាទុក & អ្នកគ្រប់គ្រង (InfoUsers)" : "Saved Info & Admins (InfoUsers)"]: "https://docs.google.com/spreadsheets/d/1dleEg_Q5KV9IRGT4DpfHooZQ_p2bKLk-2yCGYootqPA/edit",
-            [settings.lang === "KH" ? "បញ្ជីមួយទៀត (បញ្ជីឈ្មោះរួម)" : "Secondary List (បញ្ជឺឈ្មោះរួម)"]: "https://docs.google.com/spreadsheets/d/1_Kgl8UQXRsVATt_BOHYQjVWYKkRIBA12R-qnsBoSUzc/edit",
+            [settings.lang === "KH" ? "បញ្ជីមួយទៀត (បញ្ជឺឈ្មោះរួម)" : "Secondary List (បញ្ជឺឈ្មោះរួម)"]: "https://docs.google.com/spreadsheets/d/1_Kgl8UQXRsVATt_BOHYQjVWYKkRIBA12R-qnsBoSUzc/edit",
         },
         [settings.lang === "KH" ? "ថត" : "Folders"]: {
             [settings.lang === "KH" ? "ឯកសារដែលបានបញ្ចូលលើកដំបូង" : "Default Uploads"]: "https://drive.google.com/drive/folders/10RyejYi9_J0c7gxrL5wgmODy4VfJZ6SA",
@@ -2288,47 +2490,63 @@ function setupSettingsUI() {
     
     // show face-scan toggle only if superadmin
     if (loggedInAdmin && (loggedInAdmin.role === "superadmin")) {
-        faceScanToggleRow.classList.remove("hidden");
-        navAdmin.classList.remove("hidden"); // Show Admin Panel link
-        navSettingsBtn.classList.remove("hidden"); // Show settings cog
+        if (faceScanToggleRow) faceScanToggleRow.classList.remove("hidden");
+        if (navAdmin) navAdmin.classList.remove("hidden"); // Show Admin Panel link
+        if (navSettingsBtn) navSettingsBtn.classList.remove("hidden"); // Show settings cog
         
-        faceScanEnabledCheckbox.checked = loggedInAdmin.faceScan !== false;
-        faceScanEnabledCheckbox.onchange = () => {
-            loggedInAdmin.faceScan = faceScanEnabledCheckbox.checked;
-            // TODO: This should be saved to the backend
-            // For now, just update self
-            handleUpdateAdminDisabled(loggedInAdmin.name, !loggedInAdmin.faceScan);
-            showModal("success", settings.lang === "KH" ? "បានធ្វើបច្ចុប្បន្នភាពចំណង់ចំណូលចិត្តការស្កេនមុខ" : "Updated face-scan preference.");
-        };
+        if (faceScanEnabledCheckbox) {
+            faceScanEnabledCheckbox.checked = loggedInAdmin.faceScan !== false;
+            faceScanEnabledCheckbox.onchange = () => {
+                loggedInAdmin.faceScan = faceScanEnabledCheckbox.checked;
+                // TODO: This should be saved to the backend
+                // For now, just update self
+                handleUpdateAdminDisabled(loggedInAdmin.name, !loggedInAdmin.faceScan);
+                showModal("success", settings.lang === "KH" ? "បានធ្វើបច្ចុប្បន្នភាពចំណង់ចំណូលចិត្តការស្កេនមុខ" : "Updated face-scan preference.");
+            };
+        }
     }
     
-    btnThemeToggle.onclick = () => {
-        settings.theme = settings.theme === "dark" ? "light" : "dark";
-        applySettings();
-        localStorage.setItem("di_settings_v1", JSON.stringify(settings));
-    };
-    btnLang.onclick = () => {
-        settings.lang = settings.lang === "KH" ? "EN" : "KH";
-        applySettings();
-        localStorage.setItem("di_settings_v1", JSON.stringify(settings));
-    };
-    bgColorPicker.onchange = (e) => {
-        settings.bgColor = e.target.value;
-        document.body.style.background = settings.bgColor;
-        localStorage.setItem("di_settings_v1", JSON.stringify(settings));
-    };
+    if (btnThemeToggle) {
+        btnThemeToggle.onclick = () => {
+            settings.theme = settings.theme === "dark" ? "light" : "dark";
+            applySettings();
+            localStorage.setItem("di_settings_v1", JSON.stringify(settings));
+        };
+    }
+    if (btnLang) {
+        btnLang.onclick = () => {
+            settings.lang = settings.lang === "KH" ? "EN" : "KH";
+            applySettings();
+            localStorage.setItem("di_settings_v1", JSON.stringify(settings));
+        };
+    }
+    if (bgColorPicker) {
+        bgColorPicker.onchange = (e) => {
+            settings.bgColor = e.target.value;
+            document.body.style.background = settings.bgColor;
+            localStorage.setItem("di_settings_v1", JSON.stringify(settings));
+        };
+    }
 }
 
 function applySettings() {
-    document.body.setAttribute(
-        "data-theme",
-        settings.theme === "dark" ? "dark" : "light"
-    );
-    btnThemeToggle.textContent =
-        settings.theme === "dark" ? (settings.lang === "KH" ? "ងងឹត" : "Dark") : (settings.lang === "KH" ? "ពន្លឺ" : "Light");
-    btnLang.textContent = settings.lang;
-    bgColorPicker.value = settings.bgColor || "#0f172a";
-    document.body.style.background = settings.bgColor || "";
+    if (document.body) {
+        document.body.setAttribute(
+            "data-theme",
+            settings.theme === "dark" ? "dark" : "light"
+        );
+        document.body.style.background = settings.bgColor || "";
+    }
+    if (btnThemeToggle) {
+        btnThemeToggle.textContent =
+            settings.theme === "dark" ? (settings.lang === "KH" ? "ងងឹត" : "Dark") : (settings.lang === "KH" ? "ពន្លឺ" : "Light");
+    }
+    if (btnLang) {
+        btnLang.textContent = settings.lang;
+    }
+    if (bgColorPicker) {
+        bgColorPicker.value = settings.bgColor || "#0f172a";
+    }
 }
 
 /* --------------------------- INITIAL LOAD --------------------------- */
@@ -2343,8 +2561,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Check for sidebar preference
     if (localStorage.getItem('sidebar_collapsed') === 'true') {
         isSidebarCollapsed = true;
-        sidebar.classList.add('collapsed');
-        contentWrapper.classList.add('collapsed');
+        if (sidebar) sidebar.classList.add('collapsed');
+        if (contentWrapper) contentWrapper.classList.add('collapsed');
     }
 
     try {
@@ -2385,20 +2603,26 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             // 4. Update UI immediately
-            adminProfileImgHeader.crossOrigin = "anonymous";
-            adminProfileImgSidebar.crossOrigin = "anonymous";
-            adminProfileImgHeader.src = loggedInAdmin.imageUrl;
-            adminProfileImgSidebar.src = loggedInAdmin.imageUrl;
-            adminNameSidebar.textContent = loggedInAdmin.name;
-            adminRoleSidebar.textContent = loggedInAdmin.role || "admin";
-            adminProfileImgHeader.classList.remove("hidden");
-            adminProfileSidebar.classList.remove("hidden");
+            if (adminProfileImgHeader) {
+                adminProfileImgHeader.crossOrigin = "anonymous";
+                adminProfileImgHeader.src = loggedInAdmin.imageUrl;
+                adminProfileImgHeader.classList.remove("hidden");
+            }
+            if (adminProfileSidebar) {
+                adminProfileSidebar.crossOrigin = "anonymous";
+                adminProfileSidebar.src = loggedInAdmin.imageUrl;
+                adminProfileSidebar.classList.remove("hidden");
+            }
+            if (adminNameSidebar) adminNameSidebar.textContent = loggedInAdmin.name;
+            if (adminRoleSidebar) adminRoleSidebar.textContent = loggedInAdmin.role || "admin";
 
             // 5. Show app, hide login
-            loginScreen.classList.add("hidden");
-            if (loginScreen.parentNode)
-                loginScreen.parentNode.removeChild(loginScreen);
-            mainAppWrapper.classList.remove("hidden");
+            if (loginScreen) {
+                loginScreen.classList.add("hidden");
+                if (loginScreen.parentNode)
+                    loginScreen.parentNode.removeChild(loginScreen);
+            }
+            if (mainAppWrapper) mainAppWrapper.classList.remove("hidden");
 
             // 6. Setup settings (e.g., theme)
             setupSettingsUI();
