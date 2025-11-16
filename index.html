@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>ប្រព័ន្ធស្កេនមុខឌីជីថល — V4</title>
+    <title>ប្រព័ន្ធកាត់ត្រា​មុខបុគ្គលិក — V4</title>
     <link rel="icon" href="https://img.freepik.com/premium-vector/face-scan-icon_933463-79729.jpg" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -11,21 +11,246 @@
     <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
     <script src="https://cdn.jsdelivr.net/npm/qr-scanner@1.4.2/qr-scanner.umd.min.js"></script>
+    <style>
+        /* Enhanced professional styles */
+        body {
+            font-family: 'Kantumruy Pro', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        }
+        
+        .main-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        
+        .sidebar-profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-profile-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .sidebar-profile-btn img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .sidebar-profile-btn .name {
+            font-weight: 600;
+            color: white;
+        }
+        
+        .sidebar-profile-btn .role {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover {
+            background: rgba(99, 102, 241, 0.2);
+        }
+        
+        .nav-link.active {
+            background: rgba(99, 102, 241, 0.3);
+            border-left: 4px solid #6366f1;
+        }
+        
+        .video-container {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            background: #000;
+        }
+        
+        .scanner-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #4ade80, transparent);
+            animation: scan 2s infinite;
+            top: 50%;
+        }
+        
+        @keyframes scan {
+            0% { top: 10%; }
+            50% { top: 90%; }
+            100% { top: 10%; }
+        }
+        
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+        }
+        
+        .profile-stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 16px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .profile-stat-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 4px;
+        }
+        
+        .profile-stat-card p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        
+        .employee-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            margin-bottom: 16px;
+        }
+        
+        .employee-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .employee-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .employee-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #f0f0f0;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: rgba(34, 197, 94, 0.2);
+            color: #16a34a;
+        }
+        
+        .status-inactive {
+            background: rgba(239, 68, 68, 0.2);
+            color: #dc2626;
+        }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dashboard-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+        
+        .icon-blue {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+        
+        .icon-green {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+        }
+        
+        .icon-purple {
+            background: rgba(168, 85, 247, 0.1);
+            color: #a855f7;
+        }
+        
+        .icon-orange {
+            background: rgba(251, 146, 60, 0.1);
+            color: #fb923c;
+        }
+        
+        .khmer-title {
+            font-family: 'Kantumruy Pro', sans-serif;
+        }
+    </style>
 </head>
-<body data-theme="dark" class="bg-slate-900 text-slate-200">
+<body data-theme="dark" class="bg-gradient-to-br from-slate-900 to-slate-800 text-slate-200">
     <!-- LOGIN SCREEN -->
     <div id="login-screen">
         <div class="login-card text-center">
             <img src="https://i.postimg.cc/FHBn0Fdf/di3-copy.png" alt="Logo" class="w-24 h-24 rounded-full mx-auto mb-4 shadow-lg" />
-            <h1 id="login-title" class="text-2xl font-bold text-white khmer-title mb-2">ឩស្សាហកម្មឌីជីថល</h1>
-            <p id="login-subtitle" class="text-slate-400 mb-6">សូមជ្រើសរើសនិស្សិតរបស់</p>
+            <h1 id="login-title" class="text-2xl font-bold text-white khmer-title mb-2">ប្រព័ន្ធគ្រប់គ្រងរូបភាព</h1>
+            <p id="login-subtitle" class="text-slate-400 mb-6">សូមជ្រើសរើសគណនីរបស់អ្នកដើម្បីបន្ត</p>
 
             <div id="admin-selection-area">
                 <div class="w-16 h-16 border-4 border-slate-500 border-t-indigo-500 rounded-full animate-spin mx-auto mb-4" id="admin-list-loader"></div>
                 <select id="admin-select" class="hidden filter-select w-full text-base mb-4 py-3 px-4" style="background-position: right 1rem center">
-                    <option value="">-- Select Your Name --</option>
+                    <option value="">-- ជ្រើសរើសឈ្មោះរបស់អ្នក --</option>
                 </select>
-                <button id="proceed-to-scan-btn" class="hidden w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 transition shadow-lg">បន្តទៅការស្កេន</button>
+                <button id="proceed-to-scan-btn" class="hidden w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 transition shadow-lg">បន្តទៅប្រព័ន្ធ</button>
             </div>
 
             <div id="admin-scan-area" class="hidden flex flex-col items-center space-y-4">
@@ -37,10 +262,10 @@
 
                 <div class="flex flex-col w-full space-y-3">
                     <button id="admin-manual-scan-btn" class="w-full bg-slate-600 text-white py-3 rounded-xl font-semibold hover:bg-slate-700 transition">
-                        <i class="fas fa-camera mr-2"></i> ស្កេនដោយខ្លួនឯង
+                        <i class="fas fa-camera mr-2"></i> ស្កេនដោយដៃ
                     </button>
                     <button id="admin-back-btn" class="w-full text-slate-400 py-2 rounded-xl font-semibold hover:text-white transition">
-                        <i class="fas fa-arrow-left mr-2"></i> ត្រលប់​ក្រោយ
+                        <i class="fas fa-arrow-left mr-2"></i> ត្រឡប់ក្រោយ
                     </button>
                 </div>
             </div>
@@ -59,8 +284,8 @@
                     <div id="sidebar-logo-wrapper" class="flex items-center gap-3 justify-start px-2">
                         <img id="sidebar-logo" src="https://i.postimg.cc/FHBn0Fdf/di3-copy.png" alt="Logo" class="w-14 h-14 rounded-full shadow-md cursor-pointer transition-all" style="object-fit: cover" />
                         <div class="overflow-hidden">
-                            <h2 id="sidebar-logo-text" class="text-lg font-bold text-white khmer-title nav-text">ឧស្សាហកម្មឌីជីថល</h2>
-                            <p id="sidebar-sub" class="text-slate-400 text-sm nav-text">Face Scan Manager</p>
+                            <h2 id="sidebar-logo-text" class="text-lg font-bold text-white khmer-title nav-text">គ្រប់គ្រងបុគ្គលិក</h2>
+                            <p id="sidebar-sub" class="text-slate-400 text-sm nav-text">ប្រព័ន្ធកាត់ត្រាមុខ</p>
                         </div>
                     </div>
                 </div>
@@ -77,88 +302,66 @@
                         <li>
                             <a href="#" id="nav-list" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white">
                                 <i class="fas fa-users fa-fw w-5 text-center"></i>
-                                <span class="font-semibold nav-text">ទិន្នន័យរូបភាពនិស្សិត</span>
+                                <span class="font-semibold nav-text">បញ្ជីបុគ្គលិក</span>
                             </a>
                         </li>
                         <li>
                             <a href="#" id="nav-records" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white">
                                 <i class="fas fa-database fa-fw w-5 text-center"></i>
-                                <span class="font-semibold nav-text">រូបភាពបានរក្សាទុក</span>
+                                <span class="font-semibold nav-text">រូបភាពដែលបានរក្សាទុក</span>
                             </a>
                         </li>
                         <li>
                             <a href="#" id="nav-storage" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white">
                                 <i class="fas fa-link fa-fw w-5 text-center"></i>
-                                <span class="font-semibold nav-text">Storage Links</span>
+                                <span class="font-semibold nav-text">តំណភ្ជាប់រក្សាទុក</span>
                             </a>
                         </li>
                         <li>
                             <a href="#" id="nav-profile" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white">
                                 <i class="fas fa-user-circle fa-fw w-5 text-center"></i>
-                                <span class="font-semibold nav-text">Profile</span>
+                                <span class="font-semibold nav-text">ប្រវត្តិរូប</span>
                             </a>
                         </li>
                         <li>
                             <a href="#" id="nav-admin" class="nav-link hidden flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white">
                                 <i class="fas fa-shield-halved fa-fw w-5 text-center"></i>
-                                <span class="font-semibold nav-text">Admin Panel</span>
+                                <span class="font-semibold nav-text">ផ្ទាំងអ្នកគ្រប់គ្រង</span>
                             </a>
                         </li>
                         <li>
                             <a href="#" id="nav-analytics" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-indigo-500 hover:text-white">
                                 <i class="fas fa-chart-line fa-fw w-5 text-center"></i>
-                                <span class="font-semibold nav-text">Analytics</span>
+                                <span class="font-semibold nav-text">ស្ថិតិ</span>
                             </a>
                         </li>
                     </ul>
                 </nav>
 
-                <!-- Footer (Updated) -->
+                <!-- Footer (Updated - Stats Removed) -->
                 <div class="p-4 border-t border-slate-700/40 space-y-4">
                     <!-- Profile Button -->
                     <div id="admin-profile-compact" class="sidebar-profile-btn" onclick="openProfilePage()">
                         <img id="admin-profile-img-sidebar" src="" alt="Profile" class="rounded-full">
-                        <div id="admin-name-sidebar" class="name">Admin Name</div>
-                        <div id="admin-role-sidebar" class="role">Admin Role</div>
-                    </div>
-                    
-                    <!-- Stats Section -->
-                    <div class="stats-section">
-                        <h3 class="stats-title">
-                            <i class="fas fa-chart-bar"></i>
-                            <span id="stats-title-text">Statistics</span>
-                        </h3>
-                        <div class="stats-grid">
-                            <div class="stat-item">
-                                <div id="stat-total" class="stat-value">-</div>
-                                <div class="stat-label">Total</div>
-                            </div>
-                            <div class="stat-item">
-                                <div id="stat-mycount" class="stat-value">-</div>
-                                <div class="stat-label">My Uploads</div>
-                            </div>
-                            <div class="stat-item">
-                                <div id="stat-others" class="stat-value">-</div>
-                                <div class="stat-label">Others</div>
-                            </div>
-                        </div>
+                        <div id="admin-name-sidebar" class="name">ឈ្មោះអ្នកគ្រប់គ្រង</div>
+                        <div id="admin-role-sidebar" class="role">តួនាទី</div>
                     </div>
                     
                     <!-- Settings Button -->
                     <button id="nav-settings-btn" class="w-full flex items-center justify-center gap-2 bg-slate-700/30 py-2 rounded-lg hover:bg-slate-600/30 transition">
                         <i class="fas fa-cog"></i>
-                        <span class="font-medium">Settings</span>
+                        <span class="font-medium">ការកំណត់</span>
                     </button>
                     
                     <!-- Logout Button -->
                     <button id="logout-btn" class="w-full flex items-center justify-center gap-2">
                         <i class="fas fa-sign-out-alt"></i>
-                        <span class="font-medium">Logout</span>
+                        <span class="font-medium">ចាកចេញ</span>
                     </button>
                     
                     <!-- Footer Text -->
                     <div class="sidebar-footer-text">
-                        <span>Develop by IT Support 2025</span>
+                        <span>អភិវឌ្ឍន៍ដោយ IT Support 2025</span>
                     </div>
                 </div>
             </aside>
@@ -175,14 +378,14 @@
                         <i class="fas fa-bars text-xl"></i>
                     </button>
                     
-                    <h1 class="text-xl font-bold text-white khmer-title">គ្រប់គ្រងទិន្នន័យរូបភាព</h1>
+                    <h1 class="text-xl font-bold text-white khmer-title">គ្រប់គ្រងរូបភាពបុគ្គលិក</h1>
                    
                     <div class="ml-auto flex items-center gap-3">
                         <div class="hidden md:flex items-center gap-2 bg-slate-700/30 px-3 py-1 rounded-full">
-                            <span class="text-sm text-slate-300">System Status:</span>
+                            <span class="text-sm text-slate-300">ស្ថានភាពប្រព័ន្ធ:</span>
                             <span id="system-status" class="flex items-center gap-1">
                                 <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                                <span class="text-sm text-green-400">Online</span>
+                                <span class="text-sm text-green-400">លើបណ្តាញ</span>
                             </span>
                         </div>
                         <img id="admin-profile-img-header" class="w-10 h-10 rounded-full hidden cursor-pointer" src="" alt="Admin" crossorigin="anonymous" />
@@ -197,12 +400,12 @@
                                 <button id="back-btn" class="hidden absolute -top-2 -left-2 w-10 h-10 bg-slate-700/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-slate-600/50 transition z-20" title="Back to Selection">
                                     <i class="fas fa-arrow-left"></i>
                                 </button>
-                                <h1 class="text-center text-2xl mb-2 text-white khmer-title">ប្រព័ន្ធស្កេនមុខឌីជីថល</h1>
-                                <p id="subtitle" class="text-center text-slate-400 mb-6">សូមជ្រើសរើសនិស្សិតរបស់</p>
+                                <h1 class="text-center text-2xl mb-2 text-white khmer-title">ប្រព័ន្ធកាត់ត្រាមុខបុគ្គលិក</h1>
+                                <p id="subtitle" class="text-center text-slate-400 mb-6">សូមជ្រើសរើសបុគ្គលិកដើម្បីស្កេន</p>
 
                                 <div id="selection-area" class="mb-5">
                                     <div class="flex items-center gap-2 mb-4">
-                                        <input type="text" id="student-search-input" placeholder="ស្វែងរកអត្តលេខ ឬឈ្មោះ..." class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                                        <input type="text" id="student-search-input" placeholder="ស្វែងរកតាមលេខសម្គាល់ ឬឈ្មោះ..." class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                                         <button id="voice-search-btn" class="bg-indigo-600 text-white p-2 rounded-lg hover:bg-indigo-700 transition">
                                             <i class="fas fa-microphone"></i>
                                         </button>
@@ -212,14 +415,14 @@
                                     </div>
                                     <div id="scan-options" class="flex gap-2 mb-4">
                                         <button id="batch-scan-btn" class="flex-1 bg-purple-600 text-white py-2 rounded-lg font-semibold hover:bg-purple-700 transition">
-                                            <i class="fas fa-layer-group mr-2"></i> Batch Scan
+                                            <i class="fas fa-layer-group mr-2"></i> ស្កេនជាក្រុម
                                         </button>
                                         <button id="qr-scan-btn" class="flex-1 bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition">
-                                            <i class="fas fa-qrcode mr-2"></i> QR Scan
+                                            <i class="fas fa-qrcode mr-2"></i> ស្កេន QR
                                         </button>
                                     </div>
                                     <ul id="student-list" class="space-y-1">
-                                        <li class="text-center text-slate-400 p-4">Loading students...</li>
+                                        <li class="text-center text-slate-400 p-4">កំពុងផ្ទុកបុគ្គលិក...</li>
                                     </ul>
                                 </div>
 
@@ -251,12 +454,12 @@
                     <!-- PAGE: LIST -->
                     <div id="page-list" class="hidden main-content rounded-2xl p-6 h-full flex flex-col">
                         <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-                            <h1 class="text-2xl text-white khmer-title">ទិន្នន័យរូបភាពនិស្សិត</h1>
+                            <h1 class="text-2xl text-white khmer-title">បញ្ជីបុគ្គលិក</h1>
                             <div class="flex gap-4 w-full md:w-auto">
-                                <input type="text" id="list-search-input" placeholder="ស្វែងរកអត្តលេខ ឬឈ្មោះ..." class="w-full bg-slate-700 border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                                <input type="text" id="list-search-input" placeholder="ស្វែងរកតាមលេខសម្គាល់ ឬឈ្មោះ..." class="w-full bg-slate-700 border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                                 <select id="list-class-filter" class="filter-select w-full md:w-auto"></select>
                                 <button id="export-list-btn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-                                    <i class="fas fa-download mr-2"></i> Export
+                                    <i class="fas fa-download mr-2"></i> នាំចេញ
                                 </button>
                             </div>
                         </div>
@@ -264,37 +467,37 @@
                             <div class="bg-slate-700/50 p-4 rounded-lg flex items-center gap-4">
                                 <i class="fas fa-users fa-2x text-slate-400"></i>
                                 <div>
-                                    <p class="text-slate-400">ចំនួននិស្សិតសរុប</p>
+                                    <p class="text-slate-400">បុគ្គលិកសរុប</p>
                                     <p id="list-total-count" class="text-2xl font-bold text-white">-</p>
                                 </div>
                             </div>
                             <div class="bg-green-800/30 p-4 rounded-lg flex items-center gap-4">
                                 <i class="fas fa-user-check fa-2x text-green-400"></i>
                                 <div>
-                                    <p class="text-green-400">និស្សិតមានរូបភាព</p>
+                                    <p class="text-green-400">មានរូបភាព</p>
                                     <p id="list-completed-count" class="text-2xl font-bold text-green-400">-</p>
                                 </div>
                             </div>
                             <div class="bg-red-800/30 p-4 rounded-lg flex items-center gap-4">
                                 <i class="fas fa-user-clock fa-2x text-red-400"></i>
                                 <div>
-                                    <p class="text-red-400">និស្សិតគ្មានរូបភាព</p>
+                                    <p class="text-red-400">គ្មានរូបភាព</p>
                                     <p id="list-pending-count" class="text-2xl font-bold text-red-400">-</p>
                                 </div>
                             </div>
                         </div>
                         <div id="list-container" class="table-container flex-1 overflow-x-auto">
                             <div id="list-loading" class="text-center py-10">
-                                <p class="text-slate-400">កំពុងទាញទិន្នន័យរូបភាពនិស្សិត...</p>
+                                <p class="text-slate-400">កំពុងទាញយកទិន្នន័យបុគ្គលិក...</p>
                             </div>
                             <table id="list-table" class="hidden w-full text-left text-slate-300">
                                 <thead class="bg-slate-700/50 sticky top-0">
                                     <tr>
-                                        <th class="p-3">ID</th>
+                                        <th class="p-3">លេខសម្គាល់</th>
                                         <th class="p-3">ឈ្មោះ</th>
                                         <th class="p-3">រូបភាព</th>
-                                        <th class="p-3 text-center">Status</th>
-                                        <th class="p-3 text-center">Actions</th>
+                                        <th class="p-3 text-center">ស្ថានភាព</th>
+                                        <th class="p-3 text-center">សកម្មភាព</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -305,29 +508,29 @@
                     <!-- PAGE: RECORDS -->
                     <div id="page-records" class="hidden main-content rounded-2xl p-6 h-full flex flex-col">
                         <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                            <h1 class="text-2xl text-white khmer-title">រូបភាពបានរក្សាទុក</h1>
+                            <h1 class="text-2xl text-white khmer-title">រូបភាពដែលបានរក្សាទុក</h1>
                             <div class="flex gap-4 w-full md:w-auto">
-                                <input type="text" id="records-search-input" placeholder="Search ID or Name..." class="w-full bg-slate-700 border-slate-600 rounded-lg px-4 py-2" />
+                                <input type="text" id="records-search-input" placeholder="ស្វែងរកតាមលេខសម្គាល់ ឬឈ្មោះ..." class="w-full bg-slate-700 border-slate-600 rounded-lg px-4 py-2" />
                                 <select id="records-class-filter" class="filter-select w-full md:w-auto"></select>
                                 <button id="export-records-btn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
-                                    <i class="fas fa-download mr-2"></i> Export
+                                    <i class="fas fa-download mr-2"></i> នាំចេញ
                                 </button>
                             </div>
                         </div>
                         <div id="records-container" class="table-container flex-1 overflow-x-auto">
                             <div id="records-loading" class="text-center py-10">
-                                <p class="text-slate-400">កំពុងទាញរូបភាពបានរក្សាទុក...</p>
+                                <p class="text-slate-400">កំពុងទាញយករូបភាពដែលបានរក្សាទុក...</p>
                             </div>
                             <table id="records-table" class="hidden w-full text-left text-slate-300">
                                 <thead class="bg-slate-700/50 sticky top-0">
                                     <tr>
-                                        <th class="p-3">ល.រ</th>
+                                        <th class="p-3">លេខ</th>
                                         <th class="p-3">ឈ្មោះ</th>
-                                        <th class="p-3">ID</th>
-                                        <th class="p-3">ថ្នាក់</th>
+                                        <th class="p-3">លេខសម្គាល់</th>
+                                        <th class="p-3">នាយកដ្ឋាន</th>
                                         <th class="p-3">ក្រុម</th>
                                         <th class="p-3">រូបភាព</th>
-                                        <th class="p-3 text-center">កែ</th>
+                                        <th class="p-3 text-center">កែប្រែ</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -337,29 +540,45 @@
 
                     <!-- PAGE: STORAGE -->
                     <div id="page-storage" class="hidden main-content rounded-2xl p-6 h-full flex flex-col">
-                        <h1 class="text-2xl text-white khmer-title mb-6">Storage & Links</h1>
-                        <p class="text-slate-400 mb-6">This section provides direct links to the Google Sheets and Folders used by the application.</p>
+                        <h1 class="text-2xl text-white khmer-title mb-6">កន្លែងរក្សាទុក និងតំណភ្ជាប់</h1>
+                        <p class="text-slate-400 mb-6">ផ្នែកនេះផ្តល់នូវតំណភ្ជាប់ផ្ទាល់ទៅកាន់ Google Sheets និង Folders ដែលប្រើដោយកម្មវិធី។</p>
                         <div id="storage-links-container" class="space-y-6"></div>
                     </div>
 
-                    <!-- PAGE: PROFILE -->
+                    <!-- PAGE: PROFILE (Updated with Statistics) -->
                     <div id="page-profile" class="hidden main-content rounded-2xl p-6 h-full flex flex-col">
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center gap-4">
                                 <img id="profile-img-large" src="" class="w-20 h-20 rounded-full object-cover border-2 border-slate-700" alt="admin" />
                                 <div>
-                                    <h2 id="profile-name-large" class="text-2xl font-bold">Admin Name</h2>
-                                    <div id="profile-role-large" class="text-sm text-slate-400">Role</div>
+                                    <h2 id="profile-name-large" class="text-2xl font-bold">ឈ្មោះអ្នកគ្រប់គ្រង</h2>
+                                    <div id="profile-role-large" class="text-sm text-slate-400">តួនាទី</div>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <div class="text-slate-400 text-sm">Total images (all): <span id="profile-total-all">-</span></div>
-                                <div class="text-slate-400 text-sm">My uploads: <span id="profile-total-my">-</span></div>
+                                <div class="text-slate-400 text-sm">រូបភាពសរុប (ទាំងអស់): <span id="profile-total-all">-</span></div>
+                                <div class="text-slate-400 text-sm">ការបញ្ចូលរបស់ខ្ញុំ: <span id="profile-total-my">-</span></div>
                             </div>
                         </div>
 
-                        <div class="mb-4">
-                            <input id="profile-image-filter" type="text" placeholder="Filter images (name / id)" class="w-full bg-slate-700 border-slate-600 rounded-lg px-4 py-2" />
+                        <!-- Statistics Section (Moved from Sidebar) -->
+                        <div class="profile-stats">
+                            <div class="profile-stat-card">
+                                <h3 id="stat-total">282</h3>
+                                <p>សរុប</p>
+                            </div>
+                            <div class="profile-stat-card">
+                                <h3 id="stat-mycount">0</h3>
+                                <p>ការបញ្ចូលរបស់ខ្ញុំ</p>
+                            </div>
+                            <div class="profile-stat-card">
+                                <h3 id="stat-others">282</h3>
+                                <p>អ្នកដទៃ</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 mt-6">
+                            <input id="profile-image-filter" type="text" placeholder="តម្រងរូបភាព (ឈ្មោះ / លេខសម្គាល់)" class="w-full bg-slate-700 border-slate-600 rounded-lg px-4 py-2" />
                         </div>
 
                         <div id="profile-images-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
@@ -367,58 +586,58 @@
                     
                     <!-- PAGE: ADMIN -->
                     <div id="page-admin" class="hidden main-content rounded-2xl p-6 h-full flex flex-col">
-                        <h1 class="text-2xl text-white khmer-title mb-6">Admin Panel (Superadmin)</h1>
+                        <h1 class="text-2xl text-white khmer-title mb-6">ផ្ទាំងអ្នកគ្រប់គ្រង (Superadmin)</h1>
                         
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                             <!-- Column 1: Settings -->
                             <div class="space-y-4">
-                                <h3 class="text-xl font-semibold text-indigo-300">Appearance</h3>
+                                <h3 class="text-xl font-semibold text-indigo-300">រូបរាង</h3>
                                 <div class="flex items-center justify-between p-3 bg-slate-800/40 rounded-lg">
-                                    <div class="text-sm">Theme</div>
+                                    <div class="text-sm">ស្បែក</div>
                                     <div class="flex items-center gap-2">
-                                        <button id="btn-theme-toggle" class="px-3 py-1 rounded bg-slate-700/40">Dark</button>
+                                        <button id="btn-theme-toggle" class="px-3 py-1 rounded bg-slate-700/40">ងងឹត</button>
                                     </div>
                                 </div>
 
                                 <div class="flex items-center justify-between p-3 bg-slate-800/40 rounded-lg">
-                                    <div class="text-sm">Language</div>
+                                    <div class="text-sm">ភាសា</div>
                                     <div class="flex items-center gap-2">
-                                        <button id="btn-lang" class="px-3 py-1 rounded bg-slate-700/40">KH</button>
+                                        <button id="btn-lang" class="px-3 py-1 rounded bg-slate-700/40">ខ្មែរ</button>
                                     </div>
                                 </div>
 
                                 <div class="flex items-center justify-between p-3 bg-slate-800/40 rounded-lg">
-                                    <div class="text-sm">Background color</div>
+                                    <div class="text-sm">ពណ៌ផ្ទៃខាងក្រោយ</div>
                                     <input id="bg-color-picker" type="color" value="#0f172a" class="w-10 h-8 p-0 border-0 rounded" />
                                 </div>
 
-                                <h3 class="text-xl font-semibold text-indigo-300 mt-6">My Access</h3>
+                                <h3 class="text-xl font-semibold text-indigo-300 mt-6">ការចូលដំណើរការរបស់ខ្ញុំ</h3>
                                 <div id="face-scan-toggle-row" class="hidden flex items-center justify-between p-3 bg-slate-800/40 rounded-lg">
-                                    <div class="text-sm">Allow face-scan (for my account)</div>
+                                    <div class="text-sm">អនុញ្ញាតការស្កេនមុខ (សម្រាប់គណនីរបស់ខ្ញុំ)</div>
                                     <input type="checkbox" id="face-scan-enabled" class="w-6 h-6" />
                                 </div>
                                 
-                                <h3 class="text-xl font-semibold text-indigo-300 mt-6">Add New Admin</h3>
+                                <h3 class="text-xl font-semibold text-indigo-300 mt-6">បន្ថែមអ្នកគ្រប់គ្រងថ្មី</h3>
                                 <div class="p-4 bg-slate-800/40 rounded-lg space-y-3">
-                                     <input id="add-admin-name" type="text" placeholder="New Admin Name" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
-                                     <input id="add-admin-image-url" type="text" placeholder="Image URL" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
-                                     <input id="add-admin-email" type="text" placeholder="Email (Optional)" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+                                     <input id="add-admin-name" type="text" placeholder="ឈ្មោះអ្នកគ្រប់គ្រងថ្មី" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+                                     <input id="add-admin-image-url" type="text" placeholder="តំណភ្ជាប់រូបភាព" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+                                     <input id="add-admin-email" type="text" placeholder="អ៊ីមែល (ជម្រើស)" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
                                      <select id="add-admin-role" class="admin-filter-select w-full">
-                                       <option value="viewer">Viewer</option>
-                                       <option value="subadmin">Sub-Admin</option>
-                                       <option value="admin">Admin</option>
+                                       <option value="viewer">អ្នកមើល</option>
+                                       <option value="subadmin">អនុ-អ្នកគ្រប់គ្រង</option>
+                                       <option value="admin">អ្នកគ្រប់គ្រង</option>
                                        <option value="superadmin">Super-Admin</option>
                                      </select>
-                                     <button id="add-admin-btn" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition">Add New Admin</button>
+                                     <button id="add-admin-btn" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition">បន្ថែមអ្នកគ្រប់គ្រងថ្មី</button>
                                 </div>
                             </div>
                             
                             <!-- Column 2: User Management -->
                             <div class="space-y-4">
-                                <h3 class="text-xl font-semibold text-indigo-300">User Management</h3>
+                                <h3 class="text-xl font-semibold text-indigo-300">គ្រប់គ្រងអ្នកប្រើប្រាស់</h3>
                                 <div id="admin-management-list" class="space-y-3">
                                     <!-- Admin list will be populated here by JS -->
-                                    <div class="text-center text-slate-400 p-4">Loading admin list...</div>
+                                    <div class="text-center text-slate-400 p-4">កំពុងផ្ទុកបញ្ជីអ្នកគ្រប់គ្រង...</div>
                                 </div>
                             </div>
                         </div>
@@ -426,58 +645,66 @@
 
                     <!-- PAGE: ANALYTICS -->
                     <div id="page-analytics" class="hidden main-content rounded-2xl p-6 h-full flex flex-col">
-                        <h1 class="text-2xl text-white khmer-title mb-6">Analytics Dashboard</h1>
+                        <h1 class="text-2xl text-white khmer-title mb-6">ផ្ទាំងស្ថិតិ</h1>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                            <div class="bg-slate-800/50 p-4 rounded-lg">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-slate-400 text-sm">Total Scans Today</span>
-                                    <i class="fas fa-camera text-indigo-400"></i>
+                            <div class="dashboard-card">
+                                <div class="dashboard-icon icon-blue">
+                                    <i class="fas fa-camera"></i>
                                 </div>
-                                <div id="scans-today" class="text-2xl font-bold text-white">0</div>
-                                <div class="text-xs text-green-400 mt-1">
-                                    <i class="fas fa-arrow-up"></i> 12% from yesterday
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-slate-600 text-sm">ការស្កេនសរុបថ្ងៃនេះ</span>
+                                </div>
+                                <div id="scans-today" class="text-2xl font-bold text-slate-800">0</div>
+                                <div class="text-xs text-green-500 mt-1">
+                                    <i class="fas fa-arrow-up"></i> 12% ពីម្សិលមិញ
                                 </div>
                             </div>
-                            <div class="bg-slate-800/50 p-4 rounded-lg">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-slate-400 text-sm">Active Users</span>
-                                    <i class="fas fa-users text-green-400"></i>
+                            <div class="dashboard-card">
+                                <div class="dashboard-icon icon-green">
+                                    <i class="fas fa-users"></i>
                                 </div>
-                                <div id="active-users" class="text-2xl font-bold text-white">0</div>
-                                <div class="text-xs text-green-400 mt-1">
-                                    <i class="fas fa-arrow-up"></i> 5% from last week
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-slate-600 text-sm">អ្នកប្រើប្រាស់សកម្ម</span>
+                                </div>
+                                <div id="active-users" class="text-2xl font-bold text-slate-800">0</div>
+                                <div class="text-xs text-green-500 mt-1">
+                                    <i class="fas fa-arrow-up"></i> 5% ពីសប្តាហ៍មុន
                                 </div>
                             </div>
-                            <div class="bg-slate-800/50 p-4 rounded-lg">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-slate-400 text-sm">Completion Rate</span>
-                                    <i class="fas fa-chart-pie text-purple-400"></i>
+                            <div class="dashboard-card">
+                                <div class="dashboard-icon icon-purple">
+                                    <i class="fas fa-chart-pie"></i>
                                 </div>
-                                <div id="completion-rate" class="text-2xl font-bold text-white">0%</div>
-                                <div class="text-xs text-red-400 mt-1">
-                                    <i class="fas fa-arrow-down"></i> 3% from last month
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-slate-600 text-sm">អត្រាបញ្ចប់</span>
+                                </div>
+                                <div id="completion-rate" class="text-2xl font-bold text-slate-800">0%</div>
+                                <div class="text-xs text-red-500 mt-1">
+                                    <i class="fas fa-arrow-down"></i> 3% ពីខែមុន
                                 </div>
                             </div>
-                            <div class="bg-slate-800/50 p-4 rounded-lg">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-slate-400 text-sm">Storage Used</span>
-                                    <i class="fas fa-database text-yellow-400"></i>
+                            <div class="dashboard-card">
+                                <div class="dashboard-icon icon-orange">
+                                    <i class="fas fa-database"></i>
                                 </div>
-                                <div id="storage-used" class="text-2xl font-bold text-white">0 GB</div>
-                                <div class="text-xs text-slate-400 mt-1">
-                                    60% of total capacity
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-slate-600 text-sm">ទំហំដែលបានប្រើ</span>
+                                </div>
+                                <div id="storage-used" class="text-2xl font-bold text-slate-800">0 GB</div>
+                                <div class="text-xs text-slate-500 mt-1">
+                                    60% នៃទំហំសរុប
                                 </div>
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div class="bg-slate-800/50 p-4 rounded-lg">
-                                <h3 class="text-lg font-semibold text-white mb-4">Weekly Scanning Activity</h3>
+                            <div class="dashboard-card">
+                                <h3 class="text-lg font-semibold text-slate-800 mb-4">សកម្មភាពស្កេនប្រចាំសប្តាហ៍</h3>
                                 <canvas id="weekly-activity-chart" class="w-full h-64"></canvas>
                             </div>
-                            <div class="bg-slate-800/50 p-4 rounded-lg">
-                                <h3 class="text-lg font-semibold text-white mb-4">Class Completion Status</h3>
+                            <div class="dashboard-card">
+                                <h3 class="text-lg font-semibold text-slate-800 mb-4">ស្ថានភាពបញ្ចប់នៃនាយកដ្ឋាន</h3>
                                 <canvas id="class-completion-chart" class="w-full h-64"></canvas>
                             </div>
                         </div>
@@ -493,29 +720,29 @@
         <div class="welcome-modal">
             <div class="welcome-header">
                 <img id="welcome-avatar" src="" alt="Admin Avatar" class="welcome-avatar">
-                <h2 id="welcome-title" class="welcome-title">Welcome to Face Scan System</h2>
-                <p id="welcome-subtitle" class="welcome-subtitle">Let's get you started with a quick tour</p>
+                <h2 id="welcome-title" class="welcome-title">សូមស្វាគមន៍មកកាន់ប្រព័ន្ធកាត់ត្រាមុខបុគ្គលិក</h2>
+                <p id="welcome-subtitle" class="welcome-subtitle">សូមអនុញ្ញាតឱ្យយើងណែនាំអ្នកពីរបៀបប្រើប្រាស់ប្រព័ន្ធនេះ</p>
             </div>
             <div class="welcome-body">
                 <div class="welcome-section">
                     <h3 class="welcome-section-title">
                         <i class="fas fa-user-circle"></i>
-                        Your Profile
+                        ប្រវត្តិរូបរបស់អ្នក
                     </h3>
                     <div class="welcome-features">
                         <div class="welcome-feature">
                             <div class="welcome-feature-icon">
                                 <i class="fas fa-id-badge"></i>
                             </div>
-                            <h4 class="welcome-feature-title">Name</h4>
-                            <p id="welcome-name" class="welcome-feature-description">Admin Name</p>
+                            <h4 class="welcome-feature-title">ឈ្មោះ</h4>
+                            <p id="welcome-name" class="welcome-feature-description">ឈ្មោះអ្នកគ្រប់គ្រង</p>
                         </div>
                         <div class="welcome-feature">
                             <div class="welcome-feature-icon">
                                 <i class="fas fa-shield-alt"></i>
                             </div>
-                            <h4 class="welcome-feature-title">Role</h4>
-                            <p id="welcome-role" class="welcome-feature-description">Admin Role</p>
+                            <h4 class="welcome-feature-title">តួនាទី</h4>
+                            <p id="welcome-role" class="welcome-feature-description">តួនាទីអ្នកគ្រប់គ្រង</p>
                         </div>
                     </div>
                 </div>
@@ -523,36 +750,36 @@
                 <div class="welcome-section">
                     <h3 class="welcome-section-title">
                         <i class="fas fa-rocket"></i>
-                        Key Features
+                        លក្ខណៈពិសេសចម្បង
                     </h3>
                     <div class="welcome-features">
                         <div class="welcome-feature">
                             <div class="welcome-feature-icon">
                                 <i class="fas fa-camera"></i>
                             </div>
-                            <h4 class="welcome-feature-title">Face Scanning</h4>
-                            <p class="welcome-feature-description">Capture student photos with automatic face detection</p>
+                            <h4 class="welcome-feature-title">ការស្កេនមុខ</h4>
+                            <p class="welcome-feature-description">ថតរូបបុគ្គលិកដោយប្រើការរកឃើញមុខដោយស្វ័យប្រវត្តិ</p>
                         </div>
                         <div class="welcome-feature">
                             <div class="welcome-feature-icon">
                                 <i class="fas fa-qrcode"></i>
                             </div>
-                            <h4 class="welcome-feature-title">QR Code Scanning</h4>
-                            <p class="welcome-feature-description">Quickly identify students using QR codes</p>
+                            <h4 class="welcome-feature-title">ការស្កេន QR Code</h4>
+                            <p class="welcome-feature-description">កំណត់អត្តសញ្ញាណបុគ្គលិកយ៉ាងរហ័សដោយប្រើ QR codes</p>
                         </div>
                         <div class="welcome-feature">
                             <div class="welcome-feature-icon">
                                 <i class="fas fa-layer-group"></i>
                             </div>
-                            <h4 class="welcome-feature-title">Batch Scanning</h4>
-                            <p class="welcome-feature-description">Process multiple students in one session</p>
+                            <h4 class="welcome-feature-title">ការស្កេនជាក្រុម</h4>
+                            <p class="welcome-feature-description">ដំណើរការបុគ្គលិកច្រើននាក់ក្នុងមួយសម័យ</p>
                         </div>
                         <div class="welcome-feature">
                             <div class="welcome-feature-icon">
                                 <i class="fas fa-chart-line"></i>
                             </div>
-                            <h4 class="welcome-feature-title">Analytics</h4>
-                            <p class="welcome-feature-description">View statistics and progress reports</p>
+                            <h4 class="welcome-feature-title">ស្ថិតិ</h4>
+                            <p class="welcome-feature-description">មើលស្ថិតិ និងរបាយការណ៍វឌ្ឍនភាព</p>
                         </div>
                     </div>
                 </div>
@@ -560,28 +787,28 @@
                 <div class="welcome-section">
                     <h3 class="welcome-section-title">
                         <i class="fas fa-question-circle"></i>
-                        Getting Started
+                        របៀបចាប់ផ្តើម
                     </h3>
                     <div class="onboarding-container">
                         <div class="onboarding-step">
                             <div class="onboarding-step-number">1</div>
                             <div class="onboarding-step-content">
-                                <h4 class="onboarding-step-title">Select a Student</h4>
-                                <p class="onboarding-step-description">Choose a student from list or search by name/ID</p>
+                                <h4 class="onboarding-step-title">ជ្រើសរើសបុគ្គលិក</h4>
+                                <p class="onboarding-step-description">ជ្រើសរើសបុគ្គលិកពីបញ្ជី ឬស្វែងរកតាមឈ្មោះ/លេខសម្គាល់</p>
                             </div>
                         </div>
                         <div class="onboarding-step">
                             <div class="onboarding-step-number">2</div>
                             <div class="onboarding-step-content">
-                                <h4 class="onboarding-step-title">Capture Photo</h4>
-                                <p class="onboarding-step-description">Use automatic face detection or manual capture</p>
+                                <h4 class="onboarding-step-title">ថតរូប</h4>
+                                <p class="onboarding-step-description">ប្រើការរកឃើញមុខដោយស្វ័យប្រវត្តិ ឬថតដោយដៃ</p>
                             </div>
                         </div>
                         <div class="onboarding-step">
                             <div class="onboarding-step-number">3</div>
                             <div class="onboarding-step-content">
-                                <h4 class="onboarding-step-title">Upload & Save</h4>
-                                <p class="onboarding-step-description">Confirm and upload photo to system</p>
+                                <h4 class="onboarding-step-title">បញ្ចូន និងរក្សាទុក</h4>
+                                <p class="onboarding-step-description">បញ្ជាក់ និងបញ្ចូនរូបភាពទៅប្រព័ន្ធ</p>
                             </div>
                         </div>
                     </div>
@@ -590,11 +817,11 @@
                 <div class="welcome-actions">
                     <button id="start-tour-btn" class="welcome-btn welcome-btn-primary">
                         <i class="fas fa-play"></i>
-                        Start Interactive Tour
+                        ចាប់ផ្តើមការណែនាំអន្តរកម្ម
                     </button>
                     <button id="skip-tour-btn" class="welcome-btn welcome-btn-secondary">
                         <i class="fas fa-forward"></i>
-                        Skip Tour
+                       រំលងការណែនាំ
                     </button>
                 </div>
             </div>
@@ -607,14 +834,14 @@
             <div class="role-info-header">
                 <div class="role-badge">
                     <i class="fas fa-shield-alt"></i>
-                    <span id="role-badge-text">Admin Role</span>
+                    <span id="role-badge-text">តួនាទីអ្នកគ្រប់គ្រង</span>
                 </div>
-                <h2 id="role-title" class="role-title">Your Role & Permissions</h2>
-                <p id="role-description" class="role-description">Here's what you can do in system</p>
+                <h2 id="role-title" class="role-title">តួនាទី និងសិទ្ធិរបស់អ្នក</h2>
+                <p id="role-description" class="role-description">នេះជាអ្វីដែលអ្នកអាចធ្វើបានក្នុងប្រព័ន្ធ</p>
             </div>
             <div class="role-info-body">
                 <div class="role-permissions">
-                    <h3 class="role-permissions-title">Your Permissions</h3>
+                    <h3 class="role-permissions-title">សិទ្ធិរបស់អ្នក</h3>
                     <ul id="permission-list" class="permission-list">
                         <!-- Permissions will be populated by JS -->
                     </ul>
@@ -623,11 +850,11 @@
                 <div class="role-actions">
                     <button id="view-dashboard-btn" class="role-btn role-btn-primary">
                         <i class="fas fa-tachometer-alt"></i>
-                        Go to Dashboard
+                        ទៅកាន់ផ្ទាំងគ្រប់គ្រង
                     </button>
                     <button id="close-role-btn" class="role-btn role-btn-secondary">
                         <i class="fas fa-times"></i>
-                        Close
+                        បិទ
                     </button>
                 </div>
             </div>
@@ -638,7 +865,7 @@
     <div id="qr-scanner-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">QR Code Scanner</h3>
+                <h3 class="modal-title">ឧបករណ៍ស្កេន QR Code</h3>
                 <button class="close-btn" id="close-qr-scanner">
                     <i class="fas fa-times"></i>
                 </button>
@@ -647,8 +874,8 @@
                 <video id="qr-video"></video>
             </div>
             <div class="instructions">
-                <p>Position QR code within frame to scan</p>
-                <p>The scanner will automatically detect and process QR code</p>
+                <p>ដាក់ QR code នៅក្នុងស៊ុមដើម្បីស្កេន</p>
+                <p>ឧបករណ៍ស្កេននឹងរកឃើញ និងដំណើរការ QR code ដោយស្វ័យប្រវត្តិ</p>
             </div>
         </div>
     </div>
@@ -657,24 +884,24 @@
     <div id="batch-scan-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">Batch Scanning</h3>
+                <h3 class="modal-title">ការស្កេនជាក្រុម</h3>
                 <button class="close-btn" id="close-batch-scan">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="instructions">
-                <p>Select students without photos to scan in batch mode</p>
+                <p>ជ្រើសរើសបុគ្គលិកដែលគ្មានរូបភាពដើម្បីស្កេនក្នុងរបៀបជាក្រុម</p>
             </div>
             <div class="batch-list" id="batch-list">
                 <!-- Batch list will be populated by JS -->
             </div>
             <div class="modal-footer">
                 <div class="selected-count">
-                    <span id="selected-count">0</span> students selected
+                    <span id="selected-count">0</span> បុគ្គលិកដែលបានជ្រើសរើស
                 </div>
                 <div class="actions">
-                    <button class="btn btn-cancel" id="cancel-batch-scan">Cancel</button>
-                    <button class="btn btn-start" id="start-batch-scan" disabled>Start Batch Scan</button>
+                    <button class="btn btn-cancel" id="cancel-batch-scan">បោះបង់</button>
+                    <button class="btn btn-start" id="start-batch-scan" disabled>ចាប់ផ្តើមស្កេនជាក្រុម</button>
                 </div>
             </div>
         </div>
@@ -683,11 +910,11 @@
     <!-- Tour Guide -->
     <div id="tour-guide" class="tour-guide hidden">
         <div class="tour-guide-arrow"></div>
-        <h3 class="tour-guide-title" id="tour-title">Tour Title</h3>
-        <p class="tour-guide-content" id="tour-content">Tour content goes here</p>
+        <h3 class="tour-guide-title" id="tour-title">ចំណងជើងការណែនាំ</h3>
+        <p class="tour-guide-content" id="tour-content">មាតិកាការណែនាំនៅទីនេះ</p>
         <div class="tour-guide-actions">
-            <button class="tour-guide-skip" id="tour-skip">Skip Tour</button>
-            <button class="tour-guide-next" id="tour-next">Next</button>
+            <button class="tour-guide-skip" id="tour-skip">រំលងការណែនាំ</button>
+            <button class="tour-guide-next" id="tour-next">បន្ទាប់</button>
         </div>
     </div>
 
