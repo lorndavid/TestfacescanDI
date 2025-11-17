@@ -1,7 +1,7 @@
 /* --------------------------- CONFIG & DOM --------------------------- */
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM-9UZbpL8GW6agRejPVGalKcTQPIdmm5-Xa0BWnpgrJiqahHFIRSE0LKH7n15AjNQ/exec";
 
-// Add these new variables at the top of the file
+// Add these new variables at top of file
 let isFirstLogin = false;
 let tourSteps = [];
 let currentTourStep = 0;
@@ -195,7 +195,7 @@ let loggedInAdmin = null,
     adminScanInterval = null,
     isScanning = false,
     isUploading = false;
-let settings = { theme: "dark", lang: "KH", bgColor: "#0f172a" };
+let settings = { theme: "light", lang: "KH", bgColor: "#ffffff" };
 let isSidebarCollapsed = false;
 
 // Voice recognition
@@ -248,7 +248,7 @@ function showModal(type, message, actions = {}) {
     } else {
         const b = document.createElement("button");
         b.className = "w-full bg-indigo-600 text-white py-2 rounded-lg font-semibold hover:bg-indigo-700 transition";
-        b.textContent = settings.lang === "EN" ? "OK" : "យល់ព្រម";
+        b.textContent = settings.lang === "KH" ? "យល់ព្រម" : "OK";
         b.onclick = () => modal.classList.add("hidden");
         modalButtons.appendChild(b);
     }
@@ -759,7 +759,7 @@ function showTourStep() {
         return;
     }
     
-    // Position the tour guide
+    // Position tour guide
     const rect = element.getBoundingClientRect();
     const guideWidth = 300; // Approximate width of tour guide
     const guideHeight = 200; // Approximate height of tour guide
@@ -903,7 +903,7 @@ function showWelcomeModal() {
         if (startTourBtn) startTourBtn.innerHTML = '<i class="fas fa-play"></i> ចាប់ផ្តើមការណែនាំអន្តរកម្ម';
         if (skipTourBtn) skipTourBtn.innerHTML = '<i class="fas fa-forward"></i> លំងាប់ការណែនាំ';
     } else {
-        welcomeTitle.textContent = "Welcome to the Face Scan System";
+        welcomeTitle.textContent = "Welcome to Employee Face Recognition System";
         welcomeSubtitle.textContent = "Would you like a quick tour?";
         
         // Update buttons in English
@@ -956,21 +956,21 @@ function showRoleInfoModal() {
 function getRolePermissions(role) {
     const permissions = {
         viewer: [
-            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលទិន្នន័យនិស្សិត" : "View student data" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលទិន្នន័យនិស្សិត" : "View employee data" },
             { icon: "fa-eye", text: settings.lang === "KH" ? "មើលរូបភាពដែលបានរក្សាទុក" : "View saved photos" },
             { icon: "fa-eye", text: settings.lang === "KH" ? "មើលការវិភាគ" : "View analytics" }
         ],
         subadmin: [
-            { icon: "fa-camera", text: settings.lang === "KH" ? "ថតរូបភាពនិស្សិត" : "Capture student photos" },
-            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលទិន្នន័យនិស្សិត" : "View student data" },
+            { icon: "fa-camera", text: settings.lang === "KH" ? "ថតរូបភាពនិស្សិត" : "Capture employee photos" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលទិន្នន័យនិស្សិត" : "View employee data" },
             { icon: "fa-eye", text: settings.lang === "KH" ? "មើលរូបភាពដែលបានរក្សាទុក" : "View saved photos" },
             { icon: "fa-eye", text: settings.lang === "KH" ? "មើលការវិភាគ" : "View analytics" },
             { icon: "fa-download", text: settings.lang === "KH" ? "នាំចេញទិន្នន័យ" : "Export data" }
         ],
         admin: [
-            { icon: "fa-camera", text: settings.lang === "KH" ? "ថតរូបភាពនិស្សិត" : "Capture student photos" },
+            { icon: "fa-camera", text: settings.lang === "KH" ? "ថតរូបភាពនិស្សិត" : "Capture employee photos" },
             { icon: "fa-trash", text: settings.lang === "KH" ? "លុបរូបភាព" : "Delete photos" },
-            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលទិន្នន័យនិស្សិត" : "View student data" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលទិន្នន័យនិស្សិត" : "View employee data" },
             { icon: "fa-eye", text: settings.lang === "KH" ? "មើលរូបភាពដែលបានរក្សាទុក" : "View saved photos" },
             { icon: "fa-eye", text: settings.lang === "KH" ? "មើលការវិភាគ" : "View analytics" },
             { icon: "fa-download", text: settings.lang === "KH" ? "នាំចេញទិន្នន័យ" : "Export data" },
@@ -978,9 +978,9 @@ function getRolePermissions(role) {
             { icon: "fa-layer-group", text: settings.lang === "KH" ? "ស្កេនជាក្រុម" : "Batch scanning" }
         ],
         superadmin: [
-            { icon: "fa-camera", text: settings.lang === "KH" ? "ថតរូបភាពនិស្សិត" : "Capture student photos" },
+            { icon: "fa-camera", text: settings.lang === "KH" ? "ថតរូបភាពនិស្សិត" : "Capture employee photos" },
             { icon: "fa-trash", text: settings.lang === "KH" ? "លុបរូបភាព" : "Delete photos" },
-            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលទិន្នន័យនិស្សិត" : "View student data" },
+            { icon: "fa-eye", text: settings.lang === "KH" ? "មើលទិន្នន័យនិស្សិត" : "View employee data" },
             { icon: "fa-eye", text: settings.lang === "KH" ? "មើលរូបភាពដែលបានរក្សាទុក" : "View saved photos" },
             { icon: "fa-eye", text: settings.lang === "KH" ? "មើលការវិភាគ" : "View analytics" },
             { icon: "fa-download", text: settings.lang === "KH" ? "នាំចេញទិន្នន័យ" : "Export data" },
@@ -1284,7 +1284,7 @@ async function onLoginSuccess() {
         loggedInAdmin = adminObject;
     }
 
-    // Check if this is the first time login
+    // Check if this is first time login
     const sessionData = loadAdminSession();
     isFirstLogin = !sessionData || !sessionData.hasLoggedInBefore;
     
@@ -1407,7 +1407,7 @@ function populateStudentList(filter = "") {
             (s[1] || "").toLowerCase().includes(f)
     );
     if (!filtered.length) {
-        studentList.innerHTML = `<li class="text-center text-slate-400 p-4">${settings.lang === "KH" ? "រកមិនឃើញនិស្សិត" : "No students found"}.</li>`;
+        studentList.innerHTML = `<li class="text-center text-slate-400 p-4">${settings.lang === "KH" ? "រកមិនឃើញនិស្សិត" : "No students found"}</li>`;
         return;
     }
     filtered.forEach((s) => {
@@ -1445,7 +1445,7 @@ function showCameraModeSelection() {
     }
     showModal(
         "choice",
-        settings.lang === "KH" ? "សូមជ្រើសរើសប្រតិបត្តិកាមេរ៉ា" : "Select camera mode",
+        settings.lang === "KH" ? "សូមជ្រើសរើសប្រតិប្តិកាមេរ៉ា" : "Select camera mode",
         {
             [settings.lang === "KH" ? "ថតរូបស្វ័យប្រវត្តិ" : "Auto Capture"]: {
                 callback: () => startCamera("environment", "auto"),
@@ -1518,7 +1518,7 @@ function filterRecordsTable() {
         return cOk && sOk;
     });
     if (!rows.length) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center p-4 text-slate-400">${settings.lang === "KH" ? "រកមិនឃើញកំណត់ត្រា" : "No records found"}.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center p-4 text-slate-400">${settings.lang === "KH" ? "រកមិនឃើញកំណត់ត្រា" : "No records found"}</td></tr>`;
         return;
     }
     rows.forEach((r) => {
@@ -1526,7 +1526,7 @@ function filterRecordsTable() {
             url = r[5];
         const tr = document.createElement("tr");
         tr.className = "border-b border-slate-700";
-        tr.innerHTML = `<td class="p-3">${serial}</td><td class="p-3 whitespace-nowrap">${r[1]}</td><td class="p-3">${r[2]}</td><td class="p-3">${r[3]}</td><td class="p-3">${r[4]}</td><td class="p-3"><a href="${url}" target="_blank" rel="noopener noreferrer" class="relative block w-16 h-16 group rounded-lg overflow-hidden"><img src="${url}" crossorigin="anonymous" class="w-full h-full object-cover" alt="${settings.lang === "KH" ? "រូបភាពនិស្សិត" : "Student photo"}"></a></td><td class="p-3 text-center">${renderRecordControls(serial, url)}</td>`;
+        tr.innerHTML = `<td class="p-3">${serial}</td><td class="p-3 whitespace-nowrap">${r[1]}</td><td class="p-3">${r[2]}</td><td class="p-3">${r[3]}</td><td class="p-3">${r[4]}</td><td class="p-3"><a href="${url}" target="_blank" rel="noopener noreferrer" class="relative block w-16 h-16 group rounded-lg overflow-hidden"><img src="${url}" crossorigin="anonymous" class="w-full h-full object-cover" alt="${settings.lang === "KH" ? "រូបភាពនិស្សិត" : "Employee photo"}></a></td><td class="p-3 text-center">${renderRecordControls(serial, url)}</td>`;
         tbody.appendChild(tr);
     });
 }
@@ -1609,7 +1609,7 @@ function populateListClassFilterV2() {
                 .filter(Boolean)
         ),
     ];
-    listClassFilter.innerHTML = `<option value="all">${settings.lang === "KH" ? "និស្សិតទាំងអស់" : "All Students"}</option><option value="with_photos">${settings.lang === "KH" ? "មានរូបភាព" : "With Photos"}</option>`;
+    listClassFilter.innerHTML = `<option value="all">${settings.lang === "KH" ? "និស្សិតទាំងអស់" : "All Employees"}</option><option value="with_photos">${settings.lang === "KH" ? "មានរូបភាព" : "With Photos"}</option>`;
     classes
         .sort()
         .forEach(
@@ -1641,13 +1641,13 @@ function filterStudentListTable() {
     );
     const done = arr.filter((s) => s[4] > 0).length;
     if (!arr.length) {
-        tbody.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-slate-400">${settings.lang === "KH" ? "រកមិនឃើញនិស្សិត" : "No students found"}.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center p-4 text-slate-400">${settings.lang === "KH" ? "រកមិនឃើញនិស្សិត" : "No employees found"}</td></tr>`;
     } else {
         arr.forEach((s) => {
             const ok = s[4] > 0;
             const url = ok ? imgMap.get(String(s[0])) : null;
             const cell = url
-                ? `<a href="${url}" target="_blank" rel="noopener noreferrer" class="relative block w-12 h-12 group rounded-lg overflow-hidden mx-auto"><img src="${url}" crossorigin="anonymous" class="w-full h-full object-cover" alt="${settings.lang === "KH" ? "រូបភាពនិស្សិត" : "Student photo"}"></a>`
+                ? `<a href="${url}" target="_blank" rel="noopener noreferrer" class="relative block w-12 h-12 group rounded-lg overflow-hidden mx-auto"><img src="${url}" crossorigin="anonymous" class="w-full h-full object-cover" alt="${settings.lang === "KH" ? "រូបភាពនិស្សិត" : "Employee photo"}"></a>`
                 : `<span class="text-slate-500">-</span>`;
             const icon = ok
                 ? `<i class="fas fa-check-circle text-green-400"></i>`
@@ -1855,7 +1855,7 @@ async function uploadPhoto() {
     
     if (isUploading) return;
     if (!selectedStudent) {
-        showModal("error", settings.lang === "KH" ? "មិនអាចរកឃើញទិន្នន័យនិស្សិត" : "Could not find student data.");
+        showModal("error", settings.lang === "KH" ? "មិនអាចរកឃើញទិន្នន័យនិស្សិត" : "Could not find employee data.");
         return;
     }
     const imageData = captureCanvas
@@ -1972,7 +1972,7 @@ function openProfilePage() {
     navLinksDeactivate();
     hideAllPages();
     if (navProfile) navProfile.classList.add('active');
-    if (pageProfile) pageProfile.classList.remove("hidden");
+    if (pageProfile) pageProfile.classList.remove('hidden');
     populateProfileImages();
 }
 
@@ -2002,7 +2002,7 @@ function populateProfileImages(filter = "") {
                 (r[2] || "").toString().toLowerCase().includes(q)
         );
     if (!list.length)
-        profileImagesGrid.innerHTML = `<div class="text-slate-400 col-span-4">${settings.lang === "KH" ? "រកមិនឃើញរូបភាព" : "No images found"}.</div>`;
+        profileImagesGrid.innerHTML = `<div class="text-slate-400 col-span-4">${settings.lang === "KH" ? "រកមិនឃើញរូបភាព" : "No images found"}</div>`;
     list.forEach((r) => {
         const url = r[5];
         const card = document.createElement("div");
@@ -2016,7 +2016,6 @@ if (profileImageFilter) {
     profileImageFilter.oninput = () =>
         populateProfileImages(profileImageFilter.value);
 }
-
 /* --------------------------- ADMIN PANEL --------------------------- */
 async function populateAdminManagementList() {
     if (!adminManagementList) return;
